@@ -1,0 +1,74 @@
+body {
+  background-color: #00ff11;
+}
+
+#game-area {
+  background-color: #00ff11;
+}
+
+#mode-wrapper {
+  color: #000000;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+a.snake-link, a.snake-link:link, a.snake-link:visited {
+color: #FCFC54;
+}
+
+a.snake-link:hover {
+color: #FfFf54;
+}
+
+.snake-pause-screen {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  background-color:black;
+  color:white;
+}
+
+.snake-panel-component {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  color: #000000;
+  background-color: #00ff11;
+}
+
+.snake-snakebody-block {
+  background-color: #FF0000;
+  border: 0px solid #000080;
+}
+
+.snake-snakebody-alive {
+background-image: url('src/css/images/matrix-snake-block.png');
+}
+.snake-snakebody-dead {
+background-image: url('src/css/images/deadblock.png');
+}
+
+.snake-food-block {
+  background-color: #FF0000;
+  border: 0px solid #000080;
+  background-image: url("src/css/images/matrix-food-block.png");
+}
+
+.snake-playing-field {
+  background-color: #000000;
+  border: 0px solid #000000;
+}
+
+.snake-game-container {
+  background-color: #00ff11;
+}
+
+.snake-welcome-dialog {
+  background-color: #000000;
+  color: #00ff11;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+.snake-try-again-dialog, .snake-win-dialog {
+  background-color: #000000;
+  color: #ff0000;
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}

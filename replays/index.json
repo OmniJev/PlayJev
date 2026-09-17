@@ -1,0 +1,58 @@
+{
+ "generated": "2026-09-18T07:33:18",
+ "sources": [
+  "runs/replays"
+ ],
+ "policies": [
+  "teacher"
+ ],
+ "games": {
+  "mario": [],
+  "snake": [
+   {
+    "policy": "teacher",
+    "seed": 5000,
+    "file": "snake/teacher_5000.json",
+    "steps": 268,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "teacher",
+    "seed": 5001,
+    "file": "snake/teacher_5001.json",
+    "steps": 769,
+    "final_score": 161,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "teacher",
+    "seed": 5002,
+    "file": "snake/teacher_5002.json",
+    "steps": 380,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "teacher",
+    "seed": 5003,
+    "file": "snake/teacher_5003.json",
+    "steps": 658,
+    "final_score": 146,
+    "truncated": false,
+    "frames_per_step": 1
+   }
+  ],
+  "tetris": [],
+  "2048": [],
+  "flappy": [],
+  "pacman": [],
+  "breakout": [],
+  "invaders": [],
+  "racer": [],
+  "sokoban": []
+ }
+}

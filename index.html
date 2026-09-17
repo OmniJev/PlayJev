@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayJev</title>
+<meta name="description" content="An open 0.8B model plays ten browser games from pixels: one forward pass per move, a probability over the moves, no text.">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>PlayJev</h1>
+    <nav>
+      <a data-link="repo" href="https://github.com/OmniJev/PlayJev">code</a>
+      <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev</a>
+      <a href="#how">how it works</a>
+      <button id="theme" type="button">dark mode</button>
+    </nav>
+  </header>
+  <p>PlayJev is an open 0.8B vision-language model (Qwen3.5-0.8B-Base, fine-tuned) that plays ten browser games from raw pixels.
+    Each move is a single forward pass: the current frame goes in, a probability over the game's moves comes out, and no text is generated.
+    The tiles below replay recorded episodes inside the real games and draw the recorded per-step probabilities beside the picture,
+    with the chosen move in blue and the Jev confidence as a number; the label on each tile says whose recording is playing.</p>
+  <p id="notice" class="notice"></p>
+
+  <div id="all" class="allrow">
+    <span>all tiles</span>
+    <button id="all-pp" type="button">pause all</button>
+    <span class="seg"><button type="button" data-speed="1" class="on">1x</button><button type="button" data-speed="2">2x</button><button type="button" data-speed="4">4x</button></span>
+    <span>1x is the game's own pace: one recorded step per move or per 5 to 6 frames.</span>
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <h2 id="results-h">Results</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>game</th><th class="num">random</th><th class="num">trained model</th><th class="num">teacher</th><th class="num">decisions / s</th></tr></thead>
+      <tbody id="results-body"></tbody>
+    </table>
+  </div>
+  <p id="results-note" class="small"></p>
+
+  <section id="calibration">
+    <h2>Calibration</h2>
+    <p class="small">Reliability of the chosen move: its predicted probability against how often it agreed with the teacher, per game. Dot size is the number of decisions in the bin.</p>
+    <div class="calib"></div>
+  </section>
+
+  <h2 id="how">How it works</h2>
+  <p>The model never sees a game's name. It sees the frame and the option list, rendered with the frozen OpenJev prompt below,
+    and its answer is the next token after "Answer:". The probability over moves is the softmax over the option letters at that
+    position, one forward pass with no sampling and no generated text. Confidence is (p<sub>max</sub> - 1/K) / (1 - 1/K), the Jev formula,
+    so 0 is a uniform guess and 1 is certainty.</p>
+  <p>Each tile is the vendored game running in an iframe with the same shim and hook used in training: a virtual clock,
+    seeded randomness and synthetic key events, so the recorded action sequence reproduces the episode step for step. The page
+    checks the replayed score against the recording at the end of every episode and marks a tile in coral if they differ.
+    With <code>?server=http://host:port</code> in the address the page sends each frame to a running PlayJev or OpenJev server
+    and plays its answers live.</p>
+  <div class="promptrow"><label for="prompt-game">option list for</label><select id="prompt-game"></select></div>
+  <pre id="prompt"></pre>
+  <p class="small">The highlighted placeholder is where the frame's visual tokens go (one token per merged 32x32 pixel block, 182 for a 448x416 frame).
+    Option descriptions are part of the frozen prompt and never change between training and demo.</p>
+
+  <footer>
+    <span><a data-link="repo" href="https://github.com/OmniJev/PlayJev">PlayJev on GitHub</a> · <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev server</a> · <a data-link="awesome" href="https://omnijev.github.io/awesome-jev/">Awesome-JEV</a> · paper: not yet</span>
+    <span id="generated"></span>
+  </footer>
+</div>
+<script src="data.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>
