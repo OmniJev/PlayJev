@@ -8,6 +8,7 @@ python -m playjev.play snake --policy server --url http://127.0.0.1:18731/v1/sys
 python -m playjev.play snake --policy local --ckpt /path/to/ckpt --episodes 16
 """
 import argparse, asyncio, base64, json, random, statistics, time, urllib.request
+from pathlib import Path
 from .env import VecGame, ROOT
 from .teachers import make_teacher
 
@@ -77,6 +78,10 @@ async def main(a):
             for i in range(a.pages): pol.reset(i)
         scores, lengths, confs = [], [], []; steps = [0] * a.pages; seed = a.seed0 + a.pages; t0 = time.time(); total = 0
         rng = random.Random(0)
+        page_seed = list(range(a.seed0, a.seed0 + a.pages)); traces = [[] for _ in range(a.pages)]  # for --record
+        rec_dir = None
+        if a.record:
+            rec_dir = Path(a.record) / a.game; rec_dir.mkdir(parents=True, exist_ok=True)
         while len(scores) < a.episodes:
             probs = pol.decide([o["frame"] for o in obs], acts_meta, [o.get("info") for o in obs])
             acts = [argmax(p) if not a.sample else rng.choices(range(len(p)), p)[0] for p in probs]
@@ -84,8 +89,16 @@ async def main(a):
             obs = await env.step(acts); total += a.pages
             for i, o in enumerate(obs):
                 steps[i] += 1
+                if rec_dir is not None:
+                    traces[i].append({"a": acts[i], "p": [round(x, 4) for x in probs[i]], "score": o["score"]})
                 if o["done"] or steps[i] >= a.max_steps:
-                    scores.append(o["score"]); lengths.append(steps[i]); steps[i] = 0; seed += 1
+                    scores.append(o["score"]); lengths.append(steps[i]); steps[i] = 0
+                    if rec_dir is not None:  # replay file in the docs/DEMO.md format
+                        rec = {"game": a.game, "policy": a.policy_name or a.policy, "seed": page_seed[i], "actions": [x["name"] for x in acts_meta],
+                               "frames_per_step": env.spec.get("step_frames"), "steps": traces[i], "final_score": o["score"], "truncated": bool(o.get("truncated")) or steps[i] >= a.max_steps}
+                        (rec_dir / f"{rec['policy']}_{page_seed[i]}.json").write_text(json.dumps(rec, separators=(",", ":")))
+                        traces[i] = []
+                    seed += 1; page_seed[i] = seed
                     obs[i] = await env.pages[i].reset(seed)
                     if hasattr(pol, "reset"): pol.reset(i)
         dt = time.time() - t0
@@ -101,5 +114,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(); p.add_argument("game"); p.add_argument("--policy", default="random", choices=["random", "teacher", "server", "local"])
     p.add_argument("--ckpt", help="local policy: checkpoint directory or HF id for PlayJevModel"); p.add_argument("--device", default="cuda:0"); p.add_argument("--two-frame", action="store_true")
     p.add_argument("--url", default="http://127.0.0.1:18731/v1/systemone"); p.add_argument("--pages", type=int, default=8); p.add_argument("--episodes", type=int, default=16)
+    p.add_argument("--record", default=None, help="directory: write one replay JSON per finished episode (docs/DEMO.md format)")
+    p.add_argument("--policy-name", dest="policy_name", default=None, help="label stored in replay files (default: --policy)")
     p.add_argument("--max-steps", type=int, default=2000); p.add_argument("--seed0", type=int, default=5000); p.add_argument("--sample", action="store_true", help="sample actions from the policy instead of argmax")
     asyncio.run(main(p.parse_args()))

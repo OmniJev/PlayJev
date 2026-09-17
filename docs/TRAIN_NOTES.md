@@ -37,4 +37,36 @@ Collection: 3 x 33,336 records in 154 s (about 220 records/s per collector with 
 Step 0 (zero-shot, permuted options): loss 2.004, agreement 0.2375 (chance 0.25), p_max 0.733, ECE 0.50, mean
 probability per letter position 0.73 / 0.13 / 0.04 / 0.10, argmax on A for 100 percent of samples.
 
-(training in progress; table filled in below as evals land)
+The first job (621561) died at the first backward: fla 0.5.2 refuses its gated chunk backward kernel on Hopper with
+triton 3.4 to 3.7.0 (wrong results, fla issue #640). Fix: triton 3.7.1 in the venv (now in `env_setup.sh`), and the
+trainer compares the fla forward and backward with the torch reference on random inputs before training (relative
+difference 0.3 to 0.8 percent in output and every gradient on this run, within bf16 tolerance; the run aborts if
+they disagree, and `PLAYJEV_NO_FLA=1` forces the torch reference). Resubmitted as job 621566 on the same shards.
+
+Training: 60 samples/s (batch 64, about 1.05 s per step), 16.5 GB peak, 25.1 min for the epoch. Train loss 1.78 at
+step 1, 0.89 at 100, 0.71 at 400, 0.63 to 0.65 from step 1000 on. Validation (2000 fixed samples):
+
+| step | val loss | agreement | ECE | Brier | mean conf | p per letter (A, B, C, D) |
+|---|---|---|---|---|---|---|
+| 0 | 2.004 | 0.238 | 0.496 | 0.425 | 0.645 | 0.73 / 0.13 / 0.04 / 0.10 |
+| 400 | 0.686 | 0.756 | 0.060 | 0.143 | 0.620 | 0.23 / 0.24 / 0.28 / 0.25 |
+| 800 | 0.661 | 0.760 | 0.099 | 0.144 | 0.563 | 0.24 / 0.25 / 0.26 / 0.26 |
+| 1200 | 0.640 | 0.694 | 0.105 | 0.124 | 0.596 | 0.24 / 0.24 / 0.26 / 0.26 |
+| 1407 (final) | 0.639 | 0.751 | 0.057 | 0.128 | 0.594 | 0.24 / 0.24 / 0.26 / 0.26 |
+
+The letter prior is gone from step 400 on. Agreement moves by several points between evals while the loss keeps
+falling: many snake targets are exact ties (0.45 / 0.45 on two equally short paths to the food), where argmax
+agreement is a coin flip. From run 2 on the eval also reports agreement against the teacher's whole top set.
+
+Closed loop, 16 episodes each on seeds 5000+ (argmax actions, 8 pages, cap 2000 steps):
+
+| policy | score mean | median | max | episode length | mean conf |
+|---|---|---|---|---|---|
+| random | 1.0 | 1 | 1 | 3.8 | 1.0 (one-hot) |
+| trained 0.8B, one epoch | 78.2 | 71 | 126 | 295 | 0.58 |
+| BFS teacher (on `info()`) | 113.7 | 108.5 | 161 | 457 | 0.62 |
+
+The pixel model reaches 69 percent of the teacher's score from frames alone after 25 minutes of training;
+zero-shot it was at chance. Play throughput with the model in the loop: 84 env-steps/s over 8 pages (the model
+forward per step at batch 8 is about 50 ms, see MODEL_NOTES 3.2). Checkpoint:
+`$WORK/ckpt/sft_snake1/final` (step-800 and step-1200 kept as well).
