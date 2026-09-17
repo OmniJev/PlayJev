@@ -75,8 +75,13 @@ class GamePage:
         self.page_errors: list[str] = []
         self.page.on("pageerror", lambda e: self.page_errors.append(str(e)[:200]))
         # Vendored pages must not depend on the network (compute nodes are air-gapped): abort everything off-origin.
+        # Audio files are aborted too: media elements delay the page's load event until they have decoded data, and
+        # on the compute nodes that never happens (flappy's five .ogg sounds hung every page.goto at 30 s), while
+        # audio is muted anyway. An aborted source just errors the media element and the game carries on.
         base = self.base_url
-        await self.page.route(lambda url: not url.startswith(base), lambda route: route.abort())
+        audio = (".mp3", ".ogg", ".wav", ".m4a", ".mid", ".midi", ".oga", ".flac")
+        await self.page.route(lambda url: not url.startswith(base) or url.split("?", 1)[0].lower().endswith(audio),
+                              lambda route: route.abort())
 
     async def reset(self, seed: int = 1) -> dict:
         await self.page.goto(self.url, wait_until="load")
@@ -120,7 +125,7 @@ class VecGame:
         self._pw = await async_playwright().start()
         self.browser = await self._pw.chromium.launch(
             headless=self.headless,
-            args=["--no-sandbox", "--disable-gpu", "--mute-audio", "--disable-background-timer-throttling",
+            args=["--no-sandbox", "--disable-gpu", "--mute-audio", "--disable-dev-shm-usage", "--disable-background-timer-throttling",
                   "--disable-renderer-backgrounding", "--autoplay-policy=no-user-gesture-required"])
         self.contexts = [await self.browser.new_context() for _ in range((self.n + self.ppc - 1) // self.ppc)]
         for i in range(self.n):

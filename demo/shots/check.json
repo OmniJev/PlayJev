@@ -1,0 +1,62 @@
+[
+ {
+  "game": "snake",
+  "policy": "teacher",
+  "seed": 5000,
+  "steps_played": 268,
+  "steps_recorded": 268,
+  "final": 91,
+  "expected": 91,
+  "done": true,
+  "truncated": false,
+  "match": true,
+  "diverged_at": null,
+  "errors": [],
+  "seconds": 10
+ },
+ {
+  "game": "snake",
+  "policy": "teacher",
+  "seed": 5001,
+  "steps_played": 769,
+  "steps_recorded": 769,
+  "final": 161,
+  "expected": 161,
+  "done": true,
+  "truncated": false,
+  "match": true,
+  "diverged_at": null,
+  "errors": [],
+  "seconds": 28.7
+ },
+ {
+  "game": "snake",
+  "policy": "teacher",
+  "seed": 5002,
+  "steps_played": 380,
+  "steps_recorded": 380,
+  "final": 91,
+  "expected": 91,
+  "done": true,
+  "truncated": false,
+  "match": true,
+  "diverged_at": null,
+  "errors": [],
+  "seconds": 14.2
+ },
+ {
+  "game": "snake",
+  "policy": "teacher",
+  "seed": 5003,
+  "steps_played": 658,
+  "steps_recorded": 658,
+  "final": 146,
+  "expected": 146,
+  "done": true,
+  "truncated": false,
+  "match": true,
+  "diverged_at": null,
+  "errors": [],
+  "seconds": 24.6
+ }
+]

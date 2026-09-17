@@ -17,7 +17,7 @@ stack downloads about 4 GB of wheels.
 | torchvision | 0.25.0+cu128 (the Qwen image and video processors refuse to load without it) |
 | transformers | 5.17.0 |
 | accelerate / peft | 1.15.0 / 0.21.0 |
-| flash-linear-attention | 0.5.2 (triton 3.6.0) |
+| flash-linear-attention | 0.5.2, with triton 3.7.1 (torch 2.10 pins 3.6.0, but fla refuses its gated chunk backward on Hopper under triton 3.4 to 3.7.0, wrong results per fla issue #640; the forward path, i.e. every number in this file, was measured under 3.6.0 and is unaffected) |
 | tokenizers / safetensors / numpy | 0.23.2 / 0.8.0 / 2.5.3 |
 | pillow / playwright / einops | latest / 1.63.0 (matches chromium build 1243 on scratch) / latest |
 | causal-conv1d | not installed: no prebuilt wheel for torch 2.10 and no nvcc on the login node; the conv runs on the torch fallback |
@@ -93,7 +93,8 @@ Two diagnostics come with every decision: `allowed_mass`, the share of the full-
 
 **Tokens.** The snake frames are 448x429 JPEGs; the processor snaps them to 448x416 (multiples of 32), which is
 182 visual tokens, 296 input tokens in total with the plain prompt (309 with the chat prompt). A 448x448 frame is
-196 visual tokens, 224x224 is 49.
+196 visual tokens. A 224x224 frame would be 49 by patch count, but the processor's 65,536-pixel minimum upsamples it
+to 256x256 = 64 tokens (the 448x429 snake frame at long side 224 becomes 288x256 = 72; see 3.2).
 
 **Two frames per state.** `frames_per_state=2, stack="temporal"` puts the previous frame in temporal slot 0 and the
 current frame in slot 1 of the vision tower's two-frame patch (the layout the video path uses: each patch vector is

@@ -15,7 +15,8 @@
 # RUN (name, default sft_<jobid>), MODEL (snapshot path, default Qwen3.5-0.8B-Base), MICRO (micro batch, 64),
 # EVAL_EVERY / SAVE_EVERY (steps, 400) and EVAL_SAMPLES (2000), EXTRA (extra playjev.train_sft flags, e.g.
 # "--freeze-vision" or "--two-frame"), SKIP_COLLECT=1 to reuse the shards of an earlier run with the same RUN name,
-# PLAY_EXTRA (extra playjev.play flags, e.g. "--two-frame"), PLAY_CAP (episode cap for the closed loop, 1500).
+# PLAY_EXTRA (extra playjev.play flags, e.g. "--two-frame"), PLAY_CAP (episode cap for the closed loop, 1500),
+# COLLECT_GAMES (subset of GAMES to collect, default all of GAMES; the others must already have shards of this RUN).
 WORK=$WORK
 REPO=$WORK/repo
 JOB=${PBS_JOBID%%.*}
@@ -42,7 +43,7 @@ python -c "from playjev.teachers import _REGISTRY; print('teachers:', sorted(_RE
 #    multiple of 10 so the seed % 10 == 0 validation split exists; the ranges are far apart so shards never share a seed.
 if [ -z "$SKIP_COLLECT" ]; then
     PER=$(( FRAMES / 3 ))
-    for g in $GAMES; do
+    for g in ${COLLECT_GAMES:-$GAMES}; do
         t0=$(date +%s)
         EPS_C="--epsilon 0.3"; [ "$g" = sokoban ] && EPS_C=""
         python -u -m playjev.collect $g --steps $PER --pages 8 --shard ${RUN}_a --seed0 100000 > $WORK/logs/collect_${RUN}_${g}_a.log 2>&1 &

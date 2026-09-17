@@ -1,0 +1,73 @@
+/*
+JavaScript Snake
+By Patrick Gillespie
+http://patorjk.com/games/snake
+*/
+body {
+  background-color: #fc5454;
+}
+
+#mode-wrapper {
+  color: #ffffff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+a.snake-link,
+a.snake-link:link,
+a.snake-link:visited {
+  color: #fcfc54;
+}
+
+a.snake-link:hover {
+  color: #ffff54;
+}
+
+.snake-pause-screen {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  background-color: black;
+  color: white;
+}
+
+.snake-panel-component {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.snake-snakebody-block {
+  background-color: #ff0000;
+  border: 0px solid #000080;
+}
+
+.snake-snakebody-alive {
+  background-image: url("./images/snakeblock.png"),
+    url("./images/snakeblock.png");
+}
+.snake-snakebody-dead {
+  background-image: url("./images/deadblock.png"), url("./images/deadblock.png");
+}
+
+.snake-food-block {
+  background-color: #ff0000;
+  border: 0px solid #000080;
+}
+
+.snake-playing-field {
+  background-color: #0000a8;
+  border: 0px solid #0000a8;
+}
+
+.snake-welcome-dialog {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+.snake-try-again-dialog,
+.snake-win-dialog {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}

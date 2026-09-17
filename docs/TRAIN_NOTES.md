@@ -70,3 +70,21 @@ The pixel model reaches 69 percent of the teacher's score from frames alone afte
 zero-shot it was at chance. Play throughput with the model in the loop: 84 env-steps/s over 8 pages (the model
 forward per step at batch 8 is about 50 ms, see MODEL_NOTES 3.2). Checkpoint:
 `$WORK/ckpt/sft_snake1/final` (step-800 and step-1200 kept as well).
+
+## Run 2: all ten games, 0.8B-Base, one epoch (`sft_all1`, jobs 621575 then 621580)
+
+Collection: 100k frames per game, shards a and b at the game's pj.json `collect.epsilon` (0.02 for 2048, tetris,
+flappy; 0.03 sokoban; 0.1 otherwise, snake has no block so 0.1), shard c at 0.3 except sokoban. Collection rates per
+game (3 collectors in parallel on the node's 12 cores, seconds for 3 x 33,336 records): snake 157, 2048 208,
+tetris 122, breakout 130, invaders 215, flappy 246.
+
+A driver finding on the way, fixed in `playjev/env.py` (the driver owner was unreachable at the time; change is the
+one route rule): on the compute nodes every `page.goto(..., wait_until="load")` of flappy hit the 30 s timeout
+(job 621575, 0 records; the other games loaded fine there, and flappy loads in 0.6 s on the login node). Cause:
+the page creates five `Audio` objects for its `.ogg` sounds at load; media elements delay the document's `load`
+event until they have decoded data, and on the nodes that never completed. The driver now aborts requests for
+audio files (`.mp3 .ogg .wav .m4a .mid .midi .oga .flac`) alongside off-origin requests; audio is muted anyway, an
+aborted source just errors the media element. Verified locally: bench clean and `check_det.py` PASS for flappy,
+mario and racer (the games that load sounds); on the node flappy then collected at the same rate as the others.
+
+(training in progress)

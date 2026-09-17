@@ -1,0 +1,3 @@
+upstream: https://github.com/daleharvey/pacman.git
+commit: 3acc5e2bb10e93c8f08eceb1562e1a16d672a1c6
+vendored: 2026-09-17

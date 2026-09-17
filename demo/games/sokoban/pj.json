@@ -1,0 +1,17 @@
+{
+ "id": "sokoban",
+ "title": "Sokoban",
+ "entry": "index.html",
+ "upstream": "taniarascia/sokoban",
+ "license": "MIT",
+ "viewport": {
+  "width": 1100,
+  "height": 960
+ },
+ "frame": "canvas",
+ "step_frames": 1,
+ "max_steps": 500,
+ "collect": {
+  "epsilon": 0.03
+ }
+}

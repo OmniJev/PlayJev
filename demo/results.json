@@ -1,0 +1,187 @@
+{
+ "generated": "2026-09-18T07:33:18",
+ "baselines": "docs/BASELINES.md",
+ "results_dir": "runs/results",
+ "rows": [
+  {
+   "game": "mario",
+   "title": "Infinite Mario",
+   "upstream": "robertkleffner/mariohtml5",
+   "k": 7,
+   "env_steps_per_s": 251.0,
+   "random": {
+    "score": 525.8,
+    "len": 50
+   },
+   "teacher": {
+    "score": 3790.0,
+    "len": 124,
+    "what": "rule-based right runner with physics rollouts"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "snake",
+   "title": "Snake",
+   "upstream": "patorjk/JavaScript-Snake",
+   "k": 4,
+   "env_steps_per_s": 243.0,
+   "random": {
+    "score": 1.0,
+    "len": 2
+   },
+   "teacher": {
+    "score": 108.0,
+    "len": 444,
+    "what": "BFS to food, largest region fallback"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "tetris",
+   "title": "Tetris",
+   "upstream": "jakesgordon/javascript-tetris",
+   "k": 5,
+   "env_steps_per_s": 837.0,
+   "random": {
+    "score": 163.8,
+    "len": 69
+   },
+   "teacher": {
+    "score": 15204.0,
+    "len": 1500,
+    "what": "Dellacherie placement search"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "2048",
+   "title": "2048",
+   "upstream": "gabrielecirulli/2048",
+   "k": 4,
+   "env_steps_per_s": 1046.0,
+   "random": {
+    "score": 888.5,
+    "len": 123
+   },
+   "teacher": {
+    "score": 20338.0,
+    "len": 998,
+    "what": "expectimax depth 2 (+1 ply when crowded)"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "flappy",
+   "title": "Floppy Bird",
+   "upstream": "nebez/floppybird",
+   "k": 2,
+   "env_steps_per_s": 630.0,
+   "random": {
+    "score": 0.0,
+    "len": 90
+   },
+   "teacher": {
+    "score": 84.0,
+    "len": 1500,
+    "what": "exact physics, depth-first flap search"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "pacman",
+   "title": "Pacman",
+   "upstream": "daleharvey/pacman",
+   "k": 4,
+   "env_steps_per_s": 621.0,
+   "random": {
+    "score": 103.8,
+    "len": 47
+   },
+   "teacher": {
+    "score": 7501.0,
+    "len": 1500,
+    "what": "ghost occupancy propagation + safe BFS"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "breakout",
+   "title": "Breakout",
+   "upstream": "jakesgordon/javascript-breakout",
+   "k": 3,
+   "env_steps_per_s": 790.0,
+   "random": {
+    "score": 479.4,
+    "len": 99
+   },
+   "teacher": {
+    "score": 16069.0,
+    "len": 1500,
+    "what": "ball-flight simulation + bounce scoring"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "invaders",
+   "title": "Space Invaders",
+   "upstream": "StrykerKKD/SpaceInvaders",
+   "k": 3,
+   "env_steps_per_s": 517.0,
+   "random": {
+    "score": 207.5,
+    "len": 195
+   },
+   "teacher": {
+    "score": 400.0,
+    "len": 200,
+    "what": "28-step dodge-and-aim DP"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "racer",
+   "title": "Javascript Racer",
+   "upstream": "jakesgordon/javascript-racer",
+   "k": 6,
+   "env_steps_per_s": 386.0,
+   "random": {
+    "score": 232.5,
+    "len": 1500
+   },
+   "teacher": {
+    "score": 6712.0,
+    "len": 1402,
+    "what": "lateral target with curve and traffic lookahead"
+   },
+   "model": null,
+   "calibration": null
+  },
+  {
+   "game": "sokoban",
+   "title": "Sokoban",
+   "upstream": "taniarascia/sokoban",
+   "k": 4,
+   "env_steps_per_s": 1047.0,
+   "random": {
+    "score": 13.1,
+    "len": 438
+   },
+   "teacher": {
+    "score": 102.0,
+    "len": 43,
+    "what": "A* over pushes with deadlock pruning"
+   },
+   "model": null,
+   "calibration": null
+  }
+ ]
+}

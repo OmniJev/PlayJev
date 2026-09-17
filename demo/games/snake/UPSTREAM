@@ -1,0 +1,3 @@
+upstream: https://github.com/patorjk/JavaScript-Snake.git
+commit: 7c80eddde2de6af669e6ae5133ba8ae60a8d7fb9
+vendored: 2026-09-17
