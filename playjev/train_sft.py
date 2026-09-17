@@ -65,6 +65,8 @@ def slot_logits(model, batch: dict, slot_ids: torch.Tensor, device) -> torch.Ten
 
 
 def soft_ce(logits: torch.Tensor, targets: torch.Tensor, brier: float = 0.0) -> tuple[torch.Tensor, torch.Tensor]:
+    if targets.shape[1] < logits.shape[1]:  # a batch of small-K games against the global slot count
+        targets = F.pad(targets, (0, logits.shape[1] - targets.shape[1]))
     logp = F.log_softmax(logits, -1)
     ce = -(targets * logp.masked_fill(targets == 0, 0.0)).sum(-1)  # 0 * -inf is nan; zero-target slots contribute 0
     loss = ce.mean()
@@ -94,7 +96,7 @@ def evaluate(model, loader, slot_ids, device, brier: float, max_batches: int | N
     """Validation loss, teacher agreement, calibration (ECE 15 bins and Brier of p_max against agreement),
     mean Jev confidence and the mean probability per letter position, all per game and overall."""
     model.eval()
-    per: dict[str, dict] = defaultdict(lambda: {"ce": [], "correct": [], "pmax": [], "conf": [], "pos_prob": None, "pos_argmax": None, "n": 0})
+    per: dict[str, dict] = defaultdict(lambda: {"ce": [], "correct": [], "top": [], "pmax": [], "conf": [], "pos_prob": None, "pos_argmax": None, "n": 0})
     for bi, batch in enumerate(loader):
         if max_batches is not None and bi >= max_batches:
             break
@@ -105,11 +107,13 @@ def evaluate(model, loader, slot_ids, device, brier: float, max_batches: int | N
         pred = probs.argmax(-1)
         pmax = probs.max(-1).values
         teacher_pos = batch["teacher_pos"].to(device)
+        tmax = targets.max(-1).values
         for row, game in enumerate(batch["games"]):
             k = int(batch["n_opts"][row])
             s = per[game]
             p = probs[row, :k].tolist()
             s["ce"].append(float(ce[row])); s["correct"].append(bool(pred[row] == teacher_pos[row]))
+            s["top"].append(bool(targets[row, pred[row]] >= tmax[row] - 1e-6))  # argmax inside the teacher's top set (ties)
             s["pmax"].append(float(pmax[row])); s["conf"].append(choice_confidence(p))
             if s["pos_prob"] is None:
                 s["pos_prob"], s["pos_argmax"] = [0.0] * k, [0] * k
@@ -121,14 +125,15 @@ def evaluate(model, loader, slot_ids, device, brier: float, max_batches: int | N
     out = {}
     for game, s in per.items():
         n = s["n"]
-        out[game] = {"n": n, "loss": statistics.fmean(s["ce"]), "agreement": statistics.fmean(s["correct"]),
+        out[game] = {"n": n, "loss": statistics.fmean(s["ce"]), "agreement": statistics.fmean(s["correct"]), "agreement_top": statistics.fmean(s["top"]),
                      "ece": ece(s["pmax"], s["correct"]), "brier": statistics.fmean((c - float(ok)) ** 2 for c, ok in zip(s["pmax"], s["correct"])),
                      "confidence": statistics.fmean(s["conf"]), "pmax": statistics.fmean(s["pmax"]),
                      "prob_per_letter": [x / n for x in s["pos_prob"]], "argmax_per_letter": [x / n for x in s["pos_argmax"]]}
     tot = sum(v["n"] for v in out.values())
     if len(out) > 1:
         out["all"] = {"n": tot, "loss": sum(v["loss"] * v["n"] for v in out.values()) / tot,
-                      "agreement": sum(v["agreement"] * v["n"] for v in out.values()) / tot}
+                      "agreement": sum(v["agreement"] * v["n"] for v in out.values()) / tot,
+                      "agreement_top": sum(v["agreement_top"] * v["n"] for v in out.values()) / tot}
     return out
 
 
