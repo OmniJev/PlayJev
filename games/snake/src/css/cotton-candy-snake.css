@@ -1,0 +1,97 @@
+/*
+JavaScript Snake
+By Patrick Gillespie
+http://patorjk.com/games/snake
+*/
+body {
+  background-color: rgb(156, 192, 212);
+}
+
+.snake-toolbar {
+  background-color: rgb(167, 237, 255);
+  border-radius: 10px;
+}
+
+#game-area {
+  background-color: rgb(255, 197, 197);
+}
+
+#mode-wrapper {
+  color: #ff9c9c;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+a.snake-link,
+a.snake-link:link,
+a.snake-link:visited {
+  color: rgb(255, 187, 187);
+}
+
+a.snake-link:hover {
+  color: #94bfff;
+}
+
+.snake-pause-screen {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  background-color: rgb(255, 192, 192);
+  color: rgb(175, 219, 255);
+}
+
+.snake-panel-component {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  color: rgb(255, 75, 75);
+  background-color: rgb(153, 226, 255);
+}
+
+.snake-snakebody-block {
+  background-color: #ff9595;
+  border: 0px solid #000080;
+}
+
+.snake-snakebody-alive {
+  background-image: url("src/css/images/snakeblock.png");
+}
+.snake-snakebody-dead {
+  background-image: url("src/css/images/deadblock.png");
+}
+
+.snake-food-block {
+  background-color: rgb(108, 172, 255);
+  border: 0px solid #000080;
+}
+
+.snake-playing-field {
+  background-color: rgb(207, 252, 255);
+  border: 0px solid #0d0d66;
+}
+
+.snake-game-container {
+  background-color: #f89c9c;
+}
+
+.snake-welcome-dialog {
+  background-color: #ffcaca;
+  color: #b2fff9;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+#snake-snakehead-alive {
+  background-image: url("src/css/images/green-head-snakeblock.png");
+  margin: 0px;
+  padding: 0px;
+  background-color: rgb(255, 215, 215);
+  position: absolute;
+  border: 0px solid #000080;
+  background-repeat: no-repeat;
+  border-radius: 4px;
+}
+
+.snake-try-again-dialog,
+.snake-win-dialog {
+  background-color: #ffc1c1;
+  color: #acfcff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}

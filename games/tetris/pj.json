@@ -1,0 +1,2 @@
+{"id": "tetris", "title": "Tetris", "entry": "index.html", "upstream": "jakesgordon/javascript-tetris", "license": "MIT",
+ "viewport": {"width": 680, "height": 680}, "frame": "canvas", "step_frames": 1, "collect": {"epsilon": 0.02}}

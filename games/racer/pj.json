@@ -1,0 +1,3 @@
+{"id": "racer", "title": "Javascript Racer", "entry": "v4.final.html", "upstream": "jakesgordon/javascript-racer", "license": "MIT",
+ "viewport": {"width": 1100, "height": 900}, "frame": "canvas", "step_frames": 5,
+ "collect": {"epsilon": 0.1}}

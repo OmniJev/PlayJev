@@ -1,0 +1,12 @@
+diff --git a/index.html b/index.html
+index 6612ba6..7498d7b 100644
+--- a/index.html
++++ b/index.html
+@@ -20,7 +20,6 @@
+       <link href="css/reset.css" rel="stylesheet">
+       <link href="css/main.css" rel="stylesheet">
+ 
+-      <script defer src="https://yummy.nebez.dev/script.js" data-website-id="9ceaba15-371f-4407-a59a-f57a7214af41"></script>
+    </head>
+    <body>
+       <div id="gamecontainer">

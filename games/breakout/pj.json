@@ -1,0 +1,3 @@
+{"id": "breakout", "title": "Breakout", "entry": "index.html", "upstream": "jakesgordon/javascript-breakout", "license": "MIT",
+ "viewport": {"width": 700, "height": 540}, "frame": "canvas", "step_frames": 5,
+ "collect": {"epsilon": 0.1}}

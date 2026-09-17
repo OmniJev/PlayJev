@@ -1,0 +1,14 @@
+{
+ "id": "snake",
+ "title": "Snake",
+ "entry": "src/index.html",
+ "upstream": "patorjk/JavaScript-Snake",
+ "license": "MIT",
+ "viewport": {
+  "width": 520,
+  "height": 520
+ },
+ "frame": "screenshot",
+ "step_frames": 1,
+ "max_steps": 3000
+}

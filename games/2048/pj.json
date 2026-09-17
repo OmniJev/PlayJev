@@ -1,0 +1,17 @@
+{
+ "id": "2048",
+ "title": "2048",
+ "entry": "index.html",
+ "upstream": "gabrielecirulli/2048",
+ "license": "MIT",
+ "viewport": {
+  "width": 700,
+  "height": 900
+ },
+ "frame": "canvas",
+ "step_frames": 1,
+ "max_steps": 2500,
+ "collect": {
+  "epsilon": 0.02
+ }
+}

@@ -1,0 +1,2 @@
+{"id": "invaders", "title": "Space Invaders", "entry": "index.html", "upstream": "StrykerKKD/SpaceInvaders", "license": "MIT",
+ "viewport": {"width": 800, "height": 600}, "frame": "canvas", "step_frames": 5, "collect": {"epsilon": 0.1}}

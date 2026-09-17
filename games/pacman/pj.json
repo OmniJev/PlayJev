@@ -1,0 +1,3 @@
+{"id": "pacman", "title": "Pacman", "entry": "index.html", "upstream": "daleharvey/pacman", "license": "WTFPL",
+ "viewport": {"width": 400, "height": 600}, "frame": "canvas", "step_frames": 6,
+ "collect": {"epsilon": 0.1}}

@@ -1,0 +1,1 @@
+{"id": "mario", "title": "Infinite Mario", "entry": "main.html", "upstream": "robertkleffner/mariohtml5", "license": "Unlicense", "viewport": {"width": 660, "height": 520}, "frame": "canvas", "step_frames": 6, "collect": {"epsilon": 0.1}}

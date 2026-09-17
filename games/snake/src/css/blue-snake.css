@@ -1,0 +1,75 @@
+body {
+  background-color: rgb(0, 70, 32);
+}
+
+#mode-wrapper {
+  color: #ffffff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+a.snake-link,
+a.snake-link:link,
+a.snake-link:visited {
+    color: #ffffff;
+}
+
+.snake-pause-screen {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  background-color: rgb(0, 70, 32);
+  color: white;
+}
+
+.snake-panel-component {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+#snake-snakehead-alive {
+    background-image: url("src/css/images/green-head-snakeblock.png");
+    margin: 0px;
+    padding: 0px;
+    background-color: rgb(6, 104, 134);
+    position: absolute;
+    border: 0px solid #000000;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+}
+
+.snake-snakebody-block {
+  background-color: #247fb4;
+}
+
+.snake-snakebody-alive {
+    background-image: url("src/css/images/snakeblock.png");
+}
+
+.snake-snakebody-dead {
+    background-image: url("src/css/images/deadblock.png");
+}
+
+.snake-food-block {
+  background-color: rgb(207, 33, 33);
+  border: 0px solid #000000;
+  border-radius: 6px;
+}
+
+.snake-playing-field {
+  background-color: rgb(20, 156, 54);
+  border: 0px solid #000000;
+}
+
+.snake-welcome-dialog {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+.snake-try-again-dialog,
+.snake-win-dialog {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}

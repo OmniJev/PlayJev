@@ -1,0 +1,65 @@
+#!/bin/bash
+#PBS -P PROJECT
+#PBS -N pj_smoke
+#PBS -l select=1:ngpus=1:ncpus=12:mem=225GB:gpu_model=H200
+#PBS -l walltime=01:00:00
+#PBS -q autox
+#PBS -j oe
+#PBS -o $WORK/logs/
+# PlayJev smoke test on one H200: driver and versions, zero-shot snake probabilities for the Qwen3.5 checkpoints,
+# a latency / memory grid, and the Playwright bench to prove Chromium runs on a compute node.
+#   cd $WORK && qsub repo/hpc/smoke.pbs
+WORK=$WORK
+REPO=$WORK/repo
+JOB=${PBS_JOBID%%.*}
+exec > $WORK/logs/smoke_${JOB}_live.log 2>&1   # PBS -o only lands when the job ends
+set -x
+date; hostname
+cd $REPO
+source $WORK/.venv/bin/activate
+export HF_HOME=$PROJ/hf_home
+export HF_HUB_CACHE=$HF_HOME/hub HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
+export PLAYWRIGHT_BROWSERS_PATH=$SCRATCH/ms-playwright
+export PYTHONUNBUFFERED=1
+HUB=$HF_HOME/hub
+M08B=$HUB/models--Qwen--Qwen3.5-0.8B-Base/snapshots/dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68
+M2B=$(ls -d $HUB/models--Qwen--Qwen3.5-2B-Base/snapshots/*/ 2>/dev/null | head -1)
+M08I=$(ls -d $HUB/models--Qwen--Qwen3.5-0.8B/snapshots/*/ 2>/dev/null | head -1)
+OUT=$REPO/runs/smoke/$JOB
+mkdir -p $OUT
+
+# (1) hardware and versions
+nvidia-smi
+nvidia-smi --query-gpu=name,driver_version,memory.total,compute_cap --format=csv
+python -c "
+import torch, transformers, torchvision, importlib.util as u
+print('torch', torch.__version__, 'cuda', torch.version.cuda, 'torchvision', torchvision.__version__, 'transformers', transformers.__version__)
+print(torch.cuda.get_device_name(0), 'capability', torch.cuda.get_device_capability(0))
+print('fla', u.find_spec('fla') is not None, 'causal_conv1d', u.find_spec('causal_conv1d') is not None)
+import fla, triton; print('fla', fla.__version__, 'triton', triton.__version__)"
+
+# (2)+(3) 0.8B-Base: zero-shot on the snake frames (plain and chat prompts, one and two frames), latency grid
+Z="python -u -m playjev.zeroshot --game snake --frames runs/bench/snake --batch 32"
+$Z --model $M08B --template plain --latency 1,8,32 --latency-sizes 448,224 --out $OUT/q08b_plain.json
+$Z --model $M08B --template chat --out $OUT/q08b_chat.json
+$Z --model $M08B --template plain --frames-per-state 2 --stack temporal --latency 1,8,32 --latency-sizes 448 --out $OUT/q08b_plain_2f_temporal.json
+$Z --model $M08B --template plain --frames-per-state 2 --stack separate --latency 8 --latency-sizes 448 --out $OUT/q08b_plain_2f_separate.json
+
+# (4) 2B-Base, and the 0.8B instruct checkpoint through its chat template with thinking off
+if [ -n "$M2B" ] && [ -f $M2B/config.json ]; then
+    $Z --model $M2B --template plain --latency 1,8,32 --latency-sizes 448,224 --out $OUT/q2b_plain.json
+    $Z --model $M2B --template chat --out $OUT/q2b_chat.json
+fi
+if [ -n "$M08I" ] && [ -f $M08I/config.json ]; then
+    $Z --model $M08I --template chat --latency 1,8,32 --latency-sizes 448 --out $OUT/q08i_chat.json
+fi
+
+# (5) Chromium on the compute node: the random-policy bench (env-steps/s)
+ldd $PLAYWRIGHT_BROWSERS_PATH/chromium_headless_shell-*/chrome-linux/headless_shell | grep "not found" || echo "headless_shell: all shared libraries resolve"
+if ! timeout 900 python -u -m playjev.bench snake --pages 8 --steps 100; then
+    echo "BENCH FAILED in the playjev venv; retrying with probe_games_venv"
+    timeout 900 $SCRATCH/probe_games_venv/bin/python -u -m playjev.bench snake --pages 8 --steps 100 || echo "BENCH FAILED in probe_games_venv too"
+fi
+
+date
+echo SMOKE_DONE

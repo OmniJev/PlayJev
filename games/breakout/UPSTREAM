@@ -1,0 +1,3 @@
+upstream: https://github.com/jakesgordon/javascript-breakout.git
+commit: eed59e2affa9423b93d2ac8ff93061bb88b33284
+vendored: 2026-09-17

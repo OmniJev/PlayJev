@@ -1,0 +1,270 @@
+diff --git a/Sokoban.js b/Sokoban.js
+index e8009f7..7ea01b9 100644
+--- a/Sokoban.js
++++ b/Sokoban.js
+@@ -5,60 +5,82 @@ import {
+   VOID,
+   PLAYER,
+   directions,
+-  size,
+   multiplier,
+   colors,
+-  levelOneMap,
+ } from './constants.js'
+ import {
+   isBlock,
+-  isWall,
+   isTraversible,
+   isVoid,
+   getX,
+   getY,
+-  countBlocks,
+   generateGameBoard,
++  levelCount,
+ } from './utils.js'
+ 
++// PlayJev: the canvas is sized to the level, `multiplier` (75 px) per cell, but never wider or
++// taller than this. Levels above 12 x 12 get smaller cells.
++const maxCanvasSide = 900
++
+ class Sokoban {
+   constructor({ level }) {
+     this.canvas = document.querySelector('canvas')
+-    this.canvas.width = size.width
+-    this.canvas.height = size.height
+-
+     this.context = this.canvas.getContext('2d')
+-    this.context.fillStyle = colors.empty
+-    this.context.fillRect(0, 0, size.width, size.height)
++    this.levelCount = levelCount
++
++    this.loadLevel(level)
++  }
++
++  // PlayJev: replaces the fixed levelOneMap. Sets the board, the level map (what is under the
++  // player or a box: goal or floor), the cell size and the canvas size for a 1-based level number.
++  loadLevel(level) {
++    const { board, levelMap } = generateGameBoard({ level })
++    this.level = level
++    this.board = board
++    this.levelMap = levelMap
++    this.goalCount = levelMap.reduce((n, row) => n + row.filter((cell) => isVoid(cell)).length, 0)
++
++    const columns = board[0].length
++    const rows = board.length
++    this.cell = Math.min(multiplier, Math.floor(maxCanvasSide / Math.max(columns, rows)))
++    this.canvas.width = columns * this.cell
++    this.canvas.height = rows * this.cell
+ 
+-    this.board = generateGameBoard({ level })
++    this.context.fillStyle = colors.empty
++    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+   }
+ 
++  // Unchanged drawing at the original 75 px cell; every length below is the original constant
++  // times cell / 75 so smaller cells keep the same proportions.
+   paintCell(context, cell, x, y) {
++    const m = this.cell
++    const inset = (m * 5) / 75
++    const lineWidth = (m * 10) / 75
++
+     if (cell === 'void' || cell === 'player') {
+-      const circleSize = cell === 'player' ? 20 : 10
++      const circleSize = cell === 'player' ? (m * 20) / 75 : (m * 10) / 75
+ 
+       this.context.beginPath()
+-      this.context.rect(x * multiplier, y * multiplier, multiplier, multiplier)
++      this.context.rect(x * m, y * m, m, m)
+       this.context.fillStyle = colors.empty.fill
+       this.context.fill()
+ 
+       this.context.beginPath()
+-      this.context.arc(x * multiplier + 75 / 2, y * multiplier + 75 / 2, circleSize, 0, 2 * Math.PI)
+-      this.context.lineWidth = 10
++      this.context.arc(x * m + m / 2, y * m + m / 2, circleSize, 0, 2 * Math.PI)
++      this.context.lineWidth = lineWidth
+       this.context.strokeStyle = colors[cell].stroke
+       this.context.fillStyle = colors[cell].fill
+       this.context.fill()
+       this.context.stroke()
+     } else {
+       this.context.beginPath()
+-      this.context.rect(x * multiplier + 5, y * multiplier + 5, multiplier - 10, multiplier - 10)
++      this.context.rect(x * m + inset, y * m + inset, m - 2 * inset, m - 2 * inset)
+       this.context.fillStyle = colors[cell].fill
+       this.context.fill()
+ 
+       this.context.beginPath()
+-      this.context.rect(x * multiplier + 5, y * multiplier + 5, multiplier - 10, multiplier - 10)
+-      this.context.lineWidth = 10
++      this.context.rect(x * m + inset, y * m + inset, m - 2 * inset, m - 2 * inset)
++      this.context.lineWidth = lineWidth
+       this.context.strokeStyle = colors[cell].stroke
+       this.context.stroke()
+     }
+@@ -66,7 +88,11 @@ class Sokoban {
+ 
+   render(options = {}) {
+     if (options.restart) {
+-      this.board = generateGameBoard({ level: 1 })
++      this.loadLevel(options.level || this.level)
++      const label = document.querySelector('header p')
++      if (label) {
++        label.textContent = `Level ${this.level}`
++      }
+     }
+     this.board.forEach((row, y) => {
+       row.forEach((cell, x) => {
+@@ -74,19 +100,17 @@ class Sokoban {
+       })
+     })
+ 
+-    const rowsWithVoid = this.board.filter((row) => row.some((entry) => entry === VOID))
+-    // The player herself might be standing on an initially void cell:
+-    if (isVoid(levelOneMap[this.findPlayerCoords().y][this.findPlayerCoords().x])) {
+-      rowsWithVoid.push(levelOneMap[this.findPlayerCoords().y]);
+-    }
+-
+-    const rowsWithSuccess = this.board.filter((row) => row.some((entry) => entry === SUCCESS_BLOCK))
+-    const isWin = rowsWithVoid.length === 0 && rowsWithSuccess.length === 6
++    // Won when every goal holds a box (a goal under the player is still uncovered).
++    const boxesOnGoals = this.board.reduce(
++      (n, row) => n + row.filter((cell) => cell === SUCCESS_BLOCK).length,
++      0,
++    )
++    const isWin = boxesOnGoals === this.goalCount
+ 
+     if (isWin) {
+       // A winner is you
+       this.context.fillStyle = '#111'
+-      this.context.fillRect(0, 0, size.width, size.height)
++      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+       this.context.font = 'bold 60px sans-serif'
+       this.context.fillStyle = colors.success_block.fill
+       this.context.fillText('A Winner is You!', 65, 300)
+@@ -110,49 +134,26 @@ class Sokoban {
+   movePlayer(playerCoords, direction) {
+     // Replace previous spot with initial board state (void or empty)
+     this.board[playerCoords.y][playerCoords.x] =
+-      isVoid(levelOneMap[playerCoords.y][playerCoords.x]) ? VOID : EMPTY
++      isVoid(this.levelMap[playerCoords.y][playerCoords.x]) ? VOID : EMPTY
+ 
+     // Move player
+     this.board[getY(playerCoords.y, direction, 1)][getX(playerCoords.x, direction, 1)] = PLAYER
+   }
+ 
++  // Standard Sokoban push: exactly one box moves, and only onto free floor or a free goal.
++  // A wall or a second box behind it blocks the move (no chain pushes).
+   movePlayerAndBoxes(playerCoords, direction) {
+-    const newPlayerY = getY(playerCoords.y, direction, 1)
+-    const newPlayerX = getX(playerCoords.x, direction, 1)
+     const newBoxY = getY(playerCoords.y, direction, 2)
+     const newBoxX = getX(playerCoords.x, direction, 2)
+ 
+-    // Don't move if the movement pushes a box into a wall
+-    if (isWall(this.board[newBoxY][newBoxX])) {
++    if (!isTraversible(this.board[newBoxY][newBoxX])) {
+       return
+     }
+ 
+-    // Count how many blocks are in a row
+-    let blocksInARow = 0
+-    if (isBlock(this.board[newBoxY][newBoxX])) {
+-      blocksInARow = countBlocks(1, newBoxY, newBoxX, direction, this.board)
+-      // See what the next block is
+-      const nextBlock =
+-        this.board[getY(newPlayerY, direction, blocksInARow)][
+-          getX(newPlayerX, direction, blocksInARow)
+-        ]
+-      // Push all the blocks if you can
+-      if (isTraversible(nextBlock)) {
+-        for (let i = 0; i < blocksInARow; i++) {
+-          // Add blocks
+-          this.board[getY(newBoxY, direction, i)][getX(newBoxX, direction, i)] =
+-            isVoid(levelOneMap[getY(newBoxY, direction, i)][getX(newBoxX, direction, i)])
+-              ? SUCCESS_BLOCK
+-              : BLOCK
+-        }
+-        this.movePlayer(playerCoords, direction)
+-      }
+-    } else {
+-      // Move box
+-      // If on top of void, make into a success box
+-      this.board[newBoxY][newBoxX] = isVoid(levelOneMap[newBoxY][newBoxX]) ? SUCCESS_BLOCK : BLOCK
+-      this.movePlayer(playerCoords, direction)
+-    }
++    // Move box
++    // If on top of void, make into a success box
++    this.board[newBoxY][newBoxX] = isVoid(this.levelMap[newBoxY][newBoxX]) ? SUCCESS_BLOCK : BLOCK
++    this.movePlayer(playerCoords, direction)
+   }
+ 
+   move(playerCoords, direction) {
+diff --git a/script.js b/script.js
+index e7a45bf..4d47cc5 100644
+--- a/script.js
++++ b/script.js
+@@ -3,6 +3,7 @@ import Sokoban from './Sokoban.js'
+ 
+ // init
+ const sokoban = new Sokoban({ level: 1 })
++window.sokoban = sokoban // PlayJev: expose the module-local instance to the hook
+ sokoban.render({ restart: true })
+ 
+ // re-render
+diff --git a/utils.js b/utils.js
+index b52139a..6770fa1 100644
+--- a/utils.js
++++ b/utils.js
+@@ -1,4 +1,5 @@
+-import { EMPTY, WALL, BLOCK, SUCCESS_BLOCK, VOID, PLAYER, levelOneMap } from './constants.js'
++import { EMPTY, WALL, BLOCK, SUCCESS_BLOCK, VOID, PLAYER } from './constants.js'
++import { MICROBAN } from './levels/microban.js'
+ 
+ // Helpers
+ export const isBlock = (cell) => [BLOCK, SUCCESS_BLOCK].includes(cell)
+@@ -31,17 +32,34 @@ export const getY = (y, direction, spaces = 1) => {
+   }
+ }
+ 
+-export function generateGameBoard({ level }) {
+-  if (level === 1) {
+-    return JSON.parse(JSON.stringify(levelOneMap)) // clone deep hack
+-  }
++// PlayJev: levels come from the Microban set (levels/microban.js, XSB rows) instead of levelOneMap.
++export const levelCount = MICROBAN.length
++
++// XSB character -> board cell. A '+' (player standing on a goal) is PLAYER on the board while the
++// level map below remembers the goal as VOID, the way levelOneMap is consulted for the original level.
++const XSB = {
++  '#': WALL,
++  ' ': EMPTY,
++  '.': VOID,
++  $: BLOCK,
++  '*': SUCCESS_BLOCK,
++  '@': PLAYER,
++  '+': PLAYER,
+ }
+ 
+-export function countBlocks(blockCount, y, x, direction, board) {
+-  if (isBlock(board[y][x])) {
+-    blockCount++
+-    return countBlocks(blockCount, getY(y, direction), getX(x, direction), direction, board)
+-  } else {
+-    return blockCount
++// Returns { board, levelMap } for a 1-based level number. `board` is the live state, `levelMap` the
++// initial state used to know what lies under the player or a box (goal or plain floor). Ragged rows
++// are padded with EMPTY: missing cells are floor outside the walls in XSB, and the game draws floor
++// outside as plain floor (levelOneMap does the same for its corner cells).
++export function generateGameBoard({ level }) {
++  const rows = MICROBAN[level - 1]
++  if (!rows) {
++    throw new Error(`no level ${level}, have 1..${levelCount}`)
+   }
++  const width = Math.max(...rows.map((row) => row.length))
++  const board = rows.map((row) => row.padEnd(width, ' ').split('').map((ch) => XSB[ch]))
++  const levelMap = rows.map((row) =>
++    row.padEnd(width, ' ').split('').map((ch) => (ch === '+' ? VOID : XSB[ch])),
++  )
++  return { board, levelMap }
+ }

@@ -1,0 +1,44 @@
+diff --git a/pacman.js b/pacman.js
+index fd0dfd6..20cd5c8 100644
+--- a/pacman.js
++++ b/pacman.js
+@@ -272,7 +272,10 @@ Pacman.Ghost = function (game, map, colour) {
+         "makeEatable" : makeEatable,
+         "reset"       : reset,
+         "move"        : move,
+-        "draw"        : draw
++        "draw"        : draw,
++        /* PlayJev: read-only access to closure state */
++        "getPosition" : function () { return position; },
++        "getDirection": function () { return direction; }
+     };
+ };
+ 
+@@ -525,7 +528,10 @@ Pacman.User = function (game, map) {
+         "move"          : move,
+         "newLevel"      : newLevel,
+         "reset"         : reset,
+-        "resetPosition" : resetPosition
++        "resetPosition" : resetPosition,
++        /* PlayJev: read-only access to closure state */
++        "getPosition"   : function () { return position; },
++        "getDirection"  : function () { return direction; }
+     };
+ };
+ 
+@@ -1090,7 +1096,14 @@ var PACMAN = (function () {
+     };
+     
+     return {
+-        "init" : init
++        "init" : init,
++        /* PlayJev: read-only access to closure state */
++        "getState"  : function () { return state; },
++        "getTick"   : getTick,
++        "getLevel"  : function () { return level; },
++        "getUser"   : function () { return user; },
++        "getGhosts" : function () { return ghosts; },
++        "getMap"    : function () { return map; }
+     };
+     
+ }());

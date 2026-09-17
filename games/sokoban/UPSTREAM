@@ -1,0 +1,3 @@
+upstream: https://github.com/taniarascia/sokoban.git
+commit: 23ee71c46566506d85445130c78dfae2b6347792
+vendored: 2026-09-17
