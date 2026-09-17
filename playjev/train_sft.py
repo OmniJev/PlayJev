@@ -211,8 +211,9 @@ def main(a: argparse.Namespace) -> None:
     # ---- data
     records = load_records(a.games, Path(a.data_root), shards=a.shards or None)
     train_recs, val_recs = split_records(records)
-    if a.limit:
-        train_recs, val_recs = train_recs[: a.limit], val_recs[: max(8, a.limit // 10)]
+    if a.limit:  # smoke tests: the first `limit` training records of every game, a few validation records each
+        train_recs = [r for g in a.games for r in [x for x in train_recs if x.game == g][: a.limit]]
+        val_recs = [r for g in a.games for r in [x for x in val_recs if x.game == g][: max(4, a.limit // 4)]]
     print(f"[train] {len(records)} records: {len(train_recs)} train, {len(val_recs)} val; per game "
           f"{ {g: sum(r.game == g for r in train_recs) for g in a.games} }")
     processor = AutoProcessor.from_pretrained(a.model, local_files_only=Path(a.model).exists())
