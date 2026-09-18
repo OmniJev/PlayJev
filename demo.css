@@ -1,21 +1,21 @@
 /* PlayJev demo. Palette from the Awesome-JEV cover art: JEV blue #2F80ED (chosen action), coral #F0545C
    (random recordings, mismatch marks), greys for everything else. System fonts, no external resources. */
 :root {
-  --bg: #fafafa; --fg: #1b1f24; --muted: #5b6470; --line: #dfe3e8; --tile: #ffffff; --view: #ececec;
+  --bg: #fafafa; --fg: #1b1f24; --muted: #5b6470; --line: #dfe3e8; --tile: #ffffff; --view: #ffffff;
   --bar: #cfd5dc; --bar-taken: #2F80ED; --coral: #F0545C; --btn: #f3f4f6; --btn-on: #1b1f24; --btn-on-fg: #ffffff;
   --code: #f1f3f5; --link: #1f6fd6;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111111; --fg: #e8e8e8; --muted: #9aa3ad; --line: #2a2d31; --tile: #181a1d; --view: #0b0c0e;
+    --bg: #111111; --fg: #e8e8e8; --muted: #9aa3ad; --line: #2a2d31; --tile: #181a1d; --view: #181a1d;
     --bar: #3a3f47; --bar-taken: #2F80ED; --btn: #23262a; --btn-on: #e8e8e8; --btn-on-fg: #111111;
     --code: #1c1f23; --link: #6aa6f2;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111111; --fg: #e8e8e8; --muted: #9aa3ad; --line: #2a2d31; --tile: #181a1d; --view: #0b0c0e;
+  --bg: #111111; --fg: #e8e8e8; --muted: #9aa3ad; --line: #2a2d31; --tile: #181a1d; --view: #181a1d;
   --bar: #3a3f47; --bar-taken: #2F80ED; --btn: #23262a; --btn-on: #e8e8e8; --btn-on-fg: #111111;
   --code: #1c1f23; --link: #6aa6f2;
   color-scheme: dark;
