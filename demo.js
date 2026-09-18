@@ -280,14 +280,16 @@
       let obs = await this.call('start', { seed }); if (gen !== this.gen) return null;
       await this.measure(); this.showOverlay(null);
       const criteria = {}; for (const a of g.actions) criteria[a.name] = a.description;
-      let i = 0; const stepMs = g.step_ms || 150, cap = g.max_steps || 3000;
+      let i = 0; const stepMs = g.step_ms || 150, cap = g.max_steps || 3000; let prevFrame = null;
       this.renderStatus(0, null, obs.score, 'live'); this.renderBars(null, -1);
       while (!obs.done && i < cap) {
         if (gen !== this.gen) return null;
         if (!this.playing) { await this.waitResume(); if (gen !== this.gen) return null; }
         const tick = performance.now();
         const frame = obs.frame || (await this.call('frame'));
-        const body = { model: 'playjev-latest', state: { frames: [frame] }, questions: { q: { type: 'choice', instructions: INSTRUCTIONS, criteria } } };
+        // (previous, current) once there is a previous frame: a single-frame server takes the last one, a two-frame server uses both
+        const body = { model: 'playjev-latest', state: { frames: prevFrame ? [prevFrame, frame] : [frame] }, questions: { q: { type: 'choice', instructions: INSTRUCTIONS, criteria } } };
+        prevFrame = frame;
         const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), LIVE_TIMEOUT_MS);
         let p;
         try {
