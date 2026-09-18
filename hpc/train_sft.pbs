@@ -19,12 +19,19 @@
 # COLLECT_GAMES (subset of GAMES to collect, default all of GAMES; the others must already have shards of this RUN),
 # PLAY_DELAYS (closed-loop delays to run with argmax, default "0"; "1 0" for a model trained with --label-delay 1).
 # DATA_RUN (name of the run whose shards to train on, default RUN; with SKIP_COLLECT=1 this reuses another run's data).
+# DAgger round: ACTOR_CKPT=<checkpoint dir> makes the trained model play during collection (argmax with the no-op
+# rule, plus COLLECT_EPS random moves, default 0.05) while the teacher labels every visited frame; the three shards
+# then all use COLLECT_EPS and seed0 700000 / 800000 / 900000 so they never overlap the teacher-driven shards.
+# TRAIN_SHARDS (space separated) overrides the shard list to train on (default the three shards of DATA_RUN), e.g.
+# "sft_all1_a dagger1_a dagger1_b dagger1_c"; MODEL=<checkpoint dir> continues from a trained model.
+# PLAY_REFS=0 skips the sampled / random / teacher references in the closed loop (only the trained argmax runs).
 WORK=$WORK
 REPO=$WORK/repo
 JOB=${PBS_JOBID%%.*}
 GAMES=${GAMES:-snake}; FRAMES=${FRAMES:-100000}; EPOCHS=${EPOCHS:-1}; RUN=${RUN:-sft_$JOB}; MICRO=${MICRO:-64}
 EVAL_EVERY=${EVAL_EVERY:-400}; SAVE_EVERY=${SAVE_EVERY:-400}; EVAL_SAMPLES=${EVAL_SAMPLES:-2000}; PLAY_CAP=${PLAY_CAP:-1500}
-PLAY_DELAYS=${PLAY_DELAYS:-0}; DATA_RUN=${DATA_RUN:-$RUN}
+PLAY_DELAYS=${PLAY_DELAYS:-0}; DATA_RUN=${DATA_RUN:-$RUN}; COLLECT_EPS=${COLLECT_EPS:-0.05}; PLAY_REFS=${PLAY_REFS:-1}
+TRAIN_SHARDS=${TRAIN_SHARDS:-${DATA_RUN}_a ${DATA_RUN}_b ${DATA_RUN}_c}
 CKPT_ROOT=$WORK/ckpt
 exec > $WORK/logs/train_${RUN}_${JOB}_live.log 2>&1   # PBS -o only lands when the job ends
 date; hostname
@@ -37,7 +44,7 @@ export PLAYWRIGHT_BROWSERS_PATH=$SCRATCH/ms-playwright
 MODEL=${MODEL:-$HF_HOME/hub/models--Qwen--Qwen3.5-0.8B-Base/snapshots/dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68}
 OUT=$CKPT_ROOT/$RUN
 mkdir -p $OUT
-echo "RUN=$RUN DATA_RUN=$DATA_RUN GAMES=$GAMES FRAMES=$FRAMES EPOCHS=$EPOCHS MODEL=$MODEL MICRO=$MICRO EXTRA=$EXTRA PLAY_DELAYS=$PLAY_DELAYS PLAY_EXTRA=$PLAY_EXTRA"
+echo "RUN=$RUN DATA_RUN=$DATA_RUN GAMES=$GAMES FRAMES=$FRAMES EPOCHS=$EPOCHS MODEL=$MODEL MICRO=$MICRO EXTRA=$EXTRA PLAY_DELAYS=$PLAY_DELAYS PLAY_EXTRA=$PLAY_EXTRA ACTOR_CKPT=$ACTOR_CKPT TRAIN_SHARDS=$TRAIN_SHARDS PLAY_REFS=$PLAY_REFS"
 python -c "from playjev.teachers import _REGISTRY; print('teachers:', sorted(_REGISTRY))"
 
 # 1. Collect: three shards per game at a time. Shards a and b use the game's own random-action rate (pj.json
@@ -48,12 +55,16 @@ if [ -z "$SKIP_COLLECT" ]; then
     PER=$(( FRAMES / 3 ))
     for g in ${COLLECT_GAMES:-$GAMES}; do
         t0=$(date +%s)
-        EPS_C="--epsilon 0.3"; [ "$g" = sokoban ] && EPS_C=""
-        python -u -m playjev.collect $g --steps $PER --pages 8 --shard ${DATA_RUN}_a --seed0 100000 > $WORK/logs/collect_${RUN}_${g}_a.log 2>&1 &
+        if [ -n "$ACTOR_CKPT" ]; then   # DAgger: the model plays (three copies share the GPU), the teacher labels
+            ACT="--actor local --ckpt $ACTOR_CKPT --epsilon $COLLECT_EPS $PLAY_EXTRA"; EPS_C=""; S_A=700000; S_B=800000; S_C=900000
+        else
+            ACT=""; EPS_C="--epsilon 0.3"; [ "$g" = sokoban ] && EPS_C=""; S_A=100000; S_B=300000; S_C=500000
+        fi
+        python -u -m playjev.collect $g --steps $PER --pages 8 $ACT --shard ${DATA_RUN}_a --seed0 $S_A > $WORK/logs/collect_${RUN}_${g}_a.log 2>&1 &
         P1=$!
-        python -u -m playjev.collect $g --steps $PER --pages 8 --shard ${DATA_RUN}_b --seed0 300000 > $WORK/logs/collect_${RUN}_${g}_b.log 2>&1 &
+        python -u -m playjev.collect $g --steps $PER --pages 8 $ACT --shard ${DATA_RUN}_b --seed0 $S_B > $WORK/logs/collect_${RUN}_${g}_b.log 2>&1 &
         P2=$!
-        python -u -m playjev.collect $g --steps $PER --pages 8 $EPS_C --shard ${DATA_RUN}_c --seed0 500000 > $WORK/logs/collect_${RUN}_${g}_c.log 2>&1 &
+        python -u -m playjev.collect $g --steps $PER --pages 8 $ACT $EPS_C --shard ${DATA_RUN}_c --seed0 $S_C > $WORK/logs/collect_${RUN}_${g}_c.log 2>&1 &
         P3=$!
         wait $P1 $P2 $P3
         echo "[collect $g] $(( $(date +%s) - t0 )) s"; for s in a b c; do tail -1 $WORK/logs/collect_${RUN}_${g}_$s.log; done
@@ -63,7 +74,7 @@ fi
 python -u -m playjev.data $GAMES
 
 # 2. Train.
-python -u -m playjev.train_sft --games $GAMES --shards ${DATA_RUN}_a ${DATA_RUN}_b ${DATA_RUN}_c --model $MODEL --out $OUT \
+python -u -m playjev.train_sft --games $GAMES --shards $TRAIN_SHARDS --model $MODEL --out $OUT \
     --epochs $EPOCHS --batch 64 --micro-batch $MICRO --workers 10 --eval-every $EVAL_EVERY --save-every $SAVE_EVERY \
     --eval-samples $EVAL_SAMPLES --keep 2 $EXTRA
 
@@ -79,6 +90,7 @@ for g in $GAMES; do
             --record runs/replays --policy-name playjev-0.8b-$RUN$SUF $PLAY_EXTRA
         cp $REPO/runs/play/${g}_local$([ "$d" != 0 ] && echo _delay$d).json $OUT/play_${g}_local$SUF.json
     done
+    [ "$PLAY_REFS" = 0 ] && continue
     echo "[play $g] trained model, sampled"
     $PLAY $g --policy local --ckpt $OUT/final --episodes 16 --pages 8 --seed0 5000 --max-steps $PLAY_CAP --sample $PLAY_EXTRA
     cp $REPO/runs/play/${g}_local.json $OUT/play_${g}_local_sampled.json

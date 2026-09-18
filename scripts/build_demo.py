@@ -338,9 +338,12 @@ def read_model_results(results_dir: Path) -> tuple[dict, dict, dict]:
             if pol in ("random", "random-plain", "teacher"):
                 if pol != "random-plain" or "random" not in ref.get(g, {}):
                     ref.setdefault(g, {})[pol.replace("-plain", "")] = row
-            elif re.search(r"-(sampled|delay\d+|plain)(-plain)?$", str(pol)):
+            elif re.search(r"-(sampled|delay\d+)(-plain)?$", str(pol)):
                 continue
-            elif g not in model or (str(pol).startswith("playjev") and not str(model[g]["policy"]).startswith("playjev")):
+            elif str(pol).endswith("-plain"):  # plain execution: shown only until the guarded row of the same game exists
+                if g not in model or str(model[g]["policy"]).endswith("-plain"):
+                    model[g] = row
+            elif g not in model or not str(model[g]["policy"]).startswith("playjev") or str(model[g]["policy"]).endswith("-plain"):
                 model[g] = row
     return model, calib, ref
 

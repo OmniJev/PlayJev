@@ -127,14 +127,27 @@ reached 1500 steps. Argmax replays and random replays are recorded for the demo 
 |---|---|---|---|---|---|---|
 | snake | 77.8 (78.5 / 121) | 15.2 (15 / 51) | 1.0 (1 / 1) | 113.7 (108.5 / 161) | 11.4 (9.5 / 31, 4 capped) | 296, 0.61 |
 | 2048 | 54.5 (32 / 284, 16 capped) | 1304.2 (1230 / 2484) | 1086.8 (1008 / 2424) | 19593.2 (20378 / 22068) | 72.8 (48 / 260, 16 capped) | 1500, 0.16 |
-| tetris | 1034.4 (1065 / 1970) | 665.6 (625 / 1670) | - | - | 248.1 (230 / 430) | 252, 0.62 |
-| breakout | - | - | - | - | 397.8 (247.5 / 1925) | - |
-| flappy | - | - | - | - | 0.2 (0 / 1) | - |
-| invaders | - | - | - | - | 400.0 (400 / 400) | - |
-| mario | - | - | - | - | 819.9 (645 / 2165) | - |
+| tetris | 1034.4 (1065 / 1970) | 665.6 (625 / 1670) | 161.9 (165 / 220) | 15287.5 (15340 / 16160, 16 capped) | 248.1 (230 / 430) | 252, 0.62 |
+| breakout | 798.4 (415 / 2825) | 660.3 (595 / 2030) | 578.1 (272.5 / 2110) | 16546.6 (17850 / 22045, 16 capped) | 397.8 (247.5 / 1925) | 135, 0.42 |
+| flappy | 8.9 (7 / 23) | 6.0 (4.5 / 20) | 0.0 (0 / 0) | 84.0 (84 / 84, 16 capped) | 0.2 (0 / 1) | 241, 0.88 |
+| invaders | 400.0 (400 / 400) | 400.0 (400 / 400) | 215.0 (215 / 290) | 400.0 (400 / 400) | 400.0 (400 / 400) | 203, 0.48 |
+| mario | 1156.4 (837 / 2877) | 1001.5 (637.5 / 2885) | 613.2 (627 / 1009) | 4228.6 (5224.5 / 5485) | 819.9 (645 / 2165) | 43, 0.41 |
+| pacman | 1209.4 (1040 / 4100) | 601.2 (590 / 1610) | 113.1 (60 / 360) | 7190.0 (7510 / 8080, 15 capped) | 453.8 (440 / 1180) | 197, 0.71 |
+| racer | 6211.2 (6225.4 / 6712.4, 15 capped) | 5962.9 (5991.05 / 6406.7, 16 capped) | 238.3 (236.1 / 343.7, 16 capped) | 6711.7 (6711.65 / 6715.1) | 5885.1 (5911.15 / 6411.9, 16 capped) | 1500, 0.58 |
+| sokoban | 57.9 (101 / 104) | 26.2 (1.5 / 103) | 6.6 (0 / 101) | 102.2 (102 / 104) | 6.6 (0 / 101) | 245, 0.82 |
 <!-- /run2-closed-loop -->
 
-Observations while the loop runs (12:15):
+Job 621580 finished at 12:45 (5 h 24 min in all). Read as the model's share of the teacher's gain over random,
+(model - random) / (teacher - random), on the same seeds: invaders 1.00 (every policy but random clears the
+waves), racer 0.92, snake 0.68, sokoban 0.54, then a cliff: mario 0.15, pacman 0.15, flappy 0.11, tetris 0.06,
+breakout 0.01, 2048 below random (the argmax loop). Validation agreement does not predict this order: flappy
+(.998) and tetris (.810) sit at the bottom in play while their agreement is near the top, and session's step by
+step relabel of a flappy death shows why: 89 of 90 decisions match the teacher and the one miss is a recovery move
+(a second consecutive flap) that the teacher's own trajectories almost never contain. Covariate shift, so the next
+round is DAgger (job 621845, `dagger1`: the model plays 40k frames per game, the teacher labels, one more epoch
+from the `sft_all1` checkpoint on those plus run 1's shard a).
+
+Observations while the loop ran (12:15):
 
 - 2048 under argmax is a degenerate loop: all 16 episodes hit the 1500-step cap with a mean score of 54 (random
   1087). A blocked direction is a legal no-op that leaves the board bit-identical, so a deterministic policy that
