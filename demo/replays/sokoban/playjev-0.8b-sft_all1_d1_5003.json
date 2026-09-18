@@ -1,1 +1,0 @@
-{"game":"sokoban","policy":"playjev-0.8b-sft_all1_d1","seed":5003,"actions":["up","down","left","right"],"frames_per_step":1,"steps":[{"a":3,"p":[0.0076,0.0347,0.0261,0.9315],"score":101}],"final_score":101,"truncated":false}
