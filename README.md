@@ -27,7 +27,78 @@ the frame alone, in real time, with a probability the game loop can trust.
 
 ## Results
 
-<!-- RESULTS: filled from runs/play/*.json when the stage-2 closed loop lands -->
+The first ten-game model, `playjev-0.8b-sft_all1`: Qwen3.5-0.8B-Base, one epoch of behaviour cloning on 863k
+teacher-labelled frames (about 100k per game), 4 h 11 min on one H200. Closed loop on 16 held-out episodes per game
+(seeds 5000 to 5015, never seen in training), argmax move, episodes capped at 1500 steps; random and teacher play
+the same seeds through the same harness. "vs teacher" is (model - random) / (teacher - random): 0 is random play,
+1 is the teacher. Agreement is the share of steps whose move is in the teacher's best set, once on frames from the
+teacher's own play (the validation split) and once on the model's own play (the teacher scores every step of the
+recorded episodes); ECE is the calibration of the chosen move's probability against that agreement, on own play.
+
+| game | random | PlayJev 0.8B | teacher | vs teacher | agreement, teacher frames | agreement, own play | ECE, own play |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Space Invaders | 215 | **400** | 400 | 1.00 | 0.75 | 0.72 | 0.08 |
+| Racer | 238 | **6211** | 6712 | 0.92 | 0.84 | 0.56 | 0.10 |
+| Snake | 1.0 | **77.8** | 114 | 0.68 | 0.99 | 0.93 | 0.22 |
+| Sokoban | 6.6 | **57.9** | 102 | 0.54 | 0.95 | 0.91 | 0.13 |
+| Infinite Mario | 613 | **1156** | 4229 | 0.15 | 0.63 | 0.60 | 0.10 |
+| Pacman | 113 | **1036** | 7026 | 0.13 | 0.87 | 0.92 | 0.14 |
+| 2048 | 1021 | **3174** | 19593 | 0.12 | 0.48 | 0.42 | 0.01 |
+| Floppy Bird | 0.0 | **8.9** | 84.0 | 0.11 | 1.00 | 0.98 | 0.05 |
+| Tetris | 162 | **1034** | 15288 | 0.06 | 0.81 | 0.61 | 0.08 |
+| Breakout | 496 | **611** | 16547 | 0.01 | 0.72 | 0.16 | 0.42 |
+
+Zero-shot, the base model puts 0.7 on option A whatever the frame. After one epoch every game is above random,
+four are close to the teacher, and six are far from it for reasons the two agreement columns separate:
+
+- Flappy reproduces the teacher on 99.8 percent of the teacher's frames and dies at 9 pipes because the one step it
+  misses is a correction (a second consecutive flap) that the teacher's own trajectories almost never contain.
+  Tetris drops from 0.81 to 0.61 on its own boards and drops pieces one move early. This is covariate shift, the
+  standard failure of behaviour cloning, and the DAgger round (the model plays, the teacher labels what it visits)
+  is the standard fix; it is running.
+- Breakout agrees with the teacher on 16 percent of its own steps: on the teacher's frames the paddle is already
+  under the ball's landing point, so the model learned to read the paddle instead of the ball, and a single frame
+  does not show the ball's direction anyway. The two-frame input (previous and current frame in the vision tower's
+  temporal patch, no extra tokens) is the fix for that, and for Mario, whose labels depend on velocity and jump
+  phase.
+- 2048 is a reading problem (tile digits at 448 px) and the weakest game at 0.48 agreement; the model knows it,
+  its confidence there is 0.25.
+
+**Execution rule.** A move that leaves the observation unchanged (a blocked direction in 2048 or Sokoban is a legal
+no-op) is not repeated on that observation; the next most probable move is taken. Without it, a deterministic
+policy that picks a blocked direction loops to the step cap (2048 scored 54 that way). The rule never fires in the
+games whose frames change every step; their numbers are identical with and without it.
+
+**Latency.** The same model applied one step late (the decision from frame k acts at step k+1, the real-time
+setting at 83 to 100 ms per step) collapses in the reflex games: Snake 11, Tetris 248, Breakout 394, Flappy 0.2,
+Pacman 502; Invaders 400 and Racer 5885 barely move. A model trained on labels shifted by one step
+(`--label-delay 1`) is the answer to that; results follow.
+
+### Does it read the option text?
+
+On 400 validation frames per game, with the prompt otherwise unchanged (`scripts/probe_options.py`):
+
+- shuffling the options changes nothing (the training permutes them every sample);
+- replacing the names by neutral words (alpha, bravo, ...) and keeping the descriptions loses 0 to 2 points in six
+  games, 7 in Tetris, 8 in Racer, 13 in Invaders;
+- keeping only the names loses nothing, even in Snake, 2048, Pacman and Sokoban, whose names are the same four
+  words: which "up" it is comes from the frame;
+- rotating the descriptions one option along while the names stay: the decision follows the description in Flappy
+  (84 percent), Sokoban (67) and Racer (47), the name in Breakout (95), Mario (82) and Pacman (80), and splits in
+  Snake and Tetris. Both halves of the option text are read; a fixed classification head cannot be moved by editing
+  a sentence;
+- an extra fake option ("hold: keep the current move and do nothing new") gets 2 to 9 percent of the mass in seven
+  games and 13 to 18 in the three the model is least sure about (2048, Invaders, Breakout).
+
+### Is the confidence worth anything?
+
+Low-confidence steps are where the errors are: on the model's own play, Tetris agrees with the teacher on 36
+percent of the steps with confidence below 0.5 and 61 percent overall; Invaders 41 percent against 97 percent on
+steps above 0.9; Racer 34 against 97; Sokoban 3 against 94. The operational test is a System Two behind the model:
+whenever the Jev confidence is below a threshold, the decision is handed to the teacher (`playjev.play --handover`).
+Snake, 16 episodes: threshold 0 (the model alone) 76.8; 0.2 hands over 0.4 percent of the steps and scores 82.1;
+0.4 hands over 38 percent, 90.1; 0.6, 45 percent, 97.8; 0.8, 53 percent, 112.4; the teacher alone 113.7. The other
+games follow.
 
 ## The ten games
 
