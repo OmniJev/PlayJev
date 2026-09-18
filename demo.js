@@ -363,12 +363,12 @@
       tr.appendChild(cell(r.random ? fmtScore(r.random.score) : null, 'num'));
       tr.appendChild(cell(r.model ? fmtScore(r.model.score) : null, 'num'));
       tr.appendChild(cell(r.teacher && r.teacher.score != null ? fmtScore(r.teacher.score) : null, 'num'));
-      tr.appendChild(cell(r.model && r.model.decisions_per_s != null ? Math.round(r.model.decisions_per_s) : null, 'num'));
+      tr.appendChild(cell(r.vs_teacher != null ? (Math.round(r.vs_teacher * 100) / 100).toFixed(2) : null, 'num'));
       tb.appendChild(tr);
     }
     const hasModel = R.rows.some((r) => r.model);
     const foot = document.getElementById('results-note');
-    foot.textContent = 'Mean score over eight episodes per policy through the same harness, episodes capped at 1500 steps. '
+    foot.textContent = (R.note || 'Mean score per policy through the same harness, episodes capped at 1500 steps.') + ' '
       + (hasModel ? `Trained model: ${[...new Set(R.rows.filter((r) => r.model).map((r) => r.model.policy))].join(', ')}.` : 'The trained model columns fill in when its results land.');
   }
 

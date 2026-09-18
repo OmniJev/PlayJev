@@ -1,7 +1,8 @@
 {
- "generated": "2026-09-18T07:33:18",
+ "generated": "2026-09-18T11:30:04",
  "baselines": "docs/BASELINES.md",
  "results_dir": "runs/results",
+ "note": "Mean score per policy through the same harness, episodes capped at 1500 steps. Random and teacher: eight episodes on the development machine (docs/BASELINES.md). vs teacher is (model - random) / (teacher - random): 0 is random play, 1 is the teacher.",
  "rows": [
   {
    "game": "mario",
@@ -19,7 +20,9 @@
     "what": "rule-based right runner with physics rollouts"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "snake",
@@ -37,7 +40,9 @@
     "what": "BFS to food, largest region fallback"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "tetris",
@@ -55,7 +60,9 @@
     "what": "Dellacherie placement search"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "2048",
@@ -73,7 +80,9 @@
     "what": "expectimax depth 2 (+1 ply when crowded)"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "flappy",
@@ -91,7 +100,9 @@
     "what": "exact physics, depth-first flap search"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "pacman",
@@ -109,7 +120,9 @@
     "what": "ghost occupancy propagation + safe BFS"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "breakout",
@@ -127,7 +140,9 @@
     "what": "ball-flight simulation + bounce scoring"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "invaders",
@@ -145,7 +160,9 @@
     "what": "28-step dodge-and-aim DP"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "racer",
@@ -163,7 +180,9 @@
     "what": "lateral target with curve and traffic lookahead"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   },
   {
    "game": "sokoban",
@@ -181,7 +200,9 @@
     "what": "A* over pushes with deadlock pruning"
    },
    "model": null,
-   "calibration": null
+   "vs_teacher": null,
+   "calibration": null,
+   "same_seed": false
   }
  ]
 }
