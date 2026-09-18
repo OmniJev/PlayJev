@@ -7,8 +7,10 @@ set -u
 GAME=$1
 CKPT=${2:-$WORK/ckpt/sft_all1/final}
 TAUS=${3:-"0 0.2 0.4 0.6 0.8 1.01"}
+RUN=$(basename $(dirname $CKPT))   # ckpt/<run>/final -> <run>; results are also kept under runs/play/<run>_<game>_handover<tau>.json
 for tau in $TAUS; do
-    echo "[handover $GAME] tau $tau"
+    echo "[handover $GAME] tau $tau ($RUN)"
     python -u -m playjev.play $GAME --policy local --ckpt $CKPT --episodes 16 --pages 8 --seed0 5000 --max-steps 1500 --handover $tau
+    cp runs/play/${GAME}_local_handover${tau}.json runs/play/${RUN}_${GAME}_handover${tau}.json 2>/dev/null
 done
 echo "[handover $GAME] done"
