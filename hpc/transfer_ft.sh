@@ -8,7 +8,7 @@ GAME=$1; N=$2; INIT=$3; EPOCHS=${4:-3}; LR=${5:-2e-5}
 WORK=$WORK
 case $INIT in
   base) MODEL=Qwen/Qwen3.5-0.8B-Base ;;
-  hold8) MODEL=$WORK/ckpt/sft_hold8/final ;;
+  hold8) MODEL=$WORK/ckpt/sft_hold8b/final ;;
   *) MODEL=$INIT ;;
 esac
 RUN=tr_${GAME}_${N}_${INIT}; OUT=$WORK/ckpt/$RUN; mkdir -p $OUT
