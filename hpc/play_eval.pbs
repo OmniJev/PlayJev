@@ -1,0 +1,43 @@
+#!/bin/bash
+#PBS -P PROJECT
+#PBS -N pj_play
+#PBS -l select=1:ngpus=1:ncpus=12:mem=225GB:gpu_model=H200
+#PBS -l walltime=03:00:00
+#PBS -q autox
+#PBS -j oe
+#PBS -o $WORK/logs/
+# Closed-loop evaluation of an existing checkpoint on every game: trained model with argmax actions at each delay in
+# DELAYS (0 = act on the current frame, 1 = the decision from frame k is applied at step k+1, the real-time setting).
+#   cd $WORK && qsub -v RUN=sft_all1,DELAYS="1" repo/hpc/play_eval.pbs
+# Variables: RUN (checkpoint dir name under the PROJECT ckpt root; CKPT overrides the full path), GAMES, DELAYS,
+# PLAY_EXTRA (e.g. "--two-frame"), PLAY_CAP (1500), EPISODES (16), RECORD=1 to write demo replays.
+WORK=$WORK
+REPO=$WORK/repo
+JOB=${PBS_JOBID%%.*}
+CKPT_ROOT=$WORK/ckpt
+RUN=${RUN:?set RUN}; CKPT=${CKPT:-$CKPT_ROOT/$RUN/final}
+GAMES=${GAMES:-snake 2048 tetris breakout flappy invaders mario pacman racer sokoban}
+DELAYS=${DELAYS:-1}; PLAY_CAP=${PLAY_CAP:-1500}; EPISODES=${EPISODES:-16}
+exec > $WORK/logs/play_${RUN}_${JOB}_live.log 2>&1
+date; hostname
+cd $REPO
+source $WORK/.venv/bin/activate
+export HF_HOME=$PROJ/hf_home
+export HF_HUB_CACHE=$HF_HOME/hub HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false PYTHONUNBUFFERED=1
+export PLAYWRIGHT_BROWSERS_PATH=$SCRATCH/ms-playwright
+echo "RUN=$RUN CKPT=$CKPT DELAYS=$DELAYS PLAY_EXTRA=$PLAY_EXTRA"
+# the checkpoint may still be training when this job gets its slot: wait for it (up to 8 h)
+for i in $(seq 1 480); do [ -f $CKPT/config.json ] && break; sleep 60; done
+[ -f $CKPT/config.json ] || { echo "no checkpoint at $CKPT"; exit 1; }
+echo "checkpoint present at $(date)"
+for d in $DELAYS; do
+    for g in $GAMES; do
+        echo "[play $g] $RUN argmax delay $d"
+        REC=""; [ -n "$RECORD" ] && REC="--record runs/replays --policy-name playjev-0.8b-$RUN-delay$d"
+        python -u -m playjev.play $g --policy local --ckpt $CKPT --episodes $EPISODES --pages 8 --seed0 5000 \
+            --max-steps $PLAY_CAP --delay $d $REC $PLAY_EXTRA
+        cp $REPO/runs/play/${g}_local$([ "$d" != 0 ] && echo _delay$d).json $(dirname $CKPT)/play_${g}_local_delay$d.json 2>/dev/null
+    done
+done
+date
+echo PLAY_DONE

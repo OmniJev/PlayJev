@@ -108,3 +108,17 @@ Validation during training (agreement / tie-aware / ECE / mean confidence):
 | 7500 | .722 / .752 | .985 / .985 / .07 / .82 | .749 / .979 / .08 / .63 | .803 / .803 / .11 / .66 | .705 / .705 / .05 / .50 | .802 / .871 / .06 / .69 | .726 / .728 / .05 / .60 | .814 / .814 / .05 / .81 | .567 / .567 / .08 / .42 | .633 / .633 / .04 / .41 | .436 / .441 / .05 / .27 |
 
 (training in progress)
+
+## Real-time latency (decided 2026-09-18, relayed by session)
+
+The deployed model sees frame k and its answer is applied at step k+1 (one step, 83 to 100 ms in the real-time
+games, which covers the 43 ms batch-1 inference). `playjev.play --delay 1` reproduces that in the closed loop; the
+unmodified teachers collapse under it (snake 108 to 1, flappy 30 to 0 pipes, measured by session). Training for it
+needs no new data: `--label-delay 1` in `playjev/data.py` labels frame k with the teacher's decision at record k+1
+of the same episode (consecutive steps only, each episode's last record dropped), and the validation metrics of a
+delayed run are computed against those shifted targets.
+
+Runs queued after `sft_all1`: `play_eval.pbs` on `sft_all1/final` at delay 1 (how much an undelayed model loses in
+real time); `sft_all1_d1` (same shards, `--label-delay 1`, closed loop at delay 1 and 0); then the two-frame
+temporal-stack variant with the delayed label. Turn-based games (2048, sokoban, tetris as stepped here) are trained
+with the same shifted labels for a single model unless the per-game numbers say it hurts.

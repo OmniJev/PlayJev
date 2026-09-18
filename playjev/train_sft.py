@@ -209,7 +209,9 @@ def main(a: argparse.Namespace) -> None:
     print(f"[train] games {a.games} model {a.model} out {out_dir}")
 
     # ---- data
-    records = load_records(a.games, Path(a.data_root), shards=a.shards or None)
+    records = load_records(a.games, Path(a.data_root), shards=a.shards or None, label_delay=a.label_delay)
+    if a.label_delay:
+        print(f"[train] label delay {a.label_delay}: frame k is labelled with the teacher's decision at step k+{a.label_delay}")
     train_recs, val_recs = split_records(records)
     if a.limit:  # smoke tests: the first `limit` training records of every game, a few validation records each
         train_recs = [r for g in a.games for r in [x for x in train_recs if x.game == g][: a.limit]]
@@ -327,6 +329,7 @@ if __name__ == "__main__":
     p.add_argument("--games", nargs="+", required=True)
     p.add_argument("--data-root", default=str(ROOT / "data"))
     p.add_argument("--shards", nargs="*", default=[], help="use only these shard names (default: every shard under data/<game>/)")
+    p.add_argument("--label-delay", type=int, default=0, help="label frame k with the teacher's decision at step k+delay (real-time latency)")
     p.add_argument("--model", required=True, help="HF id or local snapshot path")
     p.add_argument("--out", required=True, help="checkpoint directory")
     p.add_argument("--device", default="cuda:0")

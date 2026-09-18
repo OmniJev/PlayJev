@@ -59,7 +59,26 @@ def game_options(game: str, names: Sequence[str]) -> list[dict]:
     return [{"name": n, "description": by[n]["description"]} for n in names]
 
 
-def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequence[str] | None = None) -> list[Record]:
+def shift_labels(records: list[Record], episode_keys: list[tuple], steps: list[int], delay: int) -> list[Record]:
+    """Real-time labels: the deployed model sees frame k and its answer is applied `delay` steps later, so the target
+    for frame k becomes the teacher's decision at record k + delay of the same episode (consecutive steps only; the
+    last `delay` records of every episode, and any record without a consecutive successor, are dropped)."""
+    by_ep: dict[tuple, dict[int, int]] = {}
+    for i, (key, step) in enumerate(zip(episode_keys, steps)):
+        by_ep.setdefault(key, {})[step] = i
+    out = []
+    for i, (key, step) in enumerate(zip(episode_keys, steps)):
+        j = by_ep[key].get(step + delay)
+        if j is None:
+            continue
+        r = records[i]
+        out.append(Record(game=r.game, shard_dir=r.shard_dir, frame=r.frame, prev_frame=r.prev_frame, names=r.names,
+                          probs=records[j].probs, teacher_action=records[j].teacher_action, seed=r.seed))
+    return out
+
+
+def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequence[str] | None = None,
+                 label_delay: int = 0) -> list[Record]:
     out: list[Record] = []
     for game in games:
         gdir = data_root / game
@@ -68,12 +87,15 @@ def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequ
         for shard_dir in sorted(p for p in gdir.iterdir() if (p / "records.jsonl").exists()):
             if shards and shard_dir.name not in shards:
                 continue
+            recs, keys, steps = [], [], []
             with open(shard_dir / "records.jsonl") as f:
                 for line in f:
                     r = json.loads(line)
-                    out.append(Record(game=r["game"], shard_dir=shard_dir, frame=r["frame"], prev_frame=r.get("prev_frame"),
-                                      names=tuple(r["actions"]), probs=r["teacher_probs"], teacher_action=r["teacher_action"],
-                                      seed=r["seed"]))
+                    recs.append(Record(game=r["game"], shard_dir=shard_dir, frame=r["frame"], prev_frame=r.get("prev_frame"),
+                                       names=tuple(r["actions"]), probs=r["teacher_probs"], teacher_action=r["teacher_action"],
+                                       seed=r["seed"]))
+                    keys.append((r["seed"], r["episode"])); steps.append(r["step"])
+            out.extend(shift_labels(recs, keys, steps, label_delay) if label_delay else recs)
     return out
 
 
@@ -195,8 +217,9 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("games", nargs="+")
     p.add_argument("--data-root", default=str(DATA_ROOT))
+    p.add_argument("--label-delay", type=int, default=0)
     a = p.parse_args()
-    recs = load_records(a.games, Path(a.data_root))
+    recs = load_records(a.games, Path(a.data_root), label_delay=a.label_delay)
     train, val = split_records(recs)
     print(f"{len(recs)} records, {len(train)} train, {len(val)} val (seed % {VAL_MOD} == 0)")
     for g in a.games:
