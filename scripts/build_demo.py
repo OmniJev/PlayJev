@@ -310,7 +310,7 @@ def norm_bins(cal) -> list[dict] | None:
     return out
 
 
-def read_model_results(results_dir: Path) -> tuple[dict, dict, dict]:
+def read_model_results(results_dir: Path, preferred: str | None = None) -> tuple[dict, dict, dict]:
     """runs/results/*.json in the playjev.play result shape (game, policy, score_mean, len_mean, steps_per_s), one
     dict or a list of dicts per file; a `calibration` key or a separate *calib*.json {game, bins} gives the
     reliability diagram. Rows named random/teacher are kept apart (same-seed references for the model rows); a
@@ -328,9 +328,10 @@ def read_model_results(results_dir: Path) -> tuple[dict, dict, dict]:
                 continue
             g = d["game"]
             bins = norm_bins(d.get("calibration")) or (norm_bins(d) if "bins" in d else None)
-            if bins:
-                calib[g] = {"bins": bins, "policy": d.get("policy_name") or d.get("policy"), "source": f.name,
-                            "agreement": d.get("agreement_top", d.get("agreement")), "ece": d.get("ece")}
+            if bins:  # one entry per policy; build_results picks the one that belongs to the table's model row
+                calib.setdefault(g, {})[d.get("policy_name") or d.get("policy")] = {
+                    "bins": bins, "policy": d.get("policy_name") or d.get("policy"), "source": f.name,
+                    "agreement": d.get("agreement_top", d.get("agreement")), "ece": d.get("ece")}
             pol = d.get("policy_name") or d.get("policy")
             if pol is None or ("score_mean" not in d and "score" not in d):
                 continue
@@ -345,17 +346,20 @@ def read_model_results(results_dir: Path) -> tuple[dict, dict, dict]:
             elif str(pol).endswith("-plain"):  # plain execution: shown only until the guarded row of the same game exists
                 if g not in model or str(model[g]["policy"]).endswith("-plain"):
                     model[g] = row
-            elif g not in model or not str(model[g]["policy"]).startswith("playjev") or str(model[g]["policy"]).endswith("-plain"):
+            elif preferred and pol == preferred:
                 model[g] = row
+            elif g not in model or not str(model[g]["policy"]).startswith("playjev") or str(model[g]["policy"]).endswith("-plain"):
+                if not (preferred and model.get(g, {}).get("policy") == preferred):
+                    model[g] = row
     return model, calib, ref
 
 
-def build_results(games: dict[str, dict], results_dir: Path) -> dict:
+def build_results(games: dict[str, dict], results_dir: Path, preferred: str | None = None) -> dict:
     """One row per game. Random and teacher come from the results directory when the model's run produced them on
     the same seeds; otherwise from docs/BASELINES.md (eight episodes on local-workstation). vs_teacher is (model - random) /
     (teacher - random): 0 is random play, 1 is the teacher."""
     base = parse_baselines(ROOT / "docs" / "BASELINES.md")
-    model, calib, ref = read_model_results(results_dir)
+    model, calib, ref = read_model_results(results_dir, preferred)
     rows, same_seed = [], 0
     for g, spec in games.items():
         b, r = base.get(g, {}), ref.get(g, {})
@@ -364,9 +368,11 @@ def build_results(games: dict[str, dict], results_dir: Path) -> dict:
         m = model.get(g); vs = None
         if m and rnd and tea and tea.get("score") is not None and tea["score"] != rnd["score"]:
             vs = (m["score"] - rnd["score"]) / (tea["score"] - rnd["score"])
+        cal = calib.get(g, {})
+        cal = (cal.get(m["policy"]) if m else None) or (next(iter(cal.values())) if cal else None)
         rows.append({"game": g, "title": spec["title"], "upstream": spec["upstream"], "k": len(spec["actions"]),
                      "env_steps_per_s": b.get("env_steps_per_s"), "random": rnd, "teacher": tea,
-                     "model": m, "vs_teacher": None if vs is None else round(vs, 3), "calibration": calib.get(g),
+                     "model": m, "vs_teacher": None if vs is None else round(vs, 3), "calibration": cal,
                      "same_seed": bool(r.get("random") and r.get("teacher"))})
     n_model = sum(1 for r in rows if r["model"])
     eps = {r["model"]["episodes"] for r in rows if r["model"] and r["model"].get("episodes")}
@@ -401,6 +407,7 @@ def main() -> None:
     ap.add_argument("--results", default=str(ROOT / "runs" / "results"), help="model results directory")
     ap.add_argument("--games", default=",".join(ORDER), help="comma-separated game ids")
     ap.add_argument("--exclude-policies", default=r"-(delay\d+|sampled|plain)$", help="regex; recordings whose policy name matches stay out of the page")
+    ap.add_argument("--model-policy", default=None, help="policy name for the table's trained-model column and the default recording (default: first playjev row found)")
     ap.add_argument("--out", default=str(DEMO), help="demo directory (default demo/)")
     a = ap.parse_args()
     out = Path(a.out)
@@ -432,7 +439,7 @@ def main() -> None:
     (out / "replays" / "index.json").write_text(json.dumps(replays_doc, indent=1))
 
     log("results")
-    results = build_results(games, Path(a.results))
+    results = build_results(games, Path(a.results), a.model_policy or None)
     (out / "results.json").write_text(json.dumps(results, indent=1))
 
     data = {"generated": replays_doc["generated"], "games": list(games.values()), "replays": index, "policies": policies,
