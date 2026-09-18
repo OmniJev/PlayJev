@@ -87,4 +87,24 @@ audio files (`.mp3 .ogg .wav .m4a .mid .midi .oga .flac`) alongside off-origin r
 aborted source just errors the media element. Verified locally: bench clean and `check_det.py` PASS for flappy,
 mario and racer (the games that load sounds); on the node flappy then collected at the same rate as the others.
 
+Flappy shard b died at its first page load with `TargetClosedError` (a Chromium process closed while 24 pages were
+launching; `--disable-dev-shm-usage` is the usual remedy, driver owner's call), so flappy has 66,672 records. Data:
+966,744 records, 863,381 train / 103,363 val (per game 87k to 91k train, flappy 60k). 13,490 steps of 64, warmup 404,
+eval every 1500 steps on 4000 game-balanced validation samples, 51 samples/s cumulative (about 4 h for the epoch).
+
+Zero-shot (step 0), agreement / tie-aware agreement / mean probability on letter A: racer 0.20 / 0.20 / 0.40,
+mario 0.24 / 0.24 / 0.35, snake 0.28 / 0.40 / 0.74, tetris 0.17 / 0.17 / 0.62, invaders 0.37 / 0.37 / 0.65,
+pacman 0.27 / 0.33 / 0.78, flappy 0.51 / 0.51 / 0.76, 2048 0.26 / 0.26 / 0.78, sokoban 0.24 / 0.24 / 0.68,
+breakout 0.31 / 0.32 / 0.69; all 0.286 / 0.306 (chance).
+
+Validation during training (agreement / tie-aware / ECE / mean confidence):
+
+| step | all | flappy | snake | racer | breakout | pacman | tetris | sokoban | mario | invaders | 2048 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1500 | .642 / .657 | .946 / .946 / .08 / .75 | .856 / .950 / .18 / .59 | .779 / .779 / .12 / .60 | .707 / .710 / .11 / .41 | .677 / .733 / .08 / .48 | .574 / .576 / .14 / .30 | .569 / .569 / .05 / .39 | .564 / .564 / .12 / .36 | .419 / .419 / .02 / .10 | .360 / .362 / .01 / .14 |
+| 3000 | .666 / .701 | .993 / .993 / .06 / .87 | .696 / .966 / .07 / .60 | .776 / .776 / .18 / .52 | .670 / .673 / .06 / .48 | .710 / .793 / .10 / .58 | .602 / .607 / .07 / .46 | .701 / .701 / .05 / .56 | .569 / .569 / .10 / .39 | .536 / .536 / .03 / .32 | .414 / .414 / .03 / .22 |
+| 4500 | .686 / .720 | .990 / .990 / .05 / .89 | .712 / .969 / .09 / .60 | .792 / .792 / .10 / .64 | .697 / .699 / .10 / .41 | .765 / .848 / .08 / .60 | .647 / .650 / .06 / .51 | .733 / .733 / .07 / .67 | .554 / .554 / .07 / .40 | .564 / .564 / .05 / .27 | .409 / .409 / .04 / .22 |
+| 6000 | .709 / .737 | .993 / .993 / .08 / .83 | .772 / .976 / .10 / .59 | .817 / .817 / .12 / .64 | .710 / .713 / .10 / .44 | .758 / .829 / .05 / .65 | .635 / .637 / .05 / .56 | .795 / .795 / .04 / .75 | .597 / .597 / .11 / .40 | .621 / .621 / .06 / .34 | .397 / .397 / .02 / .22 |
+| 7500 | .722 / .752 | .985 / .985 / .07 / .82 | .749 / .979 / .08 / .63 | .803 / .803 / .11 / .66 | .705 / .705 / .05 / .50 | .802 / .871 / .06 / .69 | .726 / .728 / .05 / .60 | .814 / .814 / .05 / .81 | .567 / .567 / .08 / .42 | .633 / .633 / .04 / .41 | .436 / .441 / .05 / .27 |
+
 (training in progress)

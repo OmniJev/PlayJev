@@ -78,13 +78,21 @@ async def main(a):
             for i in range(a.pages): pol.reset(i)
         scores, lengths, confs = [], [], []; steps = [0] * a.pages; seed = a.seed0 + a.pages; t0 = time.time(); total = 0
         rng = random.Random(0)
+        # --delay 1: the action decided from frame k is applied at step k+1 (real-time play, inference overlaps the
+        # current step). The first step of an episode applies the current decision. Turn-based games behave the same.
+        pending = [None] * a.pages
         page_seed = list(range(a.seed0, a.seed0 + a.pages)); traces = [[] for _ in range(a.pages)]  # for --record
         rec_dir = None
         if a.record:
             rec_dir = Path(a.record) / a.game; rec_dir.mkdir(parents=True, exist_ok=True)
         while len(scores) < a.episodes:
             probs = pol.decide([o["frame"] for o in obs], acts_meta, [o.get("info") for o in obs])
-            acts = [argmax(p) if not a.sample else rng.choices(range(len(p)), p)[0] for p in probs]
+            decided = [argmax(p) if not a.sample else rng.choices(range(len(p)), p)[0] for p in probs]
+            if a.delay:
+                acts = [pending[i] if pending[i] is not None else decided[i] for i in range(a.pages)]
+                pending = list(decided)
+            else:
+                acts = decided
             K = len(acts_meta); confs.extend((max(p) - 1 / K) / (1 - 1 / K) for p in probs)
             obs = await env.step(acts); total += a.pages
             for i, o in enumerate(obs):
@@ -98,15 +106,15 @@ async def main(a):
                                "frames_per_step": env.spec.get("step_frames"), "steps": traces[i], "final_score": o["score"], "truncated": bool(o.get("truncated")) or steps[i] >= a.max_steps}
                         (rec_dir / f"{rec['policy']}_{page_seed[i]}.json").write_text(json.dumps(rec, separators=(",", ":")))
                         traces[i] = []
-                    seed += 1; page_seed[i] = seed
+                    seed += 1; page_seed[i] = seed; pending[i] = None
                     obs[i] = await env.pages[i].reset(seed)
                     if hasattr(pol, "reset"): pol.reset(i)
         dt = time.time() - t0
-        res = {"game": a.game, "policy": a.policy, "episodes": len(scores), "score_mean": statistics.mean(scores), "score_median": statistics.median(scores),
+        res = {"game": a.game, "policy": a.policy, "delay": a.delay, "episodes": len(scores), "score_mean": statistics.mean(scores), "score_median": statistics.median(scores),
                "score_max": max(scores), "len_mean": statistics.mean(lengths), "capped": sum(l >= a.max_steps for l in lengths),
                "conf_mean": statistics.mean(confs), "steps_per_s": total / dt}
         out = ROOT / "runs" / "play"; out.mkdir(parents=True, exist_ok=True)
-        (out / f"{a.game}_{a.policy}.json").write_text(json.dumps(res, indent=1))
+        (out / f"{a.game}_{a.policy}{'_delay' + str(a.delay) if a.delay else ''}.json").write_text(json.dumps(res, indent=1))
         print(json.dumps(res))
 
 
@@ -116,5 +124,6 @@ if __name__ == "__main__":
     p.add_argument("--url", default="http://127.0.0.1:18731/v1/systemone"); p.add_argument("--pages", type=int, default=8); p.add_argument("--episodes", type=int, default=16)
     p.add_argument("--record", default=None, help="directory: write one replay JSON per finished episode (docs/DEMO.md format)")
     p.add_argument("--policy-name", dest="policy_name", default=None, help="label stored in replay files (default: --policy)")
+    p.add_argument("--delay", type=int, default=0, choices=[0, 1], help="1: apply each decision one step late (real-time latency model)")
     p.add_argument("--max-steps", type=int, default=2000); p.add_argument("--seed0", type=int, default=5000); p.add_argument("--sample", action="store_true", help="sample actions from the policy instead of argmax")
     asyncio.run(main(p.parse_args()))
