@@ -80,6 +80,8 @@ button:disabled { opacity: 0.45; cursor: default; }
 .bars .row .val { text-align: right; font-variant-numeric: tabular-nums; }
 .bars .row.taken > * { color: var(--fg); font-weight: 600; }
 .bars .row.taken .bar i { background: var(--bar-taken); }
+.bars.s2 .row.taken .bar i { background: var(--coral); }
+.tile .conf .s2tag { color: var(--coral); font-weight: 600; }
 .tile .conf { font-size: 11px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; margin-top: -2px; }
 .tile .conf b { color: var(--fg); font-weight: 600; }
 

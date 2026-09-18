@@ -28,7 +28,8 @@
     <span>all tiles</span>
     <button id="all-pp" type="button">pause all</button>
     <span class="seg"><button type="button" data-speed="1" class="on">1x</button><button type="button" data-speed="2">2x</button><button type="button" data-speed="4">4x</button></span>
-    <span>1x is the game's own pace: one recorded step per move or per 5 to 6 frames.</span>
+    <span class="seg"><button type="button" data-who="model" class="on">model alone</button><button type="button" data-who="s2">with System Two</button><button type="button" data-who="random">random</button></span>
+    <span>1x is the game's own pace: one recorded step per move or per 5 to 6 frames. With System Two, the teacher takes the steps where the model's confidence is low; those steps show in coral.</span>
   </div>
 
   <div id="grid" class="grid"></div>

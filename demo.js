@@ -100,6 +100,7 @@
       }
       root.appendChild(this.bars);
       this.conf = el('div', 'conf'); root.appendChild(this.conf);
+      this.bars = root.querySelector('.bars');
       this.status = el('div', 'status');
       this.stepEl = el('span', 'step', 'step 0'); this.scoreEl = el('span', 'score', 'score 0'); this.recEl = el('span', 'rec', ''); this.warnEl = el('span', 'warn', '');
       this.status.append(this.stepEl, this.scoreEl, this.recEl, this.warnEl); root.appendChild(this.status);
@@ -171,14 +172,16 @@
     showOverlay(text, err) { if (text == null) { this.overlay.hidden = true; return; } this.overlay.hidden = false; this.overlay.textContent = text; this.overlay.classList.toggle('err', !!err); }
 
     // ---- rendering
-    renderBars(p, taken) {
+    renderBars(p, taken, s2) {
       for (let i = 0; i < this.K; i++) {
         const v = p ? p[i] : 0; const r = this.rows[i];
         r.fill.style.width = (Math.max(0, Math.min(1, v)) * 100).toFixed(1) + '%';
         r.val.textContent = p ? v.toFixed(2) : '';
         r.row.classList.toggle('taken', i === taken);
       }
-      this.conf.innerHTML = p ? `confidence <b>${confidence(p).toFixed(2)}</b>` + (this.latency != null ? ` <span>latency ${Math.round(this.latency)} ms</span>` : '') : ' ';
+      this.bars.classList.toggle('s2', !!s2);
+      this.conf.innerHTML = p ? `confidence <b>${confidence(p).toFixed(2)}</b>` + (s2 ? ' <span class="s2tag">System Two decided</span>' : '')
+                              + (this.latency != null ? ` <span>latency ${Math.round(this.latency)} ms</span>` : '') : '\u00a0';
     }
     renderRec() {
       const pol = this.policy;
@@ -245,7 +248,7 @@
       await this.boot(); if (gen !== this.gen) return null;
       let obs = await this.call('start', { seed: rec.seed }); if (gen !== this.gen) return null;
       await this.measure(); this.showOverlay(null);
-      const steps = rec.steps, N = steps.length; let i = 0, divergedAt = null;
+      const steps = rec.steps, N = steps.length; let i = 0, divergedAt = null, handed = 0;
       this.renderStatus(0, N, obs.score); this.renderBars(null, -1);
       const stepMs = g.step_ms || 150;
       while (i < N) {
@@ -254,14 +257,15 @@
         const tick = performance.now(); const st = steps[i];
         // The bars belong to the picture on screen: decision i was made from the frame before action i, so show
         // it first, hold for the step's duration, then apply the move (otherwise the model looks one beat late).
-        this.renderBars(st.p, st.a); this.renderStatus(i, N, obs.score);
+        if (st.h) handed++;
+        this.renderBars(st.p, st.a, !!st.h); this.renderStatus(i, N, obs.score, handed ? `(System Two ${handed} of ${i + 1})` : '');
         const speed0 = opts.speed || this.speed;
         const hold = stepMs / speed0 - (performance.now() - tick); if (hold > 0) await sleep(hold);
         if (gen !== this.gen) return null;
         if (!this.playing) { await this.waitResume(); if (gen !== this.gen) return null; }
         obs = await this.call('step', { a: st.a }); if (gen !== this.gen) return null;
         i++;
-        this.renderStatus(i, N, obs.score);
+        this.renderStatus(i, N, obs.score, handed ? `(System Two ${handed} of ${i})` : '');
         if (obs.errors && obs.errors.length) for (const e of obs.errors) this.noteError(e);
         if (divergedAt == null && st.score != null && obs.score !== st.score) {
           divergedAt = i; console.warn(`[${g.id}] ${entry.policy}_${entry.seed}: score ${obs.score} at step ${i}, recording says ${st.score}`);
@@ -276,7 +280,7 @@
         console.warn(`[${g.id}] replay mismatch:`, result);
         this.setMismatch(i < N ? `ended at step ${i} of ${N}, score ${fmtScore(obs.score)}, recording ${fmtScore(rec.final_score)}` : `score ${fmtScore(obs.score)}, recording says ${fmtScore(rec.final_score)}`);
       } else if (divergedAt != null) { this.setMismatch(`score path differed at step ${divergedAt}, same final score`); }
-      this.renderStatus(i, N, obs.score, obs.done ? '(over)' : i === N ? '(end of recording)' : '');
+      this.renderStatus(i, N, obs.score, (obs.done ? '(over)' : i === N ? '(end of recording)' : '') + (handed ? ` System Two decided ${handed} of ${i} steps` : ''));
       this.result = result; return result;
     }
 
@@ -353,6 +357,23 @@
       for (const t of tiles) t.setSpeed(Number(b.dataset.speed));
       for (const x of all.querySelectorAll('[data-speed]')) x.classList.toggle('on', x === b);
     });
+    // who plays on every tile: the model alone, the model with System Two (the teacher takes the low-confidence
+    // steps), or random; a tile without such a recording keeps what it has
+    const pick = (t, which) => {
+      const row = ((D.results && D.results.rows) || []).find((r) => r.game === t.game.id);
+      const base = row && row.model ? row.model.policy : (t.policies.find((p) => String(p).startsWith('playjev')) || null);
+      if (which === 'random') return t.policies.includes('random') ? 'random' : null;
+      if (which === 's2') return t.policies.find((p) => p === base + '-s2') || null;
+      return base;
+    };
+    const hasS2 = tiles.some((t) => pick(t, 's2'));
+    for (const b of all.querySelectorAll('[data-who]')) {
+      if (b.dataset.who === 's2' && !hasS2) { b.remove(); continue; }
+      b.addEventListener('click', () => {
+        for (const t of tiles) { const p = pick(t, b.dataset.who); if (p && p !== t.policy) t.selectPolicy(p); }
+        for (const x of all.querySelectorAll('[data-who]')) x.classList.toggle('on', x === b);
+      });
+    }
     let resizeTimer = null;
     window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => tiles.forEach((t) => t.fit()), 60); });
     const notice = document.getElementById('notice');
