@@ -79,9 +79,10 @@ class HandoverPolicy:
     """System One with a System Two behind it: the model decides, and whenever its Jev confidence is below `tau` the
     decision is handed to the teacher (which reads the game's internal state). tau 0 never hands over, tau above 1
     always does. `handed` counts the steps handed over; `last` marks which pages were handed over on the last call."""
-    def __init__(self, inner, game_id, actions, n, tau):
+    def __init__(self, inner, game_id, actions, n, tau, random_rate=None, seed=0):
         self.inner, self.t, self.tau, self.K = inner, [make_teacher(game_id, actions) for _ in range(n)], tau, len(actions)
         self.handed = 0; self.total = 0; self.last = [False] * n
+        self.random_rate, self.rng = random_rate, random.Random(seed)  # control: hand over a random share of the steps instead
     def reset(self, i):
         self.t[i].reset()
         if hasattr(self.inner, "reset"): self.inner.reset(i)
@@ -89,7 +90,8 @@ class HandoverPolicy:
         probs = self.inner.decide(frames, options, infos); out = []
         for i, p in enumerate(probs):
             conf = (max(p) - 1 / self.K) / (1 - 1 / self.K)
-            self.last[i] = conf < self.tau; self.total += 1
+            self.last[i] = (self.rng.random() < self.random_rate) if self.random_rate is not None else conf < self.tau
+            self.total += 1
             if self.last[i]:
                 self.handed += 1; out.append(self.t[i].act({"info": infos[i]}))
             else:
@@ -104,8 +106,8 @@ async def main(a):
         pol = {"random": lambda: RandomPolicy(acts_meta), "teacher": lambda: TeacherPolicy(a.game, acts_meta, a.pages),
                "server": lambda: ServerPolicy(a.url, acts_meta, a.pages),
                "local": lambda: LocalPolicy(a.ckpt, acts_meta, a.pages, device=a.device, two_frame=a.two_frame)}[a.policy]()
-        if a.handover is not None:
-            pol = HandoverPolicy(pol, a.game, acts_meta, a.pages, a.handover)
+        if a.handover is not None or a.handover_random is not None:
+            pol = HandoverPolicy(pol, a.game, acts_meta, a.pages, a.handover or 0.0, a.handover_random)
         if hasattr(pol, "reset"):
             for i in range(a.pages): pol.reset(i)
         scores, lengths, confs = [], [], []; steps = [0] * a.pages; seed = a.seed0 + a.pages; t0 = time.time(); total = 0
@@ -151,7 +153,7 @@ async def main(a):
                     else: banned[i].clear()
                 if rec_dir is not None:
                     st = {"a": acts[i], "p": [round(x, 4) for x in probs[i]], "score": o["score"]}
-                    if a.handover is not None and pol.last[i]: st["h"] = 1  # this step was decided by System Two
+                    if isinstance(pol, HandoverPolicy) and pol.last[i]: st["h"] = 1  # this step was decided by System Two
                     traces[i].append(st)
                 if o["done"] or steps[i] >= a.max_steps:
                     truncated = bool(o.get("truncated")) or steps[i] >= a.max_steps
@@ -170,10 +172,11 @@ async def main(a):
                "conf_mean": statistics.mean(confs), "steps_per_s": total / dt, "steps": total}
         if a.skip_noop:
             res["noop_steps"] = noop_steps; res["skipped_steps"] = skipped_steps  # unchanged observations seen; executed moves changed by the rule
-        if a.handover is not None:
-            res["handover_tau"] = a.handover; res["handover_rate"] = pol.handed / max(1, pol.total); res["handed_steps"] = pol.handed
+        if isinstance(pol, HandoverPolicy):
+            res["handover_tau"] = a.handover; res["handover_random"] = a.handover_random
+            res["handover_rate"] = pol.handed / max(1, pol.total); res["handed_steps"] = pol.handed
         out = ROOT / "runs" / "play"; out.mkdir(parents=True, exist_ok=True)
-        tag = f"{'_delay' + str(a.delay) if a.delay else ''}{'' if a.skip_noop else '_noskip'}{'_handover' + str(a.handover) if a.handover is not None else ''}"
+        tag = f"{'_delay' + str(a.delay) if a.delay else ''}{'' if a.skip_noop else '_noskip'}{'_handover' + str(a.handover) if a.handover is not None else ''}{'_hrandom' + str(a.handover_random) if a.handover_random is not None else ''}"
         (out / f"{a.game}_{a.policy}{tag}.json").write_text(json.dumps(res, indent=1))
         print(json.dumps(res))
 
@@ -188,5 +191,6 @@ if __name__ == "__main__":
     p.add_argument("--max-steps", type=int, default=2000); p.add_argument("--seed0", type=int, default=5000); p.add_argument("--sample", action="store_true", help="sample actions from the policy instead of argmax")
     p.add_argument("--no-skip-noop", dest="skip_noop", action="store_false", help="plain execution: a move that left the observation unchanged may be repeated (2048 and sokoban can then loop to the cap)")
     p.add_argument("--handover", type=float, default=None, help="System Two: hand the decision to the teacher when the model's Jev confidence is below this (0 never, 1.01 always)")
+    p.add_argument("--handover-random", dest="handover_random", type=float, default=None, help="control: hand over this share of the steps at random instead of by confidence")
     p.set_defaults(skip_noop=True)
     asyncio.run(main(p.parse_args()))
