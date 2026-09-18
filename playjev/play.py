@@ -100,10 +100,11 @@ async def main(a):
                 if rec_dir is not None:
                     traces[i].append({"a": acts[i], "p": [round(x, 4) for x in probs[i]], "score": o["score"]})
                 if o["done"] or steps[i] >= a.max_steps:
+                    truncated = bool(o.get("truncated")) or steps[i] >= a.max_steps
                     scores.append(o["score"]); lengths.append(steps[i]); steps[i] = 0
                     if rec_dir is not None:  # replay file in the docs/DEMO.md format
                         rec = {"game": a.game, "policy": a.policy_name or a.policy, "seed": page_seed[i], "actions": [x["name"] for x in acts_meta],
-                               "frames_per_step": env.spec.get("step_frames"), "steps": traces[i], "final_score": o["score"], "truncated": bool(o.get("truncated")) or steps[i] >= a.max_steps}
+                               "frames_per_step": env.spec.get("step_frames"), "steps": traces[i], "final_score": o["score"], "truncated": truncated}
                         (rec_dir / f"{rec['policy']}_{page_seed[i]}.json").write_text(json.dumps(rec, separators=(",", ":")))
                         traces[i] = []
                     seed += 1; page_seed[i] = seed; pending[i] = None
