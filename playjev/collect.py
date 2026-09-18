@@ -36,7 +36,7 @@ async def main(a):
         actor = None  # DAgger: the model acts, the teacher labels
         if a.actor == "local":
             from .play import LocalPolicy
-            actor = LocalPolicy(a.ckpt, env.actions, a.pages, device=a.device, two_frame=a.two_frame)
+            actor = LocalPolicy(a.ckpt, env.actions, a.pages, device=a.device, two_frame=a.two_frame, stack=a.stack)
         elif a.actor == "server":
             from .play import ServerPolicy
             actor = ServerPolicy(a.url, env.actions, a.pages)
@@ -88,5 +88,6 @@ if __name__ == "__main__":
     p.add_argument("--epsilon", type=float, default=None, help="random-action rate; default from pj.json collect.epsilon or 0.1"); p.add_argument("--shard", default="s0"); p.add_argument("--seed0", type=int, default=1000); p.add_argument("--max-steps", type=int, default=3000)
     p.add_argument("--actor", default="teacher", choices=["teacher", "local", "server"], help="who plays: the teacher (default) or the trained model (DAgger; the teacher still labels)")
     p.add_argument("--ckpt", default=None, help="--actor local: checkpoint directory"); p.add_argument("--device", default="cuda:0"); p.add_argument("--two-frame", action="store_true")
+    p.add_argument("--stack", default="temporal", choices=["temporal", "separate"])
     p.add_argument("--url", default="http://127.0.0.1:18732/v1/systemone", help="--actor server: PlayJev server")
     asyncio.run(main(p.parse_args()))

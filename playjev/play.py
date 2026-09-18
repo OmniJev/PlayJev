@@ -105,7 +105,7 @@ async def main(a):
         acts_meta = env.actions
         pol = {"random": lambda: RandomPolicy(acts_meta), "teacher": lambda: TeacherPolicy(a.game, acts_meta, a.pages),
                "server": lambda: ServerPolicy(a.url, acts_meta, a.pages),
-               "local": lambda: LocalPolicy(a.ckpt, acts_meta, a.pages, device=a.device, two_frame=a.two_frame)}[a.policy]()
+               "local": lambda: LocalPolicy(a.ckpt, acts_meta, a.pages, device=a.device, two_frame=a.two_frame, stack=a.stack)}[a.policy]()
         if a.handover is not None or a.handover_random is not None:
             pol = HandoverPolicy(pol, a.game, acts_meta, a.pages, a.handover or 0.0, a.handover_random)
         if hasattr(pol, "reset"):
@@ -184,6 +184,7 @@ async def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(); p.add_argument("game"); p.add_argument("--policy", default="random", choices=["random", "teacher", "server", "local"])
     p.add_argument("--ckpt", help="local policy: checkpoint directory or HF id for PlayJevModel"); p.add_argument("--device", default="cuda:0"); p.add_argument("--two-frame", action="store_true")
+    p.add_argument("--stack", default="temporal", choices=["temporal", "separate"], help="two-frame layout: one temporal patch (same tokens) or two images (2x visual tokens)")
     p.add_argument("--url", default="http://127.0.0.1:18731/v1/systemone"); p.add_argument("--pages", type=int, default=8); p.add_argument("--episodes", type=int, default=16)
     p.add_argument("--record", default=None, help="directory: write one replay JSON per finished episode (docs/DEMO.md format)")
     p.add_argument("--policy-name", dest="policy_name", default=None, help="label stored in replay files (default: --policy)")

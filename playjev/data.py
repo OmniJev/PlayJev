@@ -78,9 +78,12 @@ def shift_labels(records: list[Record], episode_keys: list[tuple], steps: list[i
 
 
 def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequence[str] | None = None,
-                 label_delay: int = 0) -> list[Record]:
+                 label_delay: int = 0, no_delay_games: Sequence[str] = ()) -> list[Record]:
+    """`no_delay_games` keep their labels unshifted even when `label_delay` is set: the turn-based games (2048,
+    sokoban) do nothing until the player acts, so the deployed model has no latency to absorb there."""
     out: list[Record] = []
     for game in games:
+        delay = 0 if game in no_delay_games else label_delay
         gdir = data_root / game
         if not gdir.exists():
             raise FileNotFoundError(f"no data for {game} under {data_root}")
@@ -95,7 +98,7 @@ def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequ
                                        names=tuple(r["actions"]), probs=r["teacher_probs"], teacher_action=r["teacher_action"],
                                        seed=r["seed"]))
                     keys.append((r["seed"], r["episode"])); steps.append(r["step"])
-            out.extend(shift_labels(recs, keys, steps, label_delay) if label_delay else recs)
+            out.extend(shift_labels(recs, keys, steps, delay) if delay else recs)
     return out
 
 
@@ -217,9 +220,9 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("games", nargs="+")
     p.add_argument("--data-root", default=str(DATA_ROOT))
-    p.add_argument("--label-delay", type=int, default=0)
+    p.add_argument("--label-delay", type=int, default=0); p.add_argument("--no-delay-games", nargs="*", default=[])
     a = p.parse_args()
-    recs = load_records(a.games, Path(a.data_root), label_delay=a.label_delay)
+    recs = load_records(a.games, Path(a.data_root), label_delay=a.label_delay, no_delay_games=a.no_delay_games)
     train, val = split_records(recs)
     print(f"{len(recs)} records, {len(train)} train, {len(val)} val (seed % {VAL_MOD} == 0)")
     for g in a.games:
