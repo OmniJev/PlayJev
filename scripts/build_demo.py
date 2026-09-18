@@ -308,13 +308,14 @@ def norm_bins(cal) -> list[dict] | None:
     return out
 
 
-def read_model_results(results_dir: Path) -> tuple[dict, dict]:
+def read_model_results(results_dir: Path) -> tuple[dict, dict, dict]:
     """runs/results/*.json in the playjev.play result shape (game, policy, score_mean, len_mean, steps_per_s), one
     dict or a list of dicts per file; a `calibration` key or a separate *calib*.json {game, bins} gives the
-    reliability diagram. Policies named random/teacher are ignored here (BASELINES.md is their source)."""
-    model, calib = {}, {}
+    reliability diagram. Rows named random/teacher are kept apart (same-seed references for the model rows); a
+    row whose policy name ends in "-sampled" or "-delay<n>" is a variant and stays out of the table."""
+    model, calib, ref = {}, {}, {}
     if not results_dir.is_dir():
-        return model, calib
+        return model, calib, ref
     for f in sorted(results_dir.glob("*.json")):
         try:
             data = json.loads(f.read_text())
@@ -326,31 +327,51 @@ def read_model_results(results_dir: Path) -> tuple[dict, dict]:
             g = d["game"]
             bins = norm_bins(d.get("calibration")) or (norm_bins(d) if "bins" in d else None)
             if bins:
-                calib[g] = {"bins": bins, "policy": d.get("policy_name") or d.get("policy"), "source": f.name}
+                calib[g] = {"bins": bins, "policy": d.get("policy_name") or d.get("policy"), "source": f.name,
+                            "agreement": d.get("agreement_top", d.get("agreement")), "ece": d.get("ece")}
             pol = d.get("policy_name") or d.get("policy")
-            if pol in (None, "random", "teacher") or ("score_mean" not in d and "score" not in d):
+            if pol is None or ("score_mean" not in d and "score" not in d):
                 continue
             row = {"policy": pol, "score": d.get("score_mean", d.get("score")), "len": d.get("len_mean", d.get("len")),
                    "decisions_per_s": d.get("decisions_per_s", d.get("steps_per_s")), "episodes": d.get("episodes"),
-                   "conf": d.get("conf_mean"), "source": f.name}
-            if g not in model or (str(pol).startswith("playjev") and not str(model[g]["policy"]).startswith("playjev")):
+                   "conf": d.get("conf_mean"), "capped": d.get("capped"), "source": f.name}
+            if pol in ("random", "teacher"):
+                ref.setdefault(g, {})[pol] = row
+            elif re.search(r"-(sampled|delay\d+)$", str(pol)):
+                continue
+            elif g not in model or (str(pol).startswith("playjev") and not str(model[g]["policy"]).startswith("playjev")):
                 model[g] = row
-    return model, calib
+    return model, calib, ref
 
 
 def build_results(games: dict[str, dict], results_dir: Path) -> dict:
+    """One row per game. Random and teacher come from the results directory when the model's run produced them on
+    the same seeds; otherwise from docs/BASELINES.md (eight episodes on local-workstation). vs_teacher is (model - random) /
+    (teacher - random): 0 is random play, 1 is the teacher."""
     base = parse_baselines(ROOT / "docs" / "BASELINES.md")
-    model, calib = read_model_results(results_dir)
-    rows = []
+    model, calib, ref = read_model_results(results_dir)
+    rows, same_seed = [], 0
     for g, spec in games.items():
-        b = base.get(g, {})
+        b, r = base.get(g, {}), ref.get(g, {})
+        rnd = r.get("random") or b.get("random"); tea = r.get("teacher") or (dict(b["teacher"]) if b.get("teacher") else None)
+        same_seed += bool(r.get("random") and r.get("teacher"))
+        m = model.get(g); vs = None
+        if m and rnd and tea and tea.get("score") is not None and tea["score"] != rnd["score"]:
+            vs = (m["score"] - rnd["score"]) / (tea["score"] - rnd["score"])
         rows.append({"game": g, "title": spec["title"], "upstream": spec["upstream"], "k": len(spec["actions"]),
-                     "env_steps_per_s": b.get("env_steps_per_s"), "random": b.get("random"), "teacher": b.get("teacher"),
-                     "model": model.get(g), "calibration": calib.get(g)})
-    log(f"  results: baselines for {sum(1 for r in rows if r['random'])} games, model rows for "
-        f"{sum(1 for r in rows if r['model'])}, calibration for {sum(1 for r in rows if r['calibration'])}")
+                     "env_steps_per_s": b.get("env_steps_per_s"), "random": rnd, "teacher": tea,
+                     "model": m, "vs_teacher": None if vs is None else round(vs, 3), "calibration": calib.get(g),
+                     "same_seed": bool(r.get("random") and r.get("teacher"))})
+    n_model = sum(1 for r in rows if r["model"])
+    eps = {r["model"]["episodes"] for r in rows if r["model"] and r["model"].get("episodes")}
+    note = ("Mean score per policy through the same harness, episodes capped at 1500 steps. "
+            + (f"{'/'.join(str(e) for e in sorted(eps))} held-out episodes per game, random and teacher on the same seeds as the model. "
+               if same_seed == len(rows) and eps else "Random and teacher: eight episodes on the development machine (docs/BASELINES.md). ")
+            + "vs teacher is (model - random) / (teacher - random): 0 is random play, 1 is the teacher.")
+    log(f"  results: baselines for {sum(1 for r in rows if r['random'])} games ({same_seed} same-seed), model rows for "
+        f"{n_model}, calibration for {sum(1 for r in rows if r['calibration'])}")
     return {"generated": dt.datetime.now().isoformat(timespec="seconds"), "baselines": "docs/BASELINES.md",
-            "results_dir": relpath(results_dir), "rows": rows}
+            "results_dir": relpath(results_dir), "note": note, "rows": rows}
 
 
 def check_prompt_against_notes(games: dict[str, dict]) -> None:
