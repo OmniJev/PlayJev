@@ -27,42 +27,45 @@ the frame alone, in real time, with a probability the game loop can trust.
 
 ## Results
 
-The first ten-game model, `playjev-0.8b-sft_all1`: Qwen3.5-0.8B-Base, one epoch of behaviour cloning on 863k
-teacher-labelled frames (about 100k per game), 4 h 11 min on one H200. Closed loop on 16 held-out episodes per game
-(seeds 5000 to 5015, never seen in training), argmax move, episodes capped at 1500 steps; random and teacher play
-the same seeds through the same harness. "vs teacher" is (model - random) / (teacher - random): 0 is random play,
-1 is the teacher. Agreement is the share of steps whose move is in the teacher's best set, once on frames from the
-teacher's own play (the validation split) and once on the model's own play (the teacher scores every step of the
-recorded episodes); ECE is the calibration of the chosen move's probability against that agreement, on own play.
+Two models so far, both Qwen3.5-0.8B-Base and both one model for all ten games. `sft_all1` is one epoch of
+behaviour cloning on 863k teacher-labelled frames (about 100k per game, 4 h 11 min on one H200). `dagger1` is one
+DAgger round on top of it: `sft_all1` played 40k frames per game, the teachers labelled every frame it visited, and
+the model trained one more epoch (lr 1e-5) on those plus one teacher-driven shard per game (3 h 10 min). Closed loop
+on 16 held-out episodes per game (seeds 5000 to 5015), argmax move, episodes capped at 1500 steps; random and
+teacher play the same seeds through the same harness. "vs teacher" is (model - random) / (teacher - random): 0 is
+random play, 1 is the teacher.
 
-| game | random | PlayJev 0.8B | teacher | vs teacher | agreement, teacher frames | agreement, own play | ECE, own play |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Space Invaders | 215 | **400** | 400 | 1.00 | 0.75 | 0.72 | 0.08 |
-| Racer | 238 | **6211** | 6712 | 0.92 | 0.84 | 0.56 | 0.10 |
-| Snake | 1.0 | **77.8** | 114 | 0.68 | 0.99 | 0.93 | 0.22 |
-| Sokoban | 6.6 | **57.9** | 102 | 0.54 | 0.95 | 0.91 | 0.13 |
-| Infinite Mario | 613 | **1156** | 4229 | 0.15 | 0.63 | 0.60 | 0.10 |
-| Pacman | 113 | **1036** | 7026 | 0.13 | 0.87 | 0.92 | 0.14 |
-| 2048 | 1021 | **3174** | 19593 | 0.12 | 0.48 | 0.42 | 0.01 |
-| Floppy Bird | 0.0 | **8.9** | 84.0 | 0.11 | 1.00 | 0.98 | 0.05 |
-| Tetris | 162 | **1034** | 15288 | 0.06 | 0.81 | 0.61 | 0.08 |
-| Breakout | 496 | **611** | 16547 | 0.01 | 0.72 | 0.16 | 0.42 |
+| game | random | sft_all1 | dagger1 | teacher | vs teacher, sft_all1 | vs teacher, dagger1 |
+|---|---:|---:|---:|---:|---:|---:|
+| Space Invaders | 215 | 400 | **400** | 400 | 1.00 | **1.00** |
+| Racer | 238 | 6211 | **6704** | 6712 | 0.92 | **1.00** |
+| Sokoban | 6.6 | 57.9 | **102.3** | 102.2 | 0.54 | **1.00** |
+| Snake | 1.0 | 77.8 | **107.9** | 114 | 0.68 | **0.95** |
+| Pacman | 113 | 1036 | **3209** | 7026 | 0.13 | **0.45** |
+| Infinite Mario | 613 | 1156 | 1170 | 4229 | 0.15 | 0.15 |
+| Floppy Bird | 0.0 | 8.9 | 9.3 | 84.0 | 0.11 | 0.11 |
+| Tetris | 162 | 1034 | 1561 | 15288 | 0.06 | 0.09 |
+| Breakout | 496 | 611 | 1552 | 16547 | 0.01 | 0.07 |
+| 2048 | 1021 | 3174 | 2170 | 19593 | 0.12 | 0.06 |
+| mean | | | | | 0.37 | 0.49 |
 
-Zero-shot, the base model puts 0.7 on option A whatever the frame. After one epoch every game is above random,
-four are close to the teacher, and six are far from it for reasons the two agreement columns separate:
+Zero-shot, the base model puts 0.7 on option A whatever the frame. After one epoch every game is above random.
+The DAgger round separates the games by what was wrong:
 
-- Flappy reproduces the teacher on 99.8 percent of the teacher's frames and dies at 9 pipes because the one step it
-  misses is a correction (a second consecutive flap) that the teacher's own trajectories almost never contain.
-  Tetris drops from 0.81 to 0.61 on its own boards and drops pieces one move early. This is covariate shift, the
-  standard failure of behaviour cloning, and the DAgger round (the model plays, the teacher labels what it visits)
-  is the standard fix; it is running.
-- Breakout agrees with the teacher on 16 percent of its own steps: on the teacher's frames the paddle is already
-  under the ball's landing point, so the model learned to read the paddle instead of the ball, and a single frame
-  does not show the ball's direction anyway. The two-frame input (previous and current frame in the vision tower's
-  temporal patch, no extra tokens) is the fix for that, and for Mario, whose labels depend on velocity and jump
-  phase.
-- 2048 is a reading problem (tile digits at 448 px) and the weakest game at 0.48 agreement; the model knows it,
-  its confidence there is 0.25.
+- Sokoban, Racer, Snake and Pacman were covariate shift: the cloned policy reproduced the teacher on the teacher's
+  own frames (0.95, 0.84, 0.99 and 0.87 agreement) and lost it on its own (0.91, 0.56, 0.93, 0.92 on its own play,
+  with the errors concentrated where they cost most). One round of labels on the model's own states brings three of
+  them to the teacher's level and triples Pacman.
+- Breakout and Mario need motion. On the teacher's frames the paddle is already under the ball's landing point, so
+  the cloned policy learned to read the paddle instead of the ball (16 percent agreement on its own play); DAgger
+  raises that to 47 percent and the score 2.5x, but a single frame does not show the ball's direction, nor Mario's
+  velocity and jump phase. A two-frame input (previous and current frame merged into the vision tower's temporal
+  patch) did not add the motion read; two separate images is the next ablation.
+- Floppy Bird and Tetris are precision. Flappy reproduces the teacher on 99.8 percent of frames and dies at 9 pipes
+  on the one missed correction (a second consecutive flap); Tetris drops pieces one move early. Forty thousand
+  on-policy frames contain a few hundred of those moments, so the round barely moves them.
+- 2048 is a reading problem (tile digits at 448 px): 0.48 agreement either way, and the model knows it, its
+  confidence there is 0.25.
 
 **Execution rule.** A move that leaves the observation unchanged (a blocked direction in 2048 or Sokoban is a legal
 no-op) is not repeated on that observation; the next most probable move is taken. Without it, a deterministic
