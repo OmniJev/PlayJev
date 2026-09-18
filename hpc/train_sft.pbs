@@ -57,6 +57,9 @@ if [ -z "$SKIP_COLLECT" ]; then
         t0=$(date +%s)
         if [ -n "$ACTOR_CKPT" ]; then   # DAgger: the model plays (three copies share the GPU), the teacher labels
             ACT="--actor local --ckpt $ACTOR_CKPT --epsilon $COLLECT_EPS $PLAY_EXTRA"; EPS_C=""; S_A=700000; S_B=800000; S_C=900000
+            # three torch processes with the default 12 threads each plus 24 Chromium pages on 12 cores thrash (job
+            # 621845: 9 records/s per collector, cpupercent 1178); cap the CPU threads of each collector
+            export OMP_NUM_THREADS=3 MKL_NUM_THREADS=3
         else
             ACT=""; EPS_C="--epsilon 0.3"; [ "$g" = sokoban ] && EPS_C=""; S_A=100000; S_B=300000; S_C=500000
         fi
@@ -72,6 +75,7 @@ if [ -z "$SKIP_COLLECT" ]; then
     done
 fi
 python -u -m playjev.data $GAMES
+unset OMP_NUM_THREADS MKL_NUM_THREADS
 
 # 2. Train.
 python -u -m playjev.train_sft --games $GAMES --shards $TRAIN_SHARDS --model $MODEL --out $OUT \

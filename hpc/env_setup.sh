@@ -19,8 +19,8 @@ PYVER=3.12
 
 # The login node's /tmp is 5 GB and ~/.bashrc points UV_CACHE_DIR there; the cu128 torch stack alone
 # downloads about 4 GB of wheels, so cache and temp files go to scratch for this build.
-export UV_CACHE_DIR=$SCRATCH/.cache/uv
-export TMPDIR=$SCRATCH/tmp
+export UV_CACHE_DIR=${UV_CACHE_DIR:-$SCRATCH/.cache/uv}   # vanda: the personal scratch is full, point both at the project disk
+export TMPDIR=${TMPDIR:-$SCRATCH/tmp}
 mkdir -p "$WORK/logs" "$UV_CACHE_DIR" "$TMPDIR"
 
 log() { echo "[env_setup $(date +%H:%M:%S)] $*"; }
