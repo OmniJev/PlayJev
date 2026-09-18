@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-18T20:38:40",
+ "generated": "2026-09-18T22:45:56",
  "baselines": "docs/BASELINES.md",
  "results_dir": "runs/results",
  "note": "Mean score per policy through the same harness, episodes capped at 1500 steps. 16 held-out episodes per game, random and teacher on the same seeds as the model. vs teacher is (model - random) / (teacher - random): 0 is random play, 1 is the teacher.",
