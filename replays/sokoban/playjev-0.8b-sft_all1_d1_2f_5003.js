@@ -1,0 +1,1 @@
+PJ_DEMO_REPLAY({"game":"sokoban","policy":"playjev-0.8b-sft_all1_d1_2f","seed":5003,"actions":["up","down","left","right"],"frames_per_step":1,"steps":[{"a":3,"p":[0.0312,0.0497,0.0241,0.895],"score":101}],"final_score":101,"truncated":false});

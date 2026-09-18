@@ -74,7 +74,11 @@
       this.game = game; this.entries = entries || []; this.K = game.actions.length;
       this.speed = 1; this.playing = true; this.gen = 0; this.pending = new Map(); this.seq = 0;
       this.iframe = null; this.rect = null; this.errors = []; this.result = null; this.autoAdvance = true;
-      const pols = [...new Set(this.entries.map((e) => e.policy))].sort((a, b) => policyRank(a) - policyRank(b) || a.localeCompare(b));
+      // the table's trained-model policy for this game plays by default; other recordings stay selectable
+      const row = ((D.results && D.results.rows) || []).find((r) => r.game === this.game.id);
+      const preferred = row && row.model ? row.model.policy : null;
+      const rank = (n) => (n === preferred ? -0.5 : policyRank(n));
+      const pols = [...new Set(this.entries.map((e) => e.policy))].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
       if (SERVER) pols.unshift('live');
       this.policies = pols; this.policy = pols[0] || null; this.epi = 0;
       this.build();
