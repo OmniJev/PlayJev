@@ -93,6 +93,17 @@ On 400 validation frames per game, with the prompt otherwise unchanged (`scripts
 - an extra fake option ("hold: keep the current move and do nothing new") gets 2 to 9 percent of the mass in seven
   games and 13 to 18 in the three the model is least sure about (2048, Invaders, Breakout).
 
+The same probes on a model that never learned to look (an eight-game run without Snake that settled on a text-only
+policy, see the anchor note below) come out the opposite way: when names and descriptions conflict it follows the
+name 100 percent of the time in every game, neutral names collapse it to chance in Flappy and Breakout, and its
+agreement is at chance wherever a name alone does not give the move away.
+
+**Anchor game.** That eight-game mix (Snake and Racer held out) reproduced the failure with two seeds: five games
+never left the letter prior and the other three converged to "the most common move for this option list", with the
+image pathway unused. With Snake back in the mix (Racer and Pacman held out instead) every game reads the frame by
+step 1500, as in the ten-game run. Snake's labels are the ones with no text shortcut (a BFS arrow, uniform over the
+four options, decided by the board alone), and one such game in the mix is what forces the frame to be read.
+
 ### Is the confidence worth anything?
 
 Low-confidence steps are where the errors are: on the model's own play, Tetris agrees with the teacher on 36
