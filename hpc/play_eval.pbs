@@ -10,7 +10,9 @@
 # DELAYS (0 = act on the current frame, 1 = the decision from frame k is applied at step k+1, the real-time setting).
 #   cd $WORK && qsub -v RUN=sft_all1,DELAYS="1" repo/hpc/play_eval.pbs
 # Variables: RUN (checkpoint dir name under the PROJECT ckpt root; CKPT overrides the full path), GAMES, DELAYS,
-# PLAY_EXTRA (e.g. "--two-frame"), PLAY_CAP (1500), EPISODES (16), RECORD=1 to write demo replays.
+# PLAY_EXTRA (e.g. "--two-frame" or "--no-skip-noop"), PLAY_CAP (1500), EPISODES (16), RECORD=1 to write demo replays,
+# TAG (suffix on the copied result files and the default policy name, e.g. "-plain"), POLICY_NAME (override),
+# REFS=1 to also play random (recorded when RECORD=1) and teacher on the same seeds.
 WORK=$WORK
 REPO=$WORK/repo
 JOB=${PBS_JOBID%%.*}
@@ -30,13 +32,24 @@ echo "RUN=$RUN CKPT=$CKPT DELAYS=$DELAYS PLAY_EXTRA=$PLAY_EXTRA"
 for i in $(seq 1 480); do [ -f $CKPT/config.json ] && break; sleep 60; done
 [ -f $CKPT/config.json ] || { echo "no checkpoint at $CKPT"; exit 1; }
 echo "checkpoint present at $(date)"
+NOSKIP=$([[ "$PLAY_EXTRA" == *no-skip-noop* ]] && echo _noskip)
 for d in $DELAYS; do
     for g in $GAMES; do
-        echo "[play $g] $RUN argmax delay $d"
-        REC=""; [ -n "$RECORD" ] && REC="--record runs/replays --policy-name playjev-0.8b-$RUN-delay$d"
+        echo "[play $g] $RUN argmax delay $d $PLAY_EXTRA"
+        NAME=${POLICY_NAME:-playjev-0.8b-$RUN$TAG$([ "$d" != 0 ] && echo -delay$d)}
+        REC=""; [ -n "$RECORD" ] && REC="--record runs/replays --policy-name $NAME"
         python -u -m playjev.play $g --policy local --ckpt $CKPT --episodes $EPISODES --pages 8 --seed0 5000 \
             --max-steps $PLAY_CAP --delay $d $REC $PLAY_EXTRA
-        cp $REPO/runs/play/${g}_local$([ "$d" != 0 ] && echo _delay$d).json $(dirname $CKPT)/play_${g}_local_delay$d.json 2>/dev/null
+        cp $REPO/runs/play/${g}_local$([ "$d" != 0 ] && echo _delay$d)$NOSKIP.json $(dirname $CKPT)/play_${g}_local${TAG}_delay$d.json 2>/dev/null
+        if [ -n "$REFS" ]; then
+            echo "[play $g] random"
+            REC=""; [ -n "$RECORD" ] && REC="--record runs/replays --policy-name random"
+            python -u -m playjev.play $g --policy random --episodes $EPISODES --pages 8 --seed0 5000 --max-steps $PLAY_CAP $REC
+            cp $REPO/runs/play/${g}_random.json $(dirname $CKPT)/play_${g}_random${TAG}.json 2>/dev/null
+            echo "[play $g] teacher"
+            python -u -m playjev.play $g --policy teacher --episodes $EPISODES --pages 8 --seed0 5000 --max-steps $PLAY_CAP
+            cp $REPO/runs/play/${g}_teacher.json $(dirname $CKPT)/play_${g}_teacher.json 2>/dev/null
+        fi
     done
 done
 date

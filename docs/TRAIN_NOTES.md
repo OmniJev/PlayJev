@@ -108,8 +108,49 @@ Validation during training (agreement / tie-aware / ECE / mean confidence):
 | 7500 | .722 / .752 | .985 / .985 / .07 / .82 | .749 / .979 / .08 / .63 | .803 / .803 / .11 / .66 | .705 / .705 / .05 / .50 | .802 / .871 / .06 / .69 | .726 / .728 / .05 / .60 | .814 / .814 / .05 / .81 | .567 / .567 / .08 / .42 | .633 / .633 / .04 / .41 | .436 / .441 / .05 / .27 |
 | 9000 | .743 / .774 | .993 / .993 / .08 / .83 | .751 / .976 / .08 / .61 | .827 / .827 / .17 / .59 | .691 / .694 / .05 / .53 | .770 / .853 / .06 / .68 | .792 / .797 / .10 / .62 | .884 / .884 / .04 / .85 | .607 / .607 / .12 / .41 | .657 / .657 / .07 / .41 | .458 / .461 / .03 / .25 |
 | 10500 | .763 / .787 | .998 / .998 / .08 / .84 | .830 / .987 / .14 / .59 | .830 / .830 / .13 / .66 | .721 / .721 / .07 / .48 | .795 / .866 / .07 / .65 | .792 / .797 / .09 / .63 | .908 / .908 / .02 / .88 | .620 / .620 / .10 / .44 | .688 / .688 / .08 / .42 | .453 / .456 / .03 / .24 |
+| 12000 | .766 / .796 | .998 / .998 / .08 / .85 | .775 / .990 / .08 / .59 | .830 / .830 / .16 / .64 | .697 / .697 / .07 / .44 | .779 / .862 / .07 / .67 | .802 / .805 / .09 / .65 | .930 / .930 / .02 / .90 | .635 / .635 / .12 / .44 | .755 / .755 / .12 / .45 | .453 / .456 / .05 / .25 |
+| 13490 (final) | .772 / .804 | .998 / .998 / .08 / .84 | .764 / .990 / .08 / .60 | .844 / .844 / .15 / .64 | .715 / .715 / .07 / .48 | .776 / .873 / .07 / .68 | .810 / .812 / .09 / .67 | .949 / .949 / .02 / .94 | .627 / .627 / .13 / .43 | .755 / .755 / .11 / .48 | .475 / .478 / .05 / .25 |
 
-(training in progress)
+Training took 4 h 11 min on hopper-15 (56 samples/s, 17 GB peak); train loss 2.13 at step 1, 1.02 at 1000, 0.74 at
+7500, 0.70 to 0.73 over the last thousand steps; validation loss 0.708 at the end. Three games are still far from
+their teacher at one epoch: 2048 (.475, flat since step 9000), mario (.627) and breakout (.715); sokoban (.949),
+flappy (.998) and snake (tie-aware .990) are at the ceiling of what argmax agreement can show. Checkpoint
+`$WORK/ckpt/sft_all1/final` (step-10500 and step-12000 kept).
+
+Closed loop on held-out seeds 5000+, 16 episodes per game and policy, 8 pages, cap 1500 steps, all on
+`sft_all1/final` (job 621580: argmax, sampled actions, random, teacher; job 621686: argmax with `--delay 1`, the
+decision from frame k applied at step k+1). Cells are mean score (median / max); "capped" counts episodes that
+reached 1500 steps. Argmax replays and random replays are recorded for the demo (`runs/replays/<game>/`).
+
+<!-- run2-closed-loop -->
+| game | trained, argmax | trained, sampled | random | teacher | trained, argmax, delay 1 | argmax: length, conf |
+|---|---|---|---|---|---|---|
+| snake | 77.8 (78.5 / 121) | 15.2 (15 / 51) | 1.0 (1 / 1) | 113.7 (108.5 / 161) | 11.4 (9.5 / 31, 4 capped) | 296, 0.61 |
+| 2048 | 54.5 (32 / 284, 16 capped) | 1304.2 (1230 / 2484) | 1086.8 (1008 / 2424) | 19593.2 (20378 / 22068) | 72.8 (48 / 260, 16 capped) | 1500, 0.16 |
+| tetris | 1034.4 (1065 / 1970) | 665.6 (625 / 1670) | - | - | 248.1 (230 / 430) | 252, 0.62 |
+| breakout | - | - | - | - | 397.8 (247.5 / 1925) | - |
+| flappy | - | - | - | - | 0.2 (0 / 1) | - |
+| invaders | - | - | - | - | 400.0 (400 / 400) | - |
+| mario | - | - | - | - | 819.9 (645 / 2165) | - |
+<!-- /run2-closed-loop -->
+
+Observations while the loop runs (12:15):
+
+- 2048 under argmax is a degenerate loop: all 16 episodes hit the 1500-step cap with a mean score of 54 (random
+  1087). A blocked direction is a legal no-op that leaves the board bit-identical, so a deterministic policy that
+  picks one keeps picking it forever. The teacher targets give blocked moves zero mass (softmax over expectimax
+  values, T = 1200, mean p_max of the targets 0.79 on the smoke shard), so this is the model's reading of the board,
+  not the labels: 2048 validation agreement is .475 with p_max about 0.44, calibrated but unsure, and sampling from
+  that distribution scores 1304, barely above random. The four-way ranking of near-identical boards full of digits
+  is the hardest read in the roster for a 0.8B model after one epoch. Two separate things to fix: the loop (a
+  decoding rule: when the frame did not change after an action, drop that action and take the next best; this never
+  fires in the real-time games because their frames always change) and the policy itself (more 2048 epochs or
+  DAgger on the model's own states).
+- Sampled actions lose to argmax everywhere else (snake 15 vs 78, tetris 666 vs 1034), so argmax stays the protocol.
+- Delay 1 (job 621686, the same checkpoint acting one step late): snake 77.8 to 11.4, tetris 1034 to 248, flappy 0.25
+  pipes; invaders still clears every wave at 400 (left / right / hold with auto-fire barely cares about one step of
+  lag). The unmodified teachers collapse harder under the same delay (snake 108 to 1), so the model already carries
+  some tolerance, and `sft_all1_d1` is the run that trains for it.
 
 ## Run 3: all ten games, delayed labels (`sft_all1_d1`, job 621687, hopper-14)
 
@@ -123,6 +164,7 @@ after training at delay 1 (native) and delay 0. Train loss 1.80 at step 1, 1.12 
 | step | all | flappy | snake | racer | breakout | pacman | tetris | sokoban | mario | invaders | 2048 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 1500 | .569 / .583 | .894 / .902 / .12 / .56 | .711 / .820 / .26 / .27 | .692 / .692 / .16 / .45 | .691 / .691 / .08 / .46 | .634 / .656 / .12 / .36 | .262 / .262 / .08 / .17 | .463 / .463 / .04 / .25 | .536 / .536 / .14 / .36 | .429 / .429 / .07 / .17 | .398 / .400 / .06 / .18 |
+| 3000 | .624 / .649 | .899 / .907 / .08 / .69 | .744 / .922 / .12 / .51 | .781 / .781 / .20 / .50 | .691 / .691 / .04 / .60 | .702 / .765 / .08 / .54 | .417 / .417 / .05 / .28 | .557 / .557 / .06 / .40 | .551 / .551 / .10 / .36 | .506 / .506 / .06 / .18 | .410 / .415 / .06 / .18 |
 
 (training in progress)
 

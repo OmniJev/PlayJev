@@ -335,9 +335,10 @@ def read_model_results(results_dir: Path) -> tuple[dict, dict, dict]:
             row = {"policy": pol, "score": d.get("score_mean", d.get("score")), "len": d.get("len_mean", d.get("len")),
                    "decisions_per_s": d.get("decisions_per_s", d.get("steps_per_s")), "episodes": d.get("episodes"),
                    "conf": d.get("conf_mean"), "capped": d.get("capped"), "source": f.name}
-            if pol in ("random", "teacher"):
-                ref.setdefault(g, {})[pol] = row
-            elif re.search(r"-(sampled|delay\d+)$", str(pol)):
+            if pol in ("random", "random-plain", "teacher"):
+                if pol != "random-plain" or "random" not in ref.get(g, {}):
+                    ref.setdefault(g, {})[pol.replace("-plain", "")] = row
+            elif re.search(r"-(sampled|delay\d+|plain)(-plain)?$", str(pol)):
                 continue
             elif g not in model or (str(pol).startswith("playjev") and not str(model[g]["policy"]).startswith("playjev")):
                 model[g] = row

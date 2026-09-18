@@ -6,6 +6,10 @@ Policies expose  decide(frames: list[bytes], options: list[dict], infos: list[di
 python -m playjev.play snake --policy teacher --pages 8 --episodes 16
 python -m playjev.play snake --policy server --url http://127.0.0.1:18731/v1/systemone --episodes 8
 python -m playjev.play snake --policy local --ckpt /path/to/ckpt --episodes 16
+
+Execution: argmax by default (--sample to sample); a move that changed nothing (same frame and score) is not repeated
+on the same observation, the next-best move is taken (--no-skip-noop for plain execution); --delay 1 applies each
+decision one step late.
 """
 import argparse, asyncio, base64, json, random, statistics, time, urllib.request
 from pathlib import Path
@@ -85,6 +89,18 @@ async def main(a):
         # --delay 1: the action decided from frame k is applied at step k+1 (real-time play, inference overlaps the
         # current step). The first step of an episode applies the current decision. Turn-based games behave the same.
         pending = [None] * a.pages
+        # Executor rule (default, --no-skip-noop turns it off): a move that left the observation unchanged (same
+        # frame bytes, same score, not done) is not repeated on that same observation; the executor takes the best
+        # move outside the banned set instead. Games where a blocked move is a genuine no-op (2048, sokoban)
+        # otherwise trap a deterministic policy for the rest of the episode. The ban clears as soon as the
+        # observation changes. The policy is not consulted differently: its probabilities are recorded as given,
+        # only the executed index changes; the result JSON counts noop_steps and skipped_steps.
+        banned = [set() for _ in range(a.pages)]; noop_steps = 0; skipped_steps = 0
+        def pick(i, p, decided):
+            if not banned[i] or len(banned[i]) >= len(p) or decided not in banned[i]:
+                return decided, False
+            allowed = [j for j in range(len(p)) if j not in banned[i]]
+            return max(allowed, key=p.__getitem__), True
         page_seed = list(range(a.seed0, a.seed0 + a.pages)); traces = [[] for _ in range(a.pages)]  # for --record
         rec_dir = None
         if a.record:
@@ -97,10 +113,18 @@ async def main(a):
                 pending = list(decided)
             else:
                 acts = decided
+            if a.skip_noop:
+                picked = [pick(i, probs[i], acts[i]) for i in range(a.pages)]
+                acts = [x for x, _ in picked]; skipped_steps += sum(sk for _, sk in picked)
             K = len(acts_meta); confs.extend((max(p) - 1 / K) / (1 - 1 / K) for p in probs)
+            prev_obs = obs
             obs = await env.step(acts); total += a.pages
             for i, o in enumerate(obs):
                 steps[i] += 1
+                if a.skip_noop:
+                    same = (not o["done"] and o["score"] == prev_obs[i]["score"] and o.get("frame") == prev_obs[i].get("frame"))
+                    if same: banned[i].add(acts[i]); noop_steps += 1
+                    else: banned[i].clear()
                 if rec_dir is not None:
                     traces[i].append({"a": acts[i], "p": [round(x, 4) for x in probs[i]], "score": o["score"]})
                 if o["done"] or steps[i] >= a.max_steps:
@@ -111,15 +135,17 @@ async def main(a):
                                "frames_per_step": env.spec.get("step_frames"), "steps": traces[i], "final_score": o["score"], "truncated": truncated}
                         (rec_dir / f"{rec['policy']}_{page_seed[i]}.json").write_text(json.dumps(rec, separators=(",", ":")))
                         traces[i] = []
-                    seed += 1; page_seed[i] = seed; pending[i] = None
+                    seed += 1; page_seed[i] = seed; pending[i] = None; banned[i].clear()
                     obs[i] = await env.pages[i].reset(seed)
                     if hasattr(pol, "reset"): pol.reset(i)
         dt = time.time() - t0
-        res = {"game": a.game, "policy": a.policy, "delay": a.delay, "episodes": len(scores), "score_mean": statistics.mean(scores), "score_median": statistics.median(scores),
+        res = {"game": a.game, "policy": a.policy, "delay": a.delay, "skip_noop": bool(a.skip_noop), "episodes": len(scores), "score_mean": statistics.mean(scores), "score_median": statistics.median(scores),
                "score_max": max(scores), "len_mean": statistics.mean(lengths), "capped": sum(l >= a.max_steps for l in lengths),
-               "conf_mean": statistics.mean(confs), "steps_per_s": total / dt}
+               "conf_mean": statistics.mean(confs), "steps_per_s": total / dt, "steps": total}
+        if a.skip_noop:
+            res["noop_steps"] = noop_steps; res["skipped_steps"] = skipped_steps  # unchanged observations seen; executed moves changed by the rule
         out = ROOT / "runs" / "play"; out.mkdir(parents=True, exist_ok=True)
-        (out / f"{a.game}_{a.policy}{'_delay' + str(a.delay) if a.delay else ''}.json").write_text(json.dumps(res, indent=1))
+        (out / f"{a.game}_{a.policy}{'_delay' + str(a.delay) if a.delay else ''}{'' if a.skip_noop else '_noskip'}.json").write_text(json.dumps(res, indent=1))
         print(json.dumps(res))
 
 
@@ -131,4 +157,6 @@ if __name__ == "__main__":
     p.add_argument("--policy-name", dest="policy_name", default=None, help="label stored in replay files (default: --policy)")
     p.add_argument("--delay", type=int, default=0, choices=[0, 1], help="1: apply each decision one step late (real-time latency model)")
     p.add_argument("--max-steps", type=int, default=2000); p.add_argument("--seed0", type=int, default=5000); p.add_argument("--sample", action="store_true", help="sample actions from the policy instead of argmax")
+    p.add_argument("--no-skip-noop", dest="skip_noop", action="store_false", help="plain execution: a move that left the observation unchanged may be repeated (2048 and sokoban can then loop to the cap)")
+    p.set_defaults(skip_noop=True)
     asyncio.run(main(p.parse_args()))
