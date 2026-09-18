@@ -1,0 +1,15 @@
+# Versions we trained and evaluated with (hpc/env_setup.sh builds the same stack with uv on an H200 node).
+# torch and torchvision come from the cu128 index: pip install --index-url https://download.pytorch.org/whl/cu128 torch==2.10.0 torchvision==0.25.0
+torch==2.10.0
+torchvision==0.25.0
+transformers==5.17.0
+accelerate==1.15.0
+peft==0.21.0
+flash-linear-attention==0.5.2
+triton==3.7.1
+tokenizers==0.23.2
+safetensors==0.8.0
+numpy==2.5.3
+pillow
+einops
+playwright==1.63.0
