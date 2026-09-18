@@ -1,0 +1,1 @@
+PJ_DEMO_REPLAY({"game":"snake","policy":"random","seed":5017,"actions":["up","down","left","right"],"frames_per_step":1,"steps":[{"a":1,"p":[0.0,1.0,0.0,0.0],"score":1},{"a":1,"p":[0.0,1.0,0.0,0.0],"score":1},{"a":2,"p":[0.0,0.0,1.0,0.0],"score":1},{"a":2,"p":[0.0,0.0,1.0,0.0],"score":1}],"final_score":1,"truncated":false});

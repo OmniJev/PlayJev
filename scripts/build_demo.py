@@ -223,7 +223,7 @@ def policy_rank(name: str) -> tuple:
     return (0 if n.startswith("playjev") else 1 if n == "teacher" else 2 if n == "random" else 3, n)
 
 
-def build_replays(replay_dirs: list[Path], games: dict[str, dict], out: Path) -> dict:
+def build_replays(replay_dirs: list[Path], games: dict[str, dict], out: Path, exclude: str | None = None) -> dict:
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
@@ -245,6 +245,8 @@ def build_replays(replay_dirs: list[Path], games: dict[str, dict], out: Path) ->
                 log(f"  replay {f}: action list {rec['actions']} differs from the hook's {names}, skipped"); continue
             if rec["game"] != game:
                 log(f"  replay {f}: file says game {rec['game']}, folder says {game}, skipped"); continue
+            if exclude and re.search(exclude, str(rec["policy"])):
+                continue  # ablation recordings (delay variants and the like) stay out of the page
             bad = [i for i, s in enumerate(rec["steps"]) if not (0 <= int(s["a"]) < len(names)) or len(s["p"]) != len(names)]
             if bad:
                 log(f"  replay {f}: {len(bad)} steps with a bad action or probability vector, skipped"); continue
@@ -398,6 +400,7 @@ def main() -> None:
     ap.add_argument("--replays", action="append", help="replay directory (repeatable; default runs/replays)")
     ap.add_argument("--results", default=str(ROOT / "runs" / "results"), help="model results directory")
     ap.add_argument("--games", default=",".join(ORDER), help="comma-separated game ids")
+    ap.add_argument("--exclude-policies", default=r"-(delay\d+|sampled|plain)$", help="regex; recordings whose policy name matches stay out of the page")
     ap.add_argument("--out", default=str(DEMO), help="demo directory (default demo/)")
     a = ap.parse_args()
     out = Path(a.out)
@@ -422,7 +425,7 @@ def main() -> None:
     check_prompt_against_notes(games)
 
     log("replays")
-    index = build_replays(replay_dirs, games, out / "replays")
+    index = build_replays(replay_dirs, games, out / "replays", a.exclude_policies or None)
     policies = sorted({e["policy"] for lst in index.values() for e in lst}, key=policy_rank)
     replays_doc = {"generated": dt.datetime.now().isoformat(timespec="seconds"), "sources": [relpath(p) for p in replay_dirs],
                    "policies": policies, "games": index}

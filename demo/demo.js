@@ -248,16 +248,21 @@
         if (gen !== this.gen) return null;
         if (!this.playing) { await this.waitResume(); if (gen !== this.gen) return null; }
         const tick = performance.now(); const st = steps[i];
+        // The bars belong to the picture on screen: decision i was made from the frame before action i, so show
+        // it first, hold for the step's duration, then apply the move (otherwise the model looks one beat late).
+        this.renderBars(st.p, st.a); this.renderStatus(i, N, obs.score);
+        const speed0 = opts.speed || this.speed;
+        const hold = stepMs / speed0 - (performance.now() - tick); if (hold > 0) await sleep(hold);
+        if (gen !== this.gen) return null;
+        if (!this.playing) { await this.waitResume(); if (gen !== this.gen) return null; }
         obs = await this.call('step', { a: st.a }); if (gen !== this.gen) return null;
         i++;
-        this.renderBars(st.p, st.a); this.renderStatus(i, N, obs.score);
+        this.renderStatus(i, N, obs.score);
         if (obs.errors && obs.errors.length) for (const e of obs.errors) this.noteError(e);
         if (divergedAt == null && st.score != null && obs.score !== st.score) {
           divergedAt = i; console.warn(`[${g.id}] ${entry.policy}_${entry.seed}: score ${obs.score} at step ${i}, recording says ${st.score}`);
         }
         if (obs.done) break;
-        const speed = opts.speed || this.speed;
-        const wait = stepMs / speed - (performance.now() - tick); if (wait > 0) await sleep(wait);
       }
       const match = obs.score === rec.final_score && (i === N);
       const result = { game: g.id, policy: rec.policy, seed: rec.seed, steps_played: i, steps_recorded: N, final: obs.score,
@@ -302,9 +307,11 @@
         this.latency = performance.now() - tick;
         if (gen !== this.gen) return null;
         const a = argmax(p);
+        this.renderBars(p, a);  // the answer to the picture on screen, shown before the move is applied
+        const hold = stepMs / this.speed - (performance.now() - tick); if (hold > 0) await sleep(hold);
+        if (gen !== this.gen) return null;
         obs = await this.call('step', { a }); if (gen !== this.gen) return null;
-        i++; this.renderBars(p, a); this.renderStatus(i, null, obs.score, 'live');
-        const wait = stepMs / this.speed - (performance.now() - tick); if (wait > 0) await sleep(wait);
+        i++; this.renderStatus(i, null, obs.score, 'live');
       }
       this.renderStatus(i, null, obs.score, obs.done ? '(over)' : '(step cap)');
       return { game: g.id, policy: 'live', seed, steps_played: i, final: obs.score, done: !!obs.done };

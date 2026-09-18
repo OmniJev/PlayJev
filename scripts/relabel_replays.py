@@ -82,7 +82,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--replays", default=str(ROOT / "runs" / "replays"))
     ap.add_argument("--out", default=str(ROOT / "runs" / "results"))
-    ap.add_argument("--policy", default="playjev", help="policy-name prefix of the recordings to relabel")
+    ap.add_argument("--policy", default="playjev-0.8b-sft_all1", help="exact policy name of the recordings to relabel")
     ap.add_argument("--games", default=None, help="comma-separated subset")
     ap.add_argument("--pages", type=int, default=8)
     a = ap.parse_args()
@@ -90,7 +90,8 @@ def main():
     log = lambda s: print(s, flush=True)
     summary = []
     for g in games:
-        files = sorted(Path(a.replays, g).glob(f"{a.policy}*_*.json")) if Path(a.replays, g).is_dir() else []
+        d = Path(a.replays, g)  # exactly <policy>_<seed>.json (a prefix match would also catch <policy>-delay1_<seed>.json)
+        files = sorted(f for f in d.glob(f"{a.policy}_*.json") if f.stem[len(a.policy) + 1:].isdigit()) if d.is_dir() else []
         if not files:
             log(f"[{g}] no recordings for policy {a.policy}*"); continue
         pol = json.loads(files[0].read_text())["policy"]
@@ -114,9 +115,16 @@ def main():
             f"{len(entry['mismatches'])} mismatches, {entry['seconds']} s")
     if summary:
         out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
-        name = summary[0]["policy_name"].replace("/", "_")
-        (out / f"{name}_relabel.json").write_text(json.dumps(summary, indent=1))
-        log(f"wrote {out / f'{name}_relabel.json'}")
+        name = summary[0]["policy_name"].replace("/", "_"); path = out / f"{name}_relabel.json"
+        if path.is_file():  # a partial run (--games) replaces those games' entries and keeps the rest
+            done = {e["game"] for e in summary}
+            try:
+                summary = [e for e in json.loads(path.read_text()) if e.get("game") not in done] + summary
+            except json.JSONDecodeError:
+                pass
+            summary.sort(key=lambda e: GAMES.index(e["game"]) if e["game"] in GAMES else 99)
+        path.write_text(json.dumps(summary, indent=1))
+        log(f"wrote {path} ({len(summary)} games)")
 
 
 if __name__ == "__main__":
