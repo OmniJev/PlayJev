@@ -119,16 +119,18 @@ python -m playjev.play snake --policy local --ckpt ckpt/snake1/final --record ru
 `playjev.play --policy teacher` and `--policy random` give the two reference rows; `--delay 1` applies each
 decision one step late, the real-time latency model. The HPC job scripts we used are under `hpc/`.
 
-Serving: `playjev.play --policy server --url http://host:port/v1/systemone` talks to any OpenJev-compatible server
-that accepts image states (`{"state": {"frames": ["data:image/jpeg;base64,..."]}, "questions": {...}}`), and the demo
-page does the same with `?server=http://host:port`.
+Serving: `python -m playjev.serve --ckpt ckpt/snake1/final --port 18732` exposes the checkpoint at
+`/v1/systemone` in the OpenJev request shape with frames as the state
+(`{"state": {"frames": ["data:image/jpeg;base64,..."]}, "questions": {"q": {"type": "choice", "criteria": {...}}}}`).
+`playjev.play --policy server --url http://127.0.0.1:18732/v1/systemone` plays through it, and the demo page switches
+every tile to that server with `?server=http://127.0.0.1:18732`.
 
 ## Repository
 
 ```
 games/<id>/        vendored game, pj.json manifest, pj_hook.js, NOTES.md, TEACHER.md
 games/_shared/     pj_shim.js: virtual clock, seeded Math.random, synthetic keys, frame grab
-playjev/           env.py (Playwright driver), collect.py, teachers/, model.py, data.py, train_sft.py, play.py
+playjev/           env.py (Playwright driver), collect.py, teachers/, model.py, data.py, train_sft.py, play.py, serve.py
 demo/              the GitHub Pages site; scripts/build_demo.py assembles it from games/ and runs/replays/
 docs/              HARNESS.md (the hook contract), DESIGN.md, BASELINES.md, MODEL_NOTES.md, TRAIN_NOTES.md
 hpc/               PBS job scripts for collection, training and closed-loop play

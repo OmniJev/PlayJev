@@ -31,14 +31,18 @@ class TeacherPolicy:
 
 
 class ServerPolicy:
-    """POST /v1/systemone with an image state: {"state": {"frames": [dataURL]}, "questions": {"q": Choice}}."""
-    def __init__(self, url, actions, model="playjev-latest"):
-        self.url, self.model = url, model
+    """POST /v1/systemone with an image state: {"state": {"frames": [previous, current]}, "questions": {"q": Choice}}.
+    The previous frame of each page goes along once there is one; a single-frame server uses the last frame."""
+    def __init__(self, url, actions, n=1, model="playjev-latest"):
+        self.url, self.model, self.prev = url, model, [None] * n
         self.criteria = {a["name"]: a["description"] for a in actions}
+    def reset(self, i): self.prev[i] = None
     def decide(self, frames, options, infos):
         out = []
-        for f in frames:
-            body = {"model": self.model, "state": {"frames": ["data:image/jpeg;base64," + base64.b64encode(f).decode()]},
+        for i, f in enumerate(frames):
+            data = [("data:image/jpeg;base64," + base64.b64encode(x).decode()) for x in ([self.prev[i]] if self.prev[i] else []) + [f]]
+            self.prev[i] = f
+            body = {"model": self.model, "state": {"frames": data},
                     "questions": {"q": {"type": "choice", "instructions": INSTRUCTIONS, "criteria": self.criteria}}}
             req = urllib.request.Request(self.url, json.dumps(body).encode(), {"Content-Type": "application/json"})
             ans = json.loads(urllib.request.urlopen(req, timeout=60).read())["answers"]["q"]["probabilities"]
@@ -72,7 +76,7 @@ async def main(a):
         obs = await env.reset(list(range(a.seed0, a.seed0 + a.pages)))
         acts_meta = env.actions
         pol = {"random": lambda: RandomPolicy(acts_meta), "teacher": lambda: TeacherPolicy(a.game, acts_meta, a.pages),
-               "server": lambda: ServerPolicy(a.url, acts_meta),
+               "server": lambda: ServerPolicy(a.url, acts_meta, a.pages),
                "local": lambda: LocalPolicy(a.ckpt, acts_meta, a.pages, device=a.device, two_frame=a.two_frame)}[a.policy]()
         if hasattr(pol, "reset"):
             for i in range(a.pages): pol.reset(i)

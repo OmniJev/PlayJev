@@ -111,6 +111,21 @@ Validation during training (agreement / tie-aware / ECE / mean confidence):
 
 (training in progress)
 
+## Run 3: all ten games, delayed labels (`sft_all1_d1`, job 621687, hopper-14)
+
+Same shards, model, optimiser and eval schedule as `sft_all1`, with `--label-delay 1`: frame k is labelled with the
+teacher's distribution at record k+1 of the same episode (each episode's last record dropped, 13,426 steps instead of
+13,490). Validation targets are shifted the same way, so the rows below are agreement with the teacher's *next*
+decision and are not directly comparable to the `sft_all1` table (its targets are the current decision). Closed loop
+after training at delay 1 (native) and delay 0. Train loss 1.80 at step 1, 1.12 at 600, 1.06 at 1500 (`sft_all1`:
+1.02 at 1000), 57 samples/s.
+
+| step | all | flappy | snake | racer | breakout | pacman | tetris | sokoban | mario | invaders | 2048 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1500 | .569 / .583 | .894 / .902 / .12 / .56 | .711 / .820 / .26 / .27 | .692 / .692 / .16 / .45 | .691 / .691 / .08 / .46 | .634 / .656 / .12 / .36 | .262 / .262 / .08 / .17 | .463 / .463 / .04 / .25 | .536 / .536 / .14 / .36 | .429 / .429 / .07 / .17 | .398 / .400 / .06 / .18 |
+
+(training in progress)
+
 ## Real-time latency (decided 2026-09-18, relayed by session)
 
 The deployed model sees frame k and its answer is applied at step k+1 (one step, 83 to 100 ms in the real-time
