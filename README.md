@@ -98,10 +98,31 @@ On 400 validation frames per game, with the prompt otherwise unchanged (`scripts
 Low-confidence steps are where the errors are: on the model's own play, Tetris agrees with the teacher on 36
 percent of the steps with confidence below 0.5 and 61 percent overall; Invaders 41 percent against 97 percent on
 steps above 0.9; Racer 34 against 97; Sokoban 3 against 94. The operational test is a System Two behind the model:
-whenever the Jev confidence is below a threshold, the decision is handed to the teacher (`playjev.play --handover`).
-Snake, 16 episodes: threshold 0 (the model alone) 76.8; 0.2 hands over 0.4 percent of the steps and scores 82.1;
-0.4 hands over 38 percent, 90.1; 0.6, 45 percent, 97.8; 0.8, 53 percent, 112.4; the teacher alone 113.7. The other
-games follow.
+whenever the Jev confidence is below a threshold, the decision is handed to the teacher (`playjev.play --handover`),
+and the control hands the same share of steps over at random (`--handover-random`). `sft_all1`, 16 episodes per
+setting:
+
+| game | model alone | share of steps handed over | by confidence | at random, same share | teacher alone |
+|---|---:|---:|---:|---:|---:|
+| Breakout | 701 | 16% | **3423** | 1257 | 16547 |
+| | | 34% | **15139** | 6192 | |
+| Tetris | 1054 | 14% | **2976** | 1610 | 15288 |
+| | | 33% | **9109** | 3177 | |
+| | | 63% | **15156** | 8473 | |
+| Pacman | 1029 | 16% | **1739** | 1594 | 7026 |
+| | | 22% | **3573** | 2947 | |
+| Snake | 77 | 38% | **90** | 82 | 114 |
+| | | 53% | **112** | 92 | |
+| Floppy Bird | 8.9 | 3% | **14.4** | | 84 |
+| | | 18% | **38.9** | | |
+| 2048 | 3009 | 32% | **6322** | | 19593 |
+| Racer | 6214 | 11% | **6634** | | 6712 |
+| | | 39% | **6712** | | |
+
+Handing over a third of Breakout's steps by confidence reaches the teacher's level; the same share at random gets
+a third of the way. The confidence picks the steps that matter, which is what a System One is for: it knows which
+decisions to keep and which to pass on. Sokoban is the exception (34 percent handed over, 58 to 71): its failures are
+boards the model has already deadlocked, and no later decision repairs them.
 
 ## The ten games
 
