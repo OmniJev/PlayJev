@@ -216,6 +216,11 @@ def main(a: argparse.Namespace) -> None:
     if a.limit:  # smoke tests: the first `limit` training records of every game, a few validation records each
         train_recs = [r for g in a.games for r in [x for x in train_recs if x.game == g][: a.limit]]
         val_recs = [r for g in a.games for r in [x for x in val_recs if x.game == g][: max(4, a.limit // 4)]]
+    if a.subsample:  # data-efficiency runs: a seeded random subset of `subsample` training records per game, full validation
+        rng = random.Random(a.seed + 7); sub = []
+        for g in a.games:
+            pool = [x for x in train_recs if x.game == g]; rng.shuffle(pool); sub.extend(pool[: a.subsample])
+        train_recs = sub
     print(f"[train] {len(records)} records: {len(train_recs)} train, {len(val_recs)} val; per game "
           f"{ {g: sum(r.game == g for r in train_recs) for g in a.games} }")
     processor = AutoProcessor.from_pretrained(a.model, local_files_only=Path(a.model).exists())
@@ -354,5 +359,6 @@ if __name__ == "__main__":
     p.add_argument("--keep", type=int, default=2)
     p.add_argument("--log-every", type=int, default=20)
     p.add_argument("--limit", type=int, default=0, help="use only this many training records (smoke tests)")
+    p.add_argument("--subsample", type=int, default=0, help="random subset of this many training records per game (transfer / data-efficiency runs)")
     p.add_argument("--seed", type=int, default=0)
     main(p.parse_args())
