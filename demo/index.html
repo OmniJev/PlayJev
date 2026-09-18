@@ -52,7 +52,9 @@
   <p>The model never sees a game's name. It sees the frame and the option list, rendered with the frozen OpenJev prompt below,
     and its answer is the next token after "Answer:". The probability over moves is the softmax over the option letters at that
     position, one forward pass with no sampling and no generated text. Confidence is (p<sub>max</sub> - 1/K) / (1 - 1/K), the Jev formula,
-    so 0 is a uniform guess and 1 is certainty.</p>
+    so 0 is a uniform guess and 1 is certainty. The move with the highest probability is played; a move that leaves the
+    picture unchanged (a blocked direction in 2048 or Sokoban) is not repeated on the same picture, the next most probable
+    move is played instead.</p>
   <p>Each tile is the vendored game running in an iframe with the same shim and hook used in training: a virtual clock,
     seeded randomness and synthetic key events, so the recorded action sequence reproduces the episode step for step. The page
     checks the replayed score against the recording at the end of every episode and marks a tile in coral if they differ.
