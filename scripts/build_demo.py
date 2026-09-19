@@ -498,6 +498,7 @@ def main() -> None:
     data = {"generated": replays_doc["generated"], "games": list(games.values()), "replays": index, "policies": policies,
             "results": results, "links": LINKS}
     (out / "data.js").write_text("window.PJ_DEMO = " + json.dumps(data, separators=(",", ":")) + ";\n")
+    (out / ".nojekyll").touch()  # GitHub Pages drops games/_shared without it
     total = sum(p.stat().st_size for p in out.rglob("*") if p.is_file() and "shots" not in p.parts)
     log(f"done: demo/ is {total/1e6:.1f} MB without shots/; {sum(len(v) for v in index.values())} recordings, "
         f"policies {policies or ['none']}")
