@@ -1,3 +1,4 @@
 upstream: https://github.com/jakesgordon/javascript-racer.git
 commit: 3e8a060b5900755db27f899612a74a77427c853e
 vendored: 2026-09-17
+removed: audio files (never loaded; the driver aborts every audio request)

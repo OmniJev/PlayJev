@@ -1,3 +1,4 @@
 upstream: https://github.com/robertkleffner/mariohtml5.git
 commit: 1dcf623d5b3829e6a2efea93c387e81b1a3c6864
 vendored: 2026-09-17
+removed: audio files (never loaded; the driver aborts every audio request)

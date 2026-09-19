@@ -1,3 +1,4 @@
 upstream: https://github.com/nebez/floppybird.git
 commit: efd2c7f740299688e524e57bfa3f635c9b857f82
 vendored: 2026-09-17
+removed: audio files (never loaded; the driver aborts every audio request)
