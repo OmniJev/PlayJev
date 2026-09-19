@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayJev in the browser (WebGPU speed probe)</title>
+<style>
+  :root { --bg:#0e1116; --fg:#e6e9ef; --dim:#9aa4b2; --line:#232a35; --accent:#4c8dff; --ok:#3fb950; --bad:#f85149; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px 16px 48px; background:var(--bg); color:var(--fg);
+         font:14px/1.55 ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial; }
+  main { max-width:900px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 4px; font-weight:600; }
+  p.lede { color:var(--dim); margin:0 0 20px; max-width:70ch; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 16px; background:#131822; }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  select, button { font:inherit; color:var(--fg); background:#1b2230; border:1px solid var(--line);
+                   border-radius:7px; padding:6px 10px; }
+  button { cursor:pointer; }
+  button:disabled { opacity:.45; cursor:default; }
+  button.go { background:var(--accent); border-color:var(--accent); color:#fff; }
+  label.chk { color:var(--dim); display:flex; gap:6px; align-items:center; }
+  .stage { display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:16px; align-items:start; }
+  @media (max-width:720px) { .stage { grid-template-columns:1fr; } }
+  #view { position:relative; width:100%; aspect-ratio:1/1; background:#000; border-radius:8px; overflow:hidden; }
+  #view iframe { position:absolute; top:0; left:0; border:0; transform-origin:0 0; opacity:0; transition:opacity .2s; }
+  #view iframe.shown { opacity:1; }
+  .dl[hidden] { display:none; }
+  .dl { position:fixed; left:0; right:0; bottom:0; z-index:50; margin:0;
+        border-radius:0; border-left:0; border-right:0; border-bottom:0; background:#131822f2;
+        backdrop-filter:blur(6px); max-height:40vh; overflow:auto;
+        transition:transform .35s ease, opacity .35s ease; }
+  .dl .inner { max-width:900px; margin:0 auto; }
+  .dl.gone { transform:translateY(110%); opacity:0; }
+  .dl { padding:10px 16px 12px; }
+  .dl summary { color:var(--dim); font-size:12px; cursor:pointer; margin-top:8px; outline:none; }
+  .dl summary::marker { color:var(--line); }
+  .dl .head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .dl .head b { font-weight:600; font-size:15px; }
+  .dl .head span { color:var(--dim); font-size:12px; font-variant-numeric:tabular-nums; }
+  .dl .big { height:10px; background:#1b2230; border-radius:5px; overflow:hidden; }
+  .dl .big i { display:block; height:100%; width:0; background:var(--accent); transition:width .15s linear; }
+  .dl #dl-files { margin-top:8px; }
+  .dl .f { display:grid; grid-template-columns:1fr 92px; gap:8px; align-items:center;
+           font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums; margin-bottom:5px; }
+  .dl .f .n { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dl .f .t { height:5px; background:#1b2230; border-radius:3px; overflow:hidden; margin-top:3px; }
+  .dl .f .t i { display:block; height:100%; width:0; background:var(--accent); transition:width .15s linear; }
+  .dl .f.done .t i { background:var(--ok); }
+  .dl .f.cached .t i { background:var(--line); }
+  .dl .head span.stall { color:var(--bad); }
+  .dl .f .v { text-align:right; }
+  .bars div.b { margin-bottom:8px; }
+  .bars .lbl { display:flex; justify-content:space-between; font-size:12px; color:var(--dim); }
+  .bars .track { height:8px; background:#1b2230; border-radius:4px; overflow:hidden; margin-top:3px; }
+  .bars .fill { height:100%; background:var(--accent); width:0; transition:width .1s linear; }
+  .bars .b.taken .lbl { color:var(--fg); }
+  .bars .b.taken .fill { background:var(--ok); }
+  table.st { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+  table.st td { padding:3px 0; }
+  table.st td:first-child { color:var(--dim); }
+  table.st td:last-child { text-align:right; }
+  #log { white-space:pre-wrap; color:var(--dim); font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+         max-height:180px; overflow:auto; margin:0; }
+  .bad { color:var(--bad); }
+  .note { color:var(--dim); font-size:12px; }
+  code { background:#1b2230; padding:1px 5px; border-radius:4px; font-size:12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>PlayJev in the browser</h1>
+  <p class="lede">The game runs in the iframe below and every frame is answered by a vision language model running
+  inside this tab on WebGPU. No server, no upload: the weights are downloaded once and the forward pass happens on
+  your own GPU. The point of this page is the number in <b>decisions per second</b>.</p>
+
+  <div class="card">
+    <p class="note" style="margin:0 0 10px">The weights here are the stock
+    <code>onnx-community/Qwen3.5-0.8B-ONNX</code> base model, not the PlayJev checkpoint, so the moves it picks are
+    close to a letter prior. This page measures speed and proves the path; play quality needs our fine tuned weights
+    exported to ONNX.</p>
+    <div class="row">
+      <select id="game"></select>
+      <select id="dtype">
+        <option value="card">q4 decoder + fp16 vision (about 850 MB)</option>
+        <option value="q4f16">q4f16 everywhere (about 650 MB)</option>
+        <option value="q4">q4 everywhere, no fp16 needed (about 700 MB)</option>
+        <option value="fp16">fp16 everywhere (about 2.2 GB)</option>
+      </select>
+      <button id="load" class="go" disabled>load and play</button>
+      <button id="run" disabled>play</button>
+      <label class="chk"><input type="checkbox" id="pace"> real time pacing</label>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div>
+      <div id="view"></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <table class="st">
+          <tr><td>backend</td><td id="s-backend">-</td></tr>
+          <tr><td>model load</td><td id="s-load">-</td></tr>
+          <tr><td>visual tokens</td><td id="s-tok">-</td></tr>
+          <tr><td>preprocess</td><td id="s-prep">-</td></tr>
+          <tr><td>forward</td><td id="s-fwd">-</td></tr>
+          <tr><td>per decision</td><td id="s-dec">-</td></tr>
+          <tr><td>decisions/s</td><td id="s-rate">-</td></tr>
+          <tr><td>step</td><td id="s-step">-</td></tr>
+          <tr><td>score</td><td id="s-score">-</td></tr>
+        </table>
+      </div>
+      <div class="bars card" id="bars"></div>
+    </div>
+  </div>
+
+  <div class="card"><pre id="log"></pre></div>
+</main>
+
+<div class="card dl" id="dl" hidden>
+  <div class="inner">
+    <div class="head"><b id="dl-title">downloading weights</b><span id="dl-sub"></span></div>
+    <div class="big"><i id="dl-fill"></i></div>
+    <details>
+      <summary id="dl-sum">per file</summary>
+      <div id="dl-files"></div>
+      <p class="note" style="margin:8px 0 0">Files come from the HuggingFace CDN and are kept in this browser's
+      cache, so a second visit downloads nothing.</p>
+    </details>
+  </div>
+</div>
+
+
+<script type="module">
+import { AutoProcessor, Qwen3_5ForConditionalGeneration, RawImage } from
+  'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0';
+
+const MODEL_ID = 'onnx-community/Qwen3.5-0.8B-ONNX';
+const SYSTEM_PROMPT = 'Apply the question to the state. Choose exactly one of the listed options. ' +
+  'Respond with only its uppercase letter, with no explanation or reasoning.';
+const INSTRUCTIONS = 'Which move should the player make next?';
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const DTYPES = {
+  card:  { embed_tokens: 'q4',    vision_encoder: 'fp16',   decoder_model_merged: 'q4' },
+  q4f16: { embed_tokens: 'q4f16', vision_encoder: 'q4f16',  decoder_model_merged: 'q4f16' },
+  q4:    { embed_tokens: 'q4',    vision_encoder: 'q4',     decoder_model_merged: 'q4' },
+  fp16:  { embed_tokens: 'fp16',  vision_encoder: 'fp16',   decoder_model_merged: 'fp16' },
+};
+
+const $ = (id) => document.getElementById(id);
+const qs = new URLSearchParams(location.search);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const log = (msg, bad) => {
+  const el = $('log');
+  el.insertAdjacentHTML('beforeend', `<span${bad ? ' class="bad"' : ''}>${msg}</span>\n`);
+  el.scrollTop = el.scrollHeight;
+};
+
+// ---------------------------------------------------------------- prompt, exactly the one the trainer uses
+function buildPrompt(actions) {
+  const opts = actions.map((a, i) => `${LETTERS[i]}. ${a.name}${a.description ? ': ' + a.description : ''}`).join('\n');
+  const letters = LETTERS.slice(0, actions.length).split('').join(', ');
+  return `${SYSTEM_PROMPT}\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\n` +
+         `Question: ${INSTRUCTIONS}\n\nOptions:\n${opts}\n\nAnswer with one letter: ${letters}.\nAnswer:`;
+}
+
+function softmax(xs) {
+  const m = Math.max(...xs), e = xs.map((x) => Math.exp(x - m)), s = e.reduce((a, b) => a + b, 0);
+  return e.map((x) => x / s);
+}
+const median = (xs) => { const a = [...xs].sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
+
+// ---------------------------------------------------------------- the game iframe (same bridge the demo uses)
+let iframe = null, pending = new Map(), callId = 0, ready = null;
+window.addEventListener('message', (ev) => {
+  const m = ev.data;
+  if (!m || m.pjDemo !== true) return;
+  if (m.id != null) {
+    const p = pending.get(m.id); if (!p) return; pending.delete(m.id);
+    m.error ? p.reject(new Error(m.error)) : p.resolve(m.result);
+  } else if (m.ready && ready) { ready(); }
+  else if (m.pageerror) { log('game page: ' + m.pageerror, true); }
+});
+function call(op, extra) {
+  const id = ++callId;
+  return new Promise((resolve, reject) => {
+    pending.set(id, { resolve, reject });
+    iframe.contentWindow.postMessage(Object.assign({ pjDemoCall: true, id, op }, extra || {}), '*');
+    setTimeout(() => { if (pending.delete(id)) reject(new Error(op + ' timed out')); }, 20000);
+  });
+}
+async function boot(game) {
+  for (const p of pending.values()) p.reject(new Error('frame replaced'));
+  pending.clear();
+  if (iframe) iframe.remove();
+  const f = iframe = document.createElement('iframe');
+  f.width = game.viewport.width; f.height = game.viewport.height;
+  f.style.width = game.viewport.width + 'px'; f.style.height = game.viewport.height + 'px';
+  f.setAttribute('scrolling', 'no'); f.setAttribute('tabindex', '-1');
+  const loaded = new Promise((res) => { ready = res; });
+  f.src = '../' + game.entry;
+  $('view').appendChild(f);
+  const ok = await Promise.race([loaded.then(() => true), sleep(20000).then(() => false)]);
+  if (!ok) throw new Error('game did not load (hook never registered)');
+  if (game.hide) await call('style', { css: game.hide });
+  const r = await call('rect', { selector: game.view });
+  const B = $('view').clientWidth, s = Math.min(B / r.w, B / r.h);
+  const V = game.viewport;
+  f.style.clipPath = `inset(${r.y}px ${V.width - r.x - r.w}px ${V.height - r.y - r.h}px ${r.x}px)`;
+  f.style.transform = `translate(${(B - r.w * s) / 2 - r.x * s}px, ${(B - r.h * s) / 2 - r.y * s}px) scale(${s})`;
+  f.classList.add('shown');
+}
+
+// ---------------------------------------------------------------- model
+let processor = null, model = null, slotCache = new Map();
+
+async function slotIds(k) {
+  if (slotCache.has(k)) return slotCache.get(k);
+  const tok = processor.tokenizer, ids = [];
+  for (let i = 0; i < k; i++) {
+    const enc = tok(' ' + LETTERS[i], { add_special_tokens: false });
+    const row = enc.input_ids.tolist()[0].map(Number);
+    if (row.length !== 1) throw new Error(`letter ${LETTERS[i]} is ${row.length} tokens, the readout needs one`);
+    ids.push(row[0]);
+  }
+  slotCache.set(k, ids);
+  return ids;
+}
+
+/* navigator.gpu is SecureContext-only, so an http:// page on a LAN address has no WebGPU at all,
+   whatever the machine's GPU is. caches (the weight cache) disappears with it. Same browser, same page,
+   served from localhost: both come back. Say which of the two it is instead of blaming the browser. */
+/* q4f16, fp16 and the default card build all need the shader-f16 WebGPU feature. An adapter without it
+   throws "The device (webgpu) does not support fp16" the moment the session is built, after the weights
+   have already come down. Ask first, and only offer what this GPU can run. */
+async function fp16Supported() {
+  try { const a = await navigator.gpu.requestAdapter(); return !!a && a.features.has('shader-f16'); }
+  catch { return false; }
+}
+
+function gpuStatus() {
+  if (navigator.gpu) return { ok: true, short: 'webgpu available' };
+  if (!window.isSecureContext) return {
+    ok: false, short: 'blocked: page is not on https or localhost',
+    long: `WebGPU is only exposed on a secure origin, and this page is on ${location.origin}. ` +
+          'Chrome hides navigator.gpu here even on a machine with a perfectly good GPU. ' +
+          'Open the same page through an ssh tunnel so the origin is localhost, ' +
+          'or allow this origin in chrome://flags/#unsafely-treat-insecure-origin-as-secure. ' +
+          'The weight cache (window.caches) is switched off on this origin too.',
+  };
+  return { ok: false, short: 'no webgpu in this browser',
+           long: 'This browser is on a secure origin but exposes no navigator.gpu. Chrome or Edge 113+ on ' +
+                 'Windows/macOS/ChromeOS, or Chrome 152+ on Android. Firefox and Safari below 26 do not have it yet.' };
+}
+
+const MB = 1048576;
+const mb = (n) => (n / MB).toFixed(n < 10 * MB ? 1 : 0);
+
+/* One row per file plus an aggregate bar. transformers.js reports initiate / progress / done per file and
+   several files stream at once, so a single percentage would jump around; the total is what the eye wants.
+   A file served from the browser cache arrives as initiate + done with no progress in between, which is why
+   a row can finish without ever having a size. */
+const dl = {
+  files: new Map(), t0: 0, seen: 0, timer: 0, mark: 0, markAt: 0, hide: 0,
+  reset() {
+    this.files.clear(); this.t0 = performance.now(); this.seen = 0;
+    this.mark = 0; this.markAt = this.t0;
+    clearTimeout(this.hide); $('dl').classList.remove('gone');
+    $('dl-files').textContent = ''; $('dl-fill').style.width = '0';
+    $('dl-title').textContent = 'downloading weights';
+    $('dl-sub').textContent = 'starting';
+    $('dl').hidden = false;
+    clearInterval(this.timer); this.timer = setInterval(() => this.paint(), 200);
+  },
+  row(name) {
+    let f = this.files.get(name);
+    if (f) return f;
+    const el = document.createElement('div'); el.className = 'f';
+    el.innerHTML = '<div><div class="n"></div><div class="t"><i></i></div></div><div class="v"></div>';
+    el.querySelector('.n').textContent = name;
+    $('dl-files').appendChild(el);
+    f = { el, fill: el.querySelector('.t i'), val: el.querySelector('.v'), loaded: 0, total: 0, done: false };
+    this.files.set(name, f);
+    return f;
+  },
+  event(p) {
+    if (!p.file) return;
+    const f = this.row(p.file);
+    if (p.status === 'progress') {
+      f.loaded = p.loaded || 0;
+      if (p.total) f.total = p.total;
+    } else if (p.status === 'done') {
+      f.done = true;
+      if (f.total) f.loaded = f.total;
+      f.el.classList.add(f.total ? 'done' : 'cached');
+      f.fill.style.width = '100%';
+      f.val.textContent = f.total ? mb(f.total) + ' MB' : 'cached';
+    }
+  },
+  paint() {
+    let loaded = 0, total = 0, known = 0;
+    for (const f of this.files.values()) {
+      if (f.total) { loaded += f.loaded; total += f.total; known++; }
+      if (!f.done) {
+        f.fill.style.width = f.total ? (100 * f.loaded / f.total).toFixed(1) + '%' : '0';
+        f.val.textContent = f.total ? mb(f.loaded) + ' / ' + mb(f.total) + ' MB' : '...';
+      }
+    }
+    const now = performance.now();
+    if (loaded > this.mark) { this.mark = loaded; this.markAt = now; }
+    const quiet = (now - this.markAt) / 1000;
+    $('dl-sum').textContent = this.files.size === 1 ? '1 file' : `${this.files.size} files`;
+    if (!known) {
+      $('dl-sub').textContent = 'contacting the CDN' + (quiet > 20 ? `, nothing yet for ${Math.round(quiet)} s` : '');
+      $('dl-sub').classList.toggle('stall', quiet > 20);
+      return;
+    }
+    const secs = (now - this.t0) / 1000;
+    const rate = loaded / Math.max(secs, 0.5);
+    const left = rate > 0 ? (total - loaded) / rate : 0;
+    $('dl-fill').style.width = (100 * loaded / total).toFixed(1) + '%';
+    // "all known bytes are in" is not the same as "the download is over": the tokenizer lands seconds
+    // before the onnx files are even announced. wait for every tracked file to be done and for the
+    // stream to go quiet before claiming the compile step has started.
+    let pending = 0;
+    for (const f of this.files.values()) if (!f.done) pending++;
+    if (loaded >= total && !pending && quiet > 2) {
+      $('dl-title').textContent = 'compiling for your GPU';
+      $('dl-sub').classList.remove('stall');
+      $('dl-sub').textContent = `${mb(total)} MB in, building the graph. First run only, this can take a minute.`;
+      $('dl-fill').style.width = '100%';
+      return;
+    }
+    const tail = loaded >= total ? ''
+      : quiet > 20 ? `  ·  stalled for ${Math.round(quiet)} s`
+      : `  ·  about ${left < 90 ? Math.ceil(left) + ' s' : Math.ceil(left / 60) + ' min'} left`;
+    $('dl-sub').classList.toggle('stall', quiet > 20 && loaded < total);
+    $('dl-sub').textContent = `${mb(loaded)} / ${mb(total)} MB  ·  ${(rate / MB).toFixed(1)} MB/s` + tail;
+  },
+  finish(secs) {
+    clearInterval(this.timer); this.timer = 0;
+    this.markAt = performance.now();
+    this.paint();
+    $('dl-sub').classList.remove('stall');
+    let total = 0;
+    for (const f of this.files.values()) total += f.total;
+    $('dl-title').textContent = 'weights ready';
+    $('dl-sub').textContent = total
+      ? `${mb(total)} MB fetched, compiled in ${secs.toFixed(1)} s total`
+      : `served from this browser's cache, ready in ${secs.toFixed(1)} s`;
+    $('dl-fill').style.width = '100%';
+    clearTimeout(this.hide);
+    this.hide = setTimeout(() => {
+      $('dl').classList.add('gone');
+      setTimeout(() => { $('dl').hidden = true; }, 400);
+    }, 2500);
+  },
+  fail(msg) { clearInterval(this.timer); this.timer = 0; $('dl-title').textContent = 'download failed';
+              $('dl-sub').textContent = msg; },
+};
+window.pjDl = dl;   // handle for driving the panel from the console without a real 850 MB fetch
+
+async function loadModel(kind) {
+  const g = gpuStatus();
+  $('s-backend').textContent = g.short;
+  if (!g.ok) { log(g.long, true); return; }
+  const t0 = performance.now();
+  log(`loading ${MODEL_ID} (${kind}) ...`);
+  dl.reset();
+  const progress_callback = (p) => dl.event(p);
+  try {
+    processor = await AutoProcessor.from_pretrained(MODEL_ID, { progress_callback });
+    model = await Qwen3_5ForConditionalGeneration.from_pretrained(MODEL_ID,
+      { dtype: DTYPES[kind], device: 'webgpu', progress_callback });
+  } catch (e) { dl.fail(String(e.message || e)); throw e; }
+  const secs = (performance.now() - t0) / 1000;
+  dl.finish(secs);
+  $('s-load').textContent = secs.toFixed(1) + ' s';
+  log(`model ready in ${secs.toFixed(1)} s`);
+}
+
+/* playjev/env.py sends every frame to the model at long side 448, so the browser has to do the same.
+   Left alone, breakout's 700x540 canvas goes in at 374 visual tokens against the 154 the checkpoint was
+   trained on, and racer's 1100x900 at ten times that: slower, and a different input distribution. */
+const FRAME_LONG_SIDE = 448;
+
+async function decide(dataUrl, prompt, ids) {
+  const tp = performance.now();
+  let img = await RawImage.read(dataUrl);
+  const longest = Math.max(img.width, img.height);
+  if (longest !== FRAME_LONG_SIDE) {
+    const k = FRAME_LONG_SIDE / longest;
+    img = await img.resize(Math.max(1, Math.round(img.width * k)), Math.max(1, Math.round(img.height * k)));
+  }
+  const inputs = await processor(prompt, img);
+  const prep = performance.now() - tp;
+  let logits = null;
+  const tf = performance.now();
+  await model.generate({ ...inputs, max_new_tokens: 1, do_sample: false,
+    logits_processor: [(_ids, lg) => { logits = lg; return lg; }] });
+  const fwd = performance.now() - tf;
+  if (!logits) throw new Error('no logits came back from generate');
+  const d = logits.data;
+  const probs = softmax(ids.map((i) => Number(d[i])));
+  const grid = inputs.image_grid_thw ? inputs.image_grid_thw.tolist()[0].map(Number) : null;
+  const vis = grid ? Math.floor((grid[0] * grid[1] * grid[2]) / 4) : null;
+  return { probs, prep, fwd, vis };
+}
+
+// ---------------------------------------------------------------- the loop
+let games = [], gen = 0, running = false;
+
+function renderBars(actions, probs, taken) {
+  const host = $('bars');
+  if (host.dataset.k !== String(actions.length)) {
+    host.dataset.k = String(actions.length);
+    host.innerHTML = actions.map((a) =>
+      `<div class="b"><div class="lbl"><span>${a.name}</span><span class="v"></span></div>` +
+      `<div class="track"><div class="fill"></div></div></div>`).join('');
+  }
+  [...host.children].forEach((el, i) => {
+    el.classList.toggle('taken', i === taken);
+    el.querySelector('.fill').style.width = (probs ? probs[i] * 100 : 0).toFixed(1) + '%';
+    el.querySelector('.v').textContent = probs ? probs[i].toFixed(2) : '';
+  });
+}
+
+async function play() {
+  const me = ++gen;
+  const game = games.find((g) => g.id === $('game').value);
+  const prompt = buildPrompt(game.actions);
+  const ids = await slotIds(game.actions.length);
+  log(`prompt for ${game.id}: ${game.actions.length} options, letter slots ${ids.join(', ')}`);
+  await boot(game);
+  if (me !== gen) return;
+  await call('frames', { on: true });
+  let obs = await call('start', { seed: 1 + Math.floor(Math.random() * 1e6) });
+  const cap = game.max_steps || 3000, stepMs = game.step_ms || 150, times = [];
+  // the first forward pass compiles every shader, so it runs far longer than the rest and the frame
+  // sits still while it happens. say so, otherwise a working page looks frozen.
+  $('s-step').textContent = 'first pass, compiling shaders';
+  for (let i = 0; i < cap && !obs.done && me === gen; i++) {
+    const tick = performance.now();
+    const frame = obs.frame || (await call('frame'));
+    const { probs, prep, fwd, vis } = await decide(frame, prompt, ids);
+    if (me !== gen) return;
+    let a = 0; for (let j = 1; j < probs.length; j++) if (probs[j] > probs[a]) a = j;
+    renderBars(game.actions, probs, a);
+    const total = performance.now() - tick;
+    times.push(total); if (times.length > 20) times.shift();
+    const med = median(times);
+    $('s-tok').textContent = vis == null ? '-' : String(vis);
+    $('s-prep').textContent = prep.toFixed(0) + ' ms';
+    $('s-fwd').textContent = fwd.toFixed(0) + ' ms';
+    $('s-dec').textContent = med.toFixed(0) + ' ms';
+    $('s-rate').textContent = (1000 / med).toFixed(1);
+    $('s-step').textContent = `${i + 1} / ${cap}`;
+    $('s-score').textContent = String(obs.score);
+    if ($('pace').checked) { const hold = stepMs - (performance.now() - tick); if (hold > 0) await sleep(hold); }
+    obs = await call('step', { a, k: game.step_frames || undefined });
+  }
+  if (me !== gen) return;
+  log(`episode over: score ${obs.score} after ${$('s-step').textContent} steps, median ${median(times).toFixed(0)} ms per decision`);
+  running = false; $('run').textContent = 'play';
+}
+
+// ---------------------------------------------------------------- wiring
+(async function init() {
+  const idx = await (await fetch('../games/index.json', { cache: 'no-cache' })).json();
+  games = idx.games;
+  const sel = $('game');
+  for (const g of games) { const o = document.createElement('option'); o.value = g.id; o.textContent = g.title; sel.appendChild(o); }
+  sel.value = games.some((g) => g.id === qs.get('game')) ? qs.get('game') : 'breakout';
+  if (qs.get('dtype') && DTYPES[qs.get('dtype')]) $('dtype').value = qs.get('dtype');
+  const g0 = gpuStatus();
+  $('s-backend').textContent = g0.short;
+  if (!g0.ok) { log(g0.long, true); $('load').title = g0.short; }
+  const toggle = async () => {
+    if (running) { gen++; running = false; $('run').textContent = 'play'; return; }
+    running = true; $('run').textContent = 'stop';
+    try { await play(); }
+    catch (e) { log('play failed: ' + (e.stack || e), true); running = false; $('run').textContent = 'play'; }
+  };
+  $('load').onclick = async () => {
+    $('load').disabled = true;
+    try { await loadModel($('dtype').value); }
+    catch (e) { log('load failed: ' + (e.stack || e), true); $('load').disabled = false; return; }
+    $('run').disabled = false;
+    toggle();   // the weights are in, so play. the button is there to stop it and to start the next episode
+  };
+  $('run').onclick = toggle;
+  // the probe takes a moment, so the button stays disabled until it is done. a click that lands on a
+  // live-looking button and does nothing is the worst kind of stuck.
+  if (g0.ok && !(await fp16Supported())) {
+    for (const o of $('dtype').options) if (o.value !== 'q4') { o.disabled = true; o.textContent += ' (needs shader-f16)'; }
+    $('dtype').value = 'q4';
+    $('s-backend').textContent = 'webgpu available, no shader-f16';
+    log('this GPU has no shader-f16, so the fp16 and q4f16 builds cannot run on it; switched to the q4 build');
+  }
+  $('load').disabled = !g0.ok;
+  if (!g0.ok) $('load').textContent = 'webgpu unavailable';
+})();
+</script>
+</body>
+</html>

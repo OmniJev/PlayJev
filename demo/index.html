@@ -4,73 +4,170 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PlayJev</title>
-<meta name="description" content="An open 0.8B model plays ten browser games from pixels: one forward pass per move, a probability over the moves, no text.">
+<meta name="description" content="An open 0.8B model plays ten browser games from raw pixels: one forward pass per move, a probability over the moves, no text.">
+<meta property="og:title" content="PlayJev">
+<meta property="og:description" content="An open 0.8B model plays ten browser games from raw pixels: one forward pass per move, a probability over the moves, no text.">
+<meta property="og:type" content="website">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <h1>PlayJev</h1>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top">PlayJev</a>
     <nav>
-      <a data-link="repo" href="https://github.com/OmniJev/PlayJev">code</a>
-      <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev</a>
+      <a href="#games">the ten games</a>
+      <a href="#results">results</a>
+      <a href="#help">asking for help</a>
       <a href="#how">how it works</a>
-      <button id="theme" type="button">dark mode</button>
+      <a data-link="repo" href="https://github.com/OmniJev/PlayJev">code</a>
+      <button id="theme" type="button" title="switch theme">dark</button>
     </nav>
-  </header>
-  <p>PlayJev is an open 0.8B vision-language model (Qwen3.5-0.8B-Base, fine-tuned) that plays ten browser games from raw pixels.
-    Each move is a single forward pass: the current frame goes in, a probability over the game's moves comes out, and no text is generated.
-    The tiles below replay recorded episodes inside the real games and draw the recorded per-step probabilities beside the picture,
-    with the chosen move in blue and the Jev confidence as a number; the label on each tile says whose recording is playing.</p>
-  <p id="notice" class="notice"></p>
-
-  <div id="all" class="allrow">
-    <span>all tiles</span>
-    <button id="all-pp" type="button">pause all</button>
-    <span class="seg"><button type="button" data-speed="1" class="on">1x</button><button type="button" data-speed="2">2x</button><button type="button" data-speed="4">4x</button></span>
-    <span class="seg"><button type="button" data-who="model" class="on">model alone</button><button type="button" data-who="s2">with System Two</button><button type="button" data-who="random">random</button></span>
-    <span>1x is the game's own pace: one recorded step per move or per 5 to 6 frames. With System Two, the teacher takes the steps where the model's confidence is low; those steps show in coral.</span>
   </div>
+</header>
 
-  <div id="grid" class="grid"></div>
+<main id="top">
 
-  <h2 id="results-h">Results</h2>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>game</th><th class="num">random</th><th class="num">trained model</th><th class="num">teacher</th><th class="num">vs teacher</th></tr></thead>
-      <tbody id="results-body"></tbody>
-    </table>
-  </div>
-  <p id="results-note" class="small"></p>
+  <section class="lead wrap">
+    <div class="lead-copy">
+      <h1>An open 0.8B model plays ten browser games from raw pixels.</h1>
+      <p>PlayJev is Qwen3.5-0.8B-Base, fine-tuned until one forward pass turns a game frame into a probability over
+        the moves. It sees the picture, not the game's internal state, and it writes nothing: the answer is read
+        straight off the option letters, one decision every 43 ms on a single GPU.</p>
+      <p>One model plays all ten games, and the game's name never reaches it.</p>
+      <p class="quiet" id="notice"></p>
+    </div>
 
-  <section id="calibration">
-    <h2>Calibration</h2>
-    <p class="small">Reliability of the chosen move: its predicted probability against how often it agreed with the teacher, per game. Dot size is the number of decisions in the bin.</p>
-    <div class="calib"></div>
+    <div class="lead-stage">
+      <div id="picker" class="picker"></div>
+      <div id="stage" class="stage"></div>
+      <p class="quiet stage-note">Every board here is a recorded episode replaying inside the real game. The bars are
+        the probabilities the model gave that frame, and the move it played is the one in blue.</p>
+    </div>
   </section>
 
-  <h2 id="how">How it works</h2>
-  <p>The model never sees a game's name. It sees the frame and the option list, rendered with the frozen OpenJev prompt below,
-    and its answer is the next token after "Answer:". The probability over moves is the softmax over the option letters at that
-    position, one forward pass with no sampling and no generated text. Confidence is (p<sub>max</sub> - 1/K) / (1 - 1/K), the Jev formula,
-    so 0 is a uniform guess and 1 is certainty. The move with the highest probability is played; a move that leaves the
-    picture unchanged (a blocked direction in 2048 or Sokoban) is not repeated on the same picture, the next most probable
-    move is played instead.</p>
-  <p>Each tile is the vendored game running in an iframe with the same shim and hook used in training: a virtual clock,
-    seeded randomness and synthetic key events, so the recorded action sequence reproduces the episode step for step. The page
-    checks the replayed score against the recording at the end of every episode and marks a tile in coral if they differ.
-    With <code>?server=http://host:port</code> in the address the page sends each frame to a running PlayJev or OpenJev server
-    and plays its answers live.</p>
-  <div class="promptrow"><label for="prompt-game">option list for</label><select id="prompt-game"></select></div>
-  <pre id="prompt"></pre>
-  <p class="small">The highlighted placeholder is where the frame's visual tokens go (one token per merged 32x32 pixel block, 182 for a 448x416 frame).
-    Option descriptions are part of the frozen prompt and never change between training and demo.</p>
+  <section class="wrap" id="games">
+    <h2>All ten at once</h2>
+    <p>Ten games, one set of weights, ten different sets of moves to choose from. The label under each board says
+      which recording is playing.</p>
 
-  <footer>
-    <span><a data-link="repo" href="https://github.com/OmniJev/PlayJev">PlayJev on GitHub</a> · <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev server</a> · <a data-link="awesome" href="https://omnijev.github.io/awesome-jev/">Awesome-JEV</a></span>
-    <span id="generated"></span>
-  </footer>
-</div>
+    <div id="all" class="toolbar">
+      <span class="seg" role="group" aria-label="who plays">
+        <button type="button" data-who="model" class="on">the model</button
+        ><button type="button" data-who="s2">with a teacher behind it</button
+        ><button type="button" data-who="random">random play</button>
+      </span>
+      <span class="seg" role="group" aria-label="speed">
+        <button type="button" data-speed="1" class="on">1x</button
+        ><button type="button" data-speed="2">2x</button
+        ><button type="button" data-speed="4">4x</button>
+      </span>
+      <span class="seg" role="group" aria-label="how many games run">
+        <button type="button" data-mode="all" class="on">ten at once</button
+        ><button type="button" data-mode="solo">one at a time</button>
+      </span>
+      <button id="all-pp" type="button">pause all</button>
+      <span class="toolbar-note">1x is the game's own pace. Ten live games is heavy on a laptop; one at a time keeps a
+        single game running and leaves the others as names you can click.</span>
+    </div>
+
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <section class="wrap" id="results">
+    <h2>Results</h2>
+    <p>Sixteen held-out episodes per game, the same seeds for every player, the most probable move taken with no
+      sampling. The bar is where the model lands between random play and the scripted teacher that labelled its
+      training data.</p>
+    <div id="score-chart" class="chart"></div>
+    <details class="table-view">
+      <summary>the same numbers as a table</summary>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>game</th><th class="num">random</th><th class="num">the model</th><th class="num">teacher</th><th class="num">vs teacher</th></tr></thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+    </details>
+    <p id="results-note" class="quiet"></p>
+  </section>
+
+  <section class="wrap" id="calibration">
+    <h2>Does it know when it is right?</h2>
+    <p>Each dot takes the steps where the model gave its chosen move about the same probability, and asks how often
+      that move was the teacher's. On the diagonal, the number it reports is the rate it achieves. Dot size is how
+      many decisions fell in that bin.</p>
+    <div class="panels calib"></div>
+    <p id="calib-note" class="quiet"></p>
+  </section>
+
+  <section class="wrap" id="help">
+    <h2>Asking for help</h2>
+    <div class="duel-block">
+      <p>The model plays every step it is sure about and hands the rest to the teacher. Two boards of the same game
+        from the same seed: on the left the model plays alone, on the right it keeps the confident steps and the
+        teacher takes the others. The steps the teacher decided show in coral.</p>
+      <div id="duel" class="duel"></div>
+      <p id="duel-note" class="quiet"></p>
+    </div>
+
+    <div class="curves-block">
+      <h3>What the confidence is worth</h3>
+      <p>The horizontal axis is the share of steps the teacher actually took, so the left end is the model alone and
+        the right end is the teacher alone. <b class="k-blue">Picking those steps by confidence</b> is the line that
+        has to beat <b class="k-coral">handing over the same share at random</b>, or the confidence means nothing.</p>
+      <div class="panels curves"></div>
+      <p id="handover-note" class="quiet"></p>
+    </div>
+  </section>
+
+  <section class="wrap" id="transfer">
+    <h2>Learning a new game</h2>
+    <p>Two games were held out of an eight-game model. Fine-tuning that model on a few thousand frames of a held-out
+      game is compared against fine-tuning the raw base model on the same frames.</p>
+    <div class="tablewrap">
+      <table id="transfer-table">
+        <thead><tr><th>game</th><th>starts from</th><th class="num">frames</th><th class="num">agreement</th><th class="num">score</th><th class="num">vs teacher</th></tr></thead>
+        <tbody id="transfer-body"></tbody>
+      </table>
+    </div>
+    <p id="transfer-note" class="quiet"></p>
+  </section>
+
+  <section class="wrap" id="how">
+    <h2>How it works</h2>
+    <div class="how">
+      <div class="how-copy">
+        <p>The model sees the frame and the option list, rendered with the frozen OpenJev prompt, and its answer is
+          the next token after "Answer:". The probability over moves is the softmax over the option letters at that
+          position: one forward pass, no sampling, nothing generated. Confidence is
+          (p<sub>max</sub> &minus; 1/K) / (1 &minus; 1/K), so 0 is a uniform guess and 1 is certainty.</p>
+        <p>The most probable move is played, with one exception: a move that leaves the picture unchanged, such as a
+          blocked direction in 2048 or Sokoban, is not repeated on that same picture, and the next most probable move
+          goes instead.</p>
+        <p>Each board is the vendored game running with the shim and hook used in training, a virtual clock, a seeded
+          random source and synthetic key events, so the recorded action sequence reproduces the episode step for
+          step. The page checks the replayed score against the recording at the end of every episode and marks the
+          board in coral if the two ever differ.</p>
+      </div>
+      <div class="how-prompt">
+        <div class="promptrow"><label for="prompt-game">option list for</label><select id="prompt-game"></select></div>
+        <pre id="prompt"></pre>
+        <p class="quiet">The highlighted placeholder is where the frame goes: one visual token per merged 32x32 pixel
+          block, 182 of them for a 448x416 frame.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span><a data-link="repo" href="https://github.com/OmniJev/PlayJev">PlayJev on GitHub</a> ·
+    <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev server</a> ·
+    <a data-link="awesome" href="https://omnijev.github.io/awesome-jev/">Awesome-JEV</a></span>
+  <span id="generated"></span>
+</footer>
+
 <script src="data.js"></script>
 <script src="demo.js"></script>
 </body>

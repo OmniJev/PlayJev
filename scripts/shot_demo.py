@@ -56,7 +56,9 @@ def wait_started(page, timeout_s=90):
     """Every tile has left the loading overlay (game started) or shows an error."""
     t0 = time.time()
     while time.time() - t0 < timeout_s:
-        n = page.evaluate("() => window.pjDemo ? pjDemo.tiles.filter(t => t.overlay.hidden || t.overlay.classList.contains('err')).length : -1")
+        # sections that only run while scrolled into view have to be woken first, or they read as "not started"
+        page.evaluate("() => window.pjDemo && pjDemo.startAll && pjDemo.startAll()")
+        n = page.evaluate("() => window.pjDemo ? pjDemo.tiles.filter(t => t.suspended || t.overlay.hidden || t.overlay.classList.contains('err')).length : -1")
         total = page.evaluate("() => window.pjDemo ? pjDemo.tiles.length : 0")
         if n >= total > 0:
             return True

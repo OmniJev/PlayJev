@@ -1,7 +1,7 @@
 """Closed-loop evaluation: a policy plays a game in VecGame; report score per episode.
 
 Policies expose  decide(frames: list[bytes], options: list[dict], infos: list[dict]) -> list[list[float]]
-(one probability vector per page). Built in: random, teacher, server (HTTP, PlayJev/OpenJev image state), local (in-process PlayJevModel, --ckpt).
+(one probability vector per page). Built in: random, teacher, server (HTTP, image state), json (HTTP, the game's own JSON state), local (in-process PlayJevModel, --ckpt).
 
 python -m playjev.play snake --policy teacher --pages 8 --episodes 16
 python -m playjev.play snake --policy server --url http://127.0.0.1:18731/v1/systemone --episodes 8
@@ -12,6 +12,7 @@ on the same observation, the next-best move is taken (--no-skip-noop for plain e
 decision one step late.
 """
 import argparse, asyncio, base64, json, random, statistics, time, urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from .env import VecGame, ROOT
 from .teachers import make_teacher
@@ -54,6 +55,63 @@ class ServerPolicy:
         return out
 
 
+# What the model is allowed to read out of the hook's info(). Dropped: maxX (our score accumulator),
+# ticks and mapFallback (harness bookkeeping), dead and won (the outcome, which is ours to judge), and
+# levelString (the level's name, a retrieval key for memorised walkthroughs; the tile window already
+# carries the local layout, so nothing a player uses is lost). The key set is fixed and missing keys
+# are sent as null, so the payload has the same shape at every step.
+JSON_DROP = ("maxX", "ticks", "mapFallback", "dead", "won", "levelString")
+
+
+# Spellings of the characters games/mario/pj_hook.js writes into tiles.rows, taken from tileChar there.
+# Each line names what the cell is, never what to do about it. --json-legend sends this alongside the
+# grid; without it the grid is an undocumented alphabet, which the image state never is.
+MARIO_LEGEND = {
+    "#": "blocks movement from every side; also stands for cells outside the level",
+    "^": "blocks movement from above only",
+    "?": "reacts when struck from below",
+    "o": "can be picked up",
+    ".": "nothing",
+}
+GRID_NOTE = "rows[r][c] is the cell covering x from originX + c*cell to originX + (c+1)*cell, and y from originY + r*cell to originY + (r+1)*cell"
+
+
+class JsonServerPolicy:
+    """POST /v1/systemone with the game's own JSON state: {"state": {...}, "questions": {"q": Choice}}.
+    Same endpoint and same question as ServerPolicy; the state is text instead of frames, so this is the
+    OpenJev path. One request per page, sent concurrently."""
+    def __init__(self, url, actions, n=1, model="openjev-latest", drop=JSON_DROP, legend=False, player_cell=False):
+        self.url, self.model, self.drop = url, model, tuple(drop)
+        self.legend, self.player_cell = legend, player_cell
+        self.criteria = {a["name"]: a["description"] for a in actions}
+        self.keys = None  # fixed after the first state, so every later payload has the same fields
+        self.pool = ThreadPoolExecutor(max_workers=max(1, n))
+    def reset(self, i): pass
+    def state_of(self, info):
+        info = info or {}
+        keys = self.keys or [k for k in info if k not in self.drop]
+        if self.keys is None: self.keys = list(keys)
+        st = {k: info.get(k) for k in self.keys}
+        t = st.get("tiles")
+        if isinstance(t, dict) and (self.legend or self.player_cell):
+            t = dict(t)
+            if self.legend:
+                t["legend"], t["note"] = MARIO_LEGEND, GRID_NOTE
+            if self.player_cell and info.get("x") is not None:
+                t["playerCell"] = {"row": int((info["y"] - t["originY"]) // t["cell"]),
+                                   "col": int((info["x"] - t["originX"]) // t["cell"])}
+            st["tiles"] = t
+        return st
+    def ask(self, info):
+        body = {"model": self.model, "state": self.state_of(info),
+                "questions": {"q": {"type": "choice", "instructions": INSTRUCTIONS, "criteria": self.criteria}}}
+        req = urllib.request.Request(self.url, json.dumps(body).encode(), {"Content-Type": "application/json"})
+        return json.loads(urllib.request.urlopen(req, timeout=120).read())["answers"]["q"]["probabilities"]
+    def decide(self, frames, options, infos):
+        answers = list(self.pool.map(self.ask, infos))
+        return [[a[o["name"]] for o in options] for a in answers]
+
+
 class LocalPolicy:
     """In-process PlayJevModel (playjev/model.py) on a checkpoint directory or HF id: frames in, probabilities over
     the options out, one batched forward per step. Two-frame mode keeps the previous frame per page."""
@@ -79,10 +137,11 @@ class HandoverPolicy:
     """System One with a System Two behind it: the model decides, and whenever its Jev confidence is below `tau` the
     decision is handed to the teacher (which reads the game's internal state). tau 0 never hands over, tau above 1
     always does. `handed` counts the steps handed over; `last` marks which pages were handed over on the last call."""
-    def __init__(self, inner, game_id, actions, n, tau, random_rate=None, seed=0):
+    def __init__(self, inner, game_id, actions, n, tau, random_rate=None, seed=0, invert=False):
         self.inner, self.t, self.tau, self.K = inner, [make_teacher(game_id, actions) for _ in range(n)], tau, len(actions)
         self.handed = 0; self.total = 0; self.last = [False] * n
         self.random_rate, self.rng = random_rate, random.Random(seed)  # control: hand over a random share of the steps instead
+        self.invert = invert  # control: hand over the steps above tau instead, so the trigger runs the other way
     def reset(self, i):
         self.t[i].reset()
         if hasattr(self.inner, "reset"): self.inner.reset(i)
@@ -90,7 +149,8 @@ class HandoverPolicy:
         probs = self.inner.decide(frames, options, infos); out = []
         for i, p in enumerate(probs):
             conf = (max(p) - 1 / self.K) / (1 - 1 / self.K)
-            self.last[i] = (self.rng.random() < self.random_rate) if self.random_rate is not None else conf < self.tau
+            by_conf = conf > self.tau if self.invert else conf < self.tau
+            self.last[i] = (self.rng.random() < self.random_rate) if self.random_rate is not None else by_conf
             self.total += 1
             if self.last[i]:
                 self.handed += 1; out.append(self.t[i].act({"info": infos[i]}))
@@ -105,9 +165,12 @@ async def main(a):
         acts_meta = env.actions
         pol = {"random": lambda: RandomPolicy(acts_meta), "teacher": lambda: TeacherPolicy(a.game, acts_meta, a.pages),
                "server": lambda: ServerPolicy(a.url, acts_meta, a.pages),
+               "json": lambda: JsonServerPolicy(a.url, acts_meta, a.pages, model=a.model,
+                                                legend=a.json_legend, player_cell=a.json_player_cell),
                "local": lambda: LocalPolicy(a.ckpt, acts_meta, a.pages, device=a.device, two_frame=a.two_frame, stack=a.stack)}[a.policy]()
         if a.handover is not None or a.handover_random is not None:
-            pol = HandoverPolicy(pol, a.game, acts_meta, a.pages, a.handover or 0.0, a.handover_random)
+            pol = HandoverPolicy(pol, a.game, acts_meta, a.pages, a.handover or 0.0, a.handover_random,
+                                 invert=a.handover_invert)
         if hasattr(pol, "reset"):
             for i in range(a.pages): pol.reset(i)
         scores, lengths, confs = [], [], []; steps = [0] * a.pages; seed = a.seed0 + a.pages; t0 = time.time(); total = 0
@@ -174,24 +237,34 @@ async def main(a):
             res["noop_steps"] = noop_steps; res["skipped_steps"] = skipped_steps  # unchanged observations seen; executed moves changed by the rule
         if isinstance(pol, HandoverPolicy):
             res["handover_tau"] = a.handover; res["handover_random"] = a.handover_random
+            res["handover_invert"] = a.handover_invert
             res["handover_rate"] = pol.handed / max(1, pol.total); res["handed_steps"] = pol.handed
         out = ROOT / "runs" / "play"; out.mkdir(parents=True, exist_ok=True)
-        tag = f"{'_delay' + str(a.delay) if a.delay else ''}{'' if a.skip_noop else '_noskip'}{'_handover' + str(a.handover) if a.handover is not None else ''}{'_hrandom' + str(a.handover_random) if a.handover_random is not None else ''}"
-        (out / f"{a.game}_{a.policy}{tag}.json").write_text(json.dumps(res, indent=1))
+        tag = f"{'_delay' + str(a.delay) if a.delay else ''}{'' if a.skip_noop else '_noskip'}{'_handover' + str(a.handover) if a.handover is not None else ''}{'_hrandom' + str(a.handover_random) if a.handover_random is not None else ''}{'_hinv' if a.handover_invert else ''}"
+        text = json.dumps(res, indent=1)
+        if a.out:  # an explicit path replaces the shared one, so two jobs playing the same game cannot read each other's file
+            dest = Path(a.out); dest.parent.mkdir(parents=True, exist_ok=True); dest.write_text(text)
+        else:
+            (out / f"{a.game}_{a.policy}{tag}.json").write_text(text)
         print(json.dumps(res))
 
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(); p.add_argument("game"); p.add_argument("--policy", default="random", choices=["random", "teacher", "server", "local"])
+    p = argparse.ArgumentParser(); p.add_argument("game"); p.add_argument("--policy", default="random", choices=["random", "teacher", "server", "local", "json"])
+    p.add_argument("--model", default="openjev-latest", help="json policy: model name sent to the server")
+    p.add_argument("--json-legend", dest="json_legend", action="store_true", help="json policy: send the tile alphabet and the grid's coordinate rule with the state")
+    p.add_argument("--json-player-cell", dest="json_player_cell", action="store_true", help="json policy: send the player's row and column in the grid (derivable from x, y and the origin)")
     p.add_argument("--ckpt", help="local policy: checkpoint directory or HF id for PlayJevModel"); p.add_argument("--device", default="cuda:0"); p.add_argument("--two-frame", action="store_true")
     p.add_argument("--stack", default="temporal", choices=["temporal", "separate"], help="two-frame layout: one temporal patch (same tokens) or two images (2x visual tokens)")
     p.add_argument("--url", default="http://127.0.0.1:18731/v1/systemone"); p.add_argument("--pages", type=int, default=8); p.add_argument("--episodes", type=int, default=16)
     p.add_argument("--record", default=None, help="directory: write one replay JSON per finished episode (docs/DEMO.md format)")
+    p.add_argument("--out", default=None, help="write the result JSON here instead of runs/play/<game>_<policy>.json (that path is shared: concurrent jobs would read each other's file)")
     p.add_argument("--policy-name", dest="policy_name", default=None, help="label stored in replay files (default: --policy)")
     p.add_argument("--delay", type=int, default=0, choices=[0, 1], help="1: apply each decision one step late (real-time latency model)")
     p.add_argument("--max-steps", type=int, default=2000); p.add_argument("--seed0", type=int, default=5000); p.add_argument("--sample", action="store_true", help="sample actions from the policy instead of argmax")
     p.add_argument("--no-skip-noop", dest="skip_noop", action="store_false", help="plain execution: a move that left the observation unchanged may be repeated (2048 and sokoban can then loop to the cap)")
     p.add_argument("--handover", type=float, default=None, help="System Two: hand the decision to the teacher when the model's Jev confidence is below this (0 never, 1.01 always)")
     p.add_argument("--handover-random", dest="handover_random", type=float, default=None, help="control: hand over this share of the steps at random instead of by confidence")
+    p.add_argument("--handover-invert", dest="handover_invert", action="store_true", help="control: hand over the steps whose confidence is above the threshold instead of below it")
     p.set_defaults(skip_noop=True)
     asyncio.run(main(p.parse_args()))

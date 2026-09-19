@@ -77,10 +77,31 @@ def shift_labels(records: list[Record], episode_keys: list[tuple], steps: list[i
     return out
 
 
+def boost_last_steps(keys: list[tuple], steps: list[int], seeds: list[int], last_k: int, times: int,
+                     short_than: int = 500) -> list[int]:
+    """Indices to append so that the last `last_k` records of every short episode appear `times` times in training.
+    Short (fewer than `short_than` steps; every cap in the roster is at least 500) means the episode ended by a death,
+    a solved level or a teacher give-up, so its last steps hold the corrections a DAgger round is collected for and
+    which are otherwise a few hundred frames among tens of thousands. Validation seeds are never boosted."""
+    by_ep: dict[tuple, list[tuple[int, int]]] = {}
+    for i, (key, step) in enumerate(zip(keys, steps)):
+        by_ep.setdefault(key, []).append((step, i))
+    extra: list[int] = []
+    for key, items in by_ep.items():
+        length = max(st for st, _ in items) + 1
+        if length >= short_than or seeds[items[0][1]] % VAL_MOD == 0:
+            continue
+        extra.extend(i for st, i in items if st >= length - last_k for _ in range(times - 1))
+    return extra
+
+
 def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequence[str] | None = None,
-                 label_delay: int = 0, no_delay_games: Sequence[str] = ()) -> list[Record]:
+                 label_delay: int = 0, no_delay_games: Sequence[str] = (), boost_last: tuple[int, int] | None = None,
+                 boost_games: Sequence[str] = ()) -> list[Record]:
     """`no_delay_games` keep their labels unshifted even when `label_delay` is set: the turn-based games (2048,
-    sokoban) do nothing until the player acts, so the deployed model has no latency to absorb there."""
+    sokoban) do nothing until the player acts, so the deployed model has no latency to absorb there. `boost_last`
+    = (k, times) repeats the last k records of every short episode `times` times (see boost_last_steps);
+    `boost_games`, when non-empty, limits that to those games and leaves the rest of the roster untouched."""
     out: list[Record] = []
     for game in games:
         delay = 0 if game in no_delay_games else label_delay
@@ -98,6 +119,9 @@ def load_records(games: Sequence[str], data_root: Path = DATA_ROOT, shards: Sequ
                                        names=tuple(r["actions"]), probs=r["teacher_probs"], teacher_action=r["teacher_action"],
                                        seed=r["seed"]))
                     keys.append((r["seed"], r["episode"])); steps.append(r["step"])
+            if boost_last and (not boost_games or game in boost_games):
+                for i in boost_last_steps(keys, steps, [r.seed for r in recs], *boost_last):
+                    recs.append(recs[i]); keys.append(keys[i]); steps.append(steps[i])
             out.extend(shift_labels(recs, keys, steps, delay) if delay else recs)
     return out
 
@@ -221,8 +245,11 @@ def main() -> None:
     p.add_argument("games", nargs="+")
     p.add_argument("--data-root", default=str(DATA_ROOT))
     p.add_argument("--label-delay", type=int, default=0); p.add_argument("--no-delay-games", nargs="*", default=[])
+    p.add_argument("--boost-last", type=int, nargs=2, default=None, metavar=("K", "TIMES"))
+    p.add_argument("--boost-games", nargs="*", default=[], help="limit --boost-last to these games (default: all)")
     a = p.parse_args()
-    recs = load_records(a.games, Path(a.data_root), label_delay=a.label_delay, no_delay_games=a.no_delay_games)
+    recs = load_records(a.games, Path(a.data_root), label_delay=a.label_delay, no_delay_games=a.no_delay_games,
+                        boost_last=tuple(a.boost_last) if a.boost_last else None, boost_games=a.boost_games)
     train, val = split_records(recs)
     print(f"{len(recs)} records, {len(train)} train, {len(val)} val (seed % {VAL_MOD} == 0)")
     for g in a.games:

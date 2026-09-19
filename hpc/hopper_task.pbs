@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -P PROJECT
+#PBS -N pj_task
+#PBS -l select=1:ngpus=1:ncpus=12:mem=225GB:gpu_model=H200
+#PBS -l walltime=06:00:00
+#PBS -q autox
+#PBS -j oe
+#PBS -o $WORK/logs/
+# One command from the repo on a hopper H200 node, the PlayJev venv active (the hopper twin of hpc/vanda_task.pbs).
+#   cd $WORK && qsub -v 'NAME=trshuf,CMD=bash hpc/transfer_ft.sh racer 1000 shuf' repo/hpc/hopper_task.pbs
+#   qsub -W depend=afterok:622683 -v 'NAME=...,CMD=...' repo/hpc/hopper_task.pbs        # after another job succeeds
+# Variables: NAME (log name), CMD (shell command, cwd = the repo), THREADS (OMP threads, default 6).
+WORK=$WORK
+REPO=$WORK/repo
+JOB=${PBS_JOBID%%.*}
+NAME=${NAME:-task}
+exec > $WORK/logs/${NAME}_${JOB}_live.log 2>&1
+date; hostname; nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader
+cd $REPO
+source $WORK/.venv/bin/activate
+export HF_HOME=$PROJ/hf_home
+export HF_HUB_CACHE=$HF_HOME/hub HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false PYTHONUNBUFFERED=1
+export PLAYWRIGHT_BROWSERS_PATH=$SCRATCH/ms-playwright
+export OMP_NUM_THREADS=${THREADS:-6}
+export WORK=$WORK   # hpc/transfer_*.sh read checkpoints from here
+echo "CMD: $CMD"
+eval "$CMD"
+echo "exit $?"; date; echo TASK_DONE

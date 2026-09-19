@@ -13,6 +13,7 @@ readout in fp32. Checkpoints are saved in bf16 in HF format, so `PlayJevModel(ck
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import math
 import os
@@ -210,7 +211,11 @@ def main(a: argparse.Namespace) -> None:
 
     # ---- data
     records = load_records(a.games, Path(a.data_root), shards=a.shards or None, label_delay=a.label_delay,
-                           no_delay_games=a.no_delay_games)
+                           no_delay_games=a.no_delay_games, boost_last=tuple(a.boost_last) if a.boost_last else None,
+                           boost_games=a.boost_games)
+    if a.boost_last:
+        print(f"[train] boost: the last {a.boost_last[0]} records of every episode shorter than 500 steps appear {a.boost_last[1]} times"
+              + (f" (only for {' '.join(a.boost_games)})" if a.boost_games else ""))
     if a.label_delay:
         print(f"[train] label delay {a.label_delay}: frame k is labelled with the teacher's decision at step k+{a.label_delay}"
               + (f" (not for {' '.join(a.no_delay_games)})" if a.no_delay_games else ""))
@@ -223,6 +228,19 @@ def main(a: argparse.Namespace) -> None:
         for g in a.games:
             pool = [x for x in train_recs if x.game == g]; rng.shuffle(pool); sub.extend(pool[: a.subsample])
         train_recs = sub
+    if a.shuffle_labels:  # control: the targets of one game are dealt out to its own frames at random, so the run
+        # learns the answer format and the option text of every game while the frame says nothing about the answer
+        rng = random.Random(a.seed + 11); shuffled = list(train_recs)
+        for g in a.games:
+            idx = [i for i, r in enumerate(shuffled) if r.game == g]
+            labels = [(shuffled[i].probs, shuffled[i].teacher_action) for i in idx]
+            rng.shuffle(labels)
+            for i, (probs, act) in zip(idx, labels):
+                shuffled[i] = dataclasses.replace(shuffled[i], probs=probs, teacher_action=act)
+        kept = statistics.fmean(shuffled[i].teacher_action == train_recs[i].teacher_action for i in range(len(train_recs)))
+        train_recs = shuffled
+        print(f"[train] shuffle-labels: targets dealt out within each game, {kept:.3f} land on their own frame by chance"
+              f" (validation is untouched, so its agreement reads what the run actually learned)")
     print(f"[train] {len(records)} records: {len(train_recs)} train, {len(val_recs)} val; per game "
           f"{ {g: sum(r.game == g for r in train_recs) for g in a.games} }")
     processor = AutoProcessor.from_pretrained(a.model, local_files_only=Path(a.model).exists())
@@ -338,6 +356,8 @@ if __name__ == "__main__":
     p.add_argument("--shards", nargs="*", default=[], help="use only these shard names (default: every shard under data/<game>/)")
     p.add_argument("--label-delay", type=int, default=0, help="label frame k with the teacher's decision at step k+delay (real-time latency)")
     p.add_argument("--no-delay-games", nargs="*", default=[], help="games whose labels stay unshifted under --label-delay (turn-based: 2048 sokoban)")
+    p.add_argument("--boost-last", type=int, nargs=2, default=None, metavar=("K", "TIMES"), help="repeat the last K records of every short (< 500 steps) episode TIMES times (DAgger: oversample the steps before a death)")
+    p.add_argument("--boost-games", nargs="*", default=[], help="apply --boost-last to these games only (default: every game in --games)")
     p.add_argument("--model", required=True, help="HF id or local snapshot path")
     p.add_argument("--out", required=True, help="checkpoint directory")
     p.add_argument("--device", default="cuda:0")
@@ -363,5 +383,6 @@ if __name__ == "__main__":
     p.add_argument("--log-every", type=int, default=20)
     p.add_argument("--limit", type=int, default=0, help="use only this many training records (smoke tests)")
     p.add_argument("--subsample", type=int, default=0, help="random subset of this many training records per game (transfer / data-efficiency runs)")
+    p.add_argument("--shuffle-labels", action="store_true", help="control: permute the training targets within each game so the frame carries no information about the answer")
     p.add_argument("--seed", type=int, default=0)
     main(p.parse_args())

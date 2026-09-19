@@ -1,14 +1,25 @@
 {
- "generated": "2026-09-18T22:46:05",
+ "generated": "2026-09-19T12:14:47",
  "sources": [
   "runs/replays"
  ],
  "policies": [
   "playjev-0.8b-dagger1",
   "playjev-0.8b-dagger1-s2",
+  "playjev-0.8b-dagger2",
   "playjev-0.8b-sft_all1",
+  "playjev-0.8b-sft_all1_d1",
+  "playjev-0.8b-sft_all1_d1_2f",
+  "playjev-0.8b-spec_breakout",
+  "playjev-0.8b-spec_flappy",
+  "playjev-0.8b-spec_mario",
+  "playjev-0.8b-spec_tetris",
   "teacher",
-  "random"
+  "random",
+  "transfer-racer-10kf-base",
+  "transfer-racer-10kf-hold8",
+  "transfer-racer-1kf-base",
+  "transfer-racer-1kf-hold8"
  ],
  "games": {
   "mario": [
@@ -301,6 +312,150 @@
     "frames_per_step": 6
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "mario/playjev-0.8b-dagger2_5000.json",
+    "steps": 26,
+    "final_score": 597,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "mario/playjev-0.8b-dagger2_5001.json",
+    "steps": 135,
+    "final_score": 3339,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "mario/playjev-0.8b-dagger2_5002.json",
+    "steps": 125,
+    "final_score": 2874,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "mario/playjev-0.8b-dagger2_5003.json",
+    "steps": 14,
+    "final_score": 279,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "mario/playjev-0.8b-dagger2_5004.json",
+    "steps": 70,
+    "final_score": 2186,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "mario/playjev-0.8b-dagger2_5005.json",
+    "steps": 17,
+    "final_score": 329,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "mario/playjev-0.8b-dagger2_5006.json",
+    "steps": 78,
+    "final_score": 2120,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "mario/playjev-0.8b-dagger2_5007.json",
+    "steps": 65,
+    "final_score": 1793,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "mario/playjev-0.8b-dagger2_5009.json",
+    "steps": 160,
+    "final_score": 5216,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "mario/playjev-0.8b-dagger2_5010.json",
+    "steps": 41,
+    "final_score": 930,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "mario/playjev-0.8b-dagger2_5011.json",
+    "steps": 38,
+    "final_score": 994,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "mario/playjev-0.8b-dagger2_5012.json",
+    "steps": 13,
+    "final_score": 316,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "mario/playjev-0.8b-dagger2_5013.json",
+    "steps": 57,
+    "final_score": 1259,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "mario/playjev-0.8b-dagger2_5014.json",
+    "steps": 87,
+    "final_score": 2498,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5015,
+    "file": "mario/playjev-0.8b-dagger2_5015.json",
+    "steps": 92,
+    "final_score": 2602,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5020,
+    "file": "mario/playjev-0.8b-dagger2_5020.json",
+    "steps": 38,
+    "final_score": 891,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "mario/playjev-0.8b-sft_all1_5000.json",
@@ -441,6 +596,438 @@
     "file": "mario/playjev-0.8b-sft_all1_5020.json",
     "steps": 41,
     "final_score": 1242,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 9,
+    "final_score": 178,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 45,
+    "final_score": 251,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 1500,
+    "final_score": 299,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 1500,
+    "final_score": 251,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 1500,
+    "final_score": 219,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 1500,
+    "final_score": 171,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 1500,
+    "final_score": 123,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 6,
+    "final_score": 90,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 1500,
+    "final_score": 155,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 1500,
+    "final_score": 667,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 8,
+    "final_score": 158,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 57,
+    "final_score": 203,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 18,
+    "final_score": 363,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 14,
+    "final_score": 338,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5018,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5018.json",
+    "steps": 19,
+    "final_score": 331,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5019,
+    "file": "mario/playjev-0.8b-sft_all1_d1_5019.json",
+    "steps": 18,
+    "final_score": 155,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 9,
+    "final_score": 178,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 45,
+    "final_score": 251,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 1500,
+    "final_score": 299,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 1500,
+    "final_score": 251,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 1500,
+    "final_score": 219,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 1500,
+    "final_score": 171,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 1500,
+    "final_score": 123,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 6,
+    "final_score": 90,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 1500,
+    "final_score": 155,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 1500,
+    "final_score": 667,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 8,
+    "final_score": 158,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 57,
+    "final_score": 203,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 1500,
+    "final_score": 507,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 14,
+    "final_score": 338,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5018,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5018.json",
+    "steps": 19,
+    "final_score": 331,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5019,
+    "file": "mario/playjev-0.8b-sft_all1_d1_2f_5019.json",
+    "steps": 18,
+    "final_score": 155,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5000,
+    "file": "mario/playjev-0.8b-spec_mario_5000.json",
+    "steps": 9,
+    "final_score": 178,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5001,
+    "file": "mario/playjev-0.8b-spec_mario_5001.json",
+    "steps": 114,
+    "final_score": 2862,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5002,
+    "file": "mario/playjev-0.8b-spec_mario_5002.json",
+    "steps": 124,
+    "final_score": 2891,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5004,
+    "file": "mario/playjev-0.8b-spec_mario_5004.json",
+    "steps": 88,
+    "final_score": 2172,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5005,
+    "file": "mario/playjev-0.8b-spec_mario_5005.json",
+    "steps": 43,
+    "final_score": 363,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5006,
+    "file": "mario/playjev-0.8b-spec_mario_5006.json",
+    "steps": 34,
+    "final_score": 891,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5007,
+    "file": "mario/playjev-0.8b-spec_mario_5007.json",
+    "steps": 64,
+    "final_score": 1669,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5009,
+    "file": "mario/playjev-0.8b-spec_mario_5009.json",
+    "steps": 29,
+    "final_score": 795,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5010,
+    "file": "mario/playjev-0.8b-spec_mario_5010.json",
+    "steps": 50,
+    "final_score": 931,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5011,
+    "file": "mario/playjev-0.8b-spec_mario_5011.json",
+    "steps": 41,
+    "final_score": 1020,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5012,
+    "file": "mario/playjev-0.8b-spec_mario_5012.json",
+    "steps": 60,
+    "final_score": 1694,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5013,
+    "file": "mario/playjev-0.8b-spec_mario_5013.json",
+    "steps": 61,
+    "final_score": 1259,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5014,
+    "file": "mario/playjev-0.8b-spec_mario_5014.json",
+    "steps": 46,
+    "final_score": 1211,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5015,
+    "file": "mario/playjev-0.8b-spec_mario_5015.json",
+    "steps": 30,
+    "final_score": 759,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5016,
+    "file": "mario/playjev-0.8b-spec_mario_5016.json",
+    "steps": 39,
+    "final_score": 1155,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-spec_mario",
+    "seed": 5017,
+    "file": "mario/playjev-0.8b-spec_mario_5017.json",
+    "steps": 40,
+    "final_score": 853,
     "truncated": false,
     "frames_per_step": 6
    },
@@ -879,6 +1466,150 @@
     "frames_per_step": 1
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "snake/playjev-0.8b-dagger2_5000.json",
+    "steps": 255,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "snake/playjev-0.8b-dagger2_5001.json",
+    "steps": 266,
+    "final_score": 86,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "snake/playjev-0.8b-dagger2_5002.json",
+    "steps": 348,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "snake/playjev-0.8b-dagger2_5003.json",
+    "steps": 480,
+    "final_score": 106,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "snake/playjev-0.8b-dagger2_5004.json",
+    "steps": 394,
+    "final_score": 81,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "snake/playjev-0.8b-dagger2_5005.json",
+    "steps": 517,
+    "final_score": 131,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "snake/playjev-0.8b-dagger2_5006.json",
+    "steps": 479,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "snake/playjev-0.8b-dagger2_5007.json",
+    "steps": 372,
+    "final_score": 97,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "snake/playjev-0.8b-dagger2_5009.json",
+    "steps": 294,
+    "final_score": 71,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "snake/playjev-0.8b-dagger2_5011.json",
+    "steps": 270,
+    "final_score": 71,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "snake/playjev-0.8b-dagger2_5012.json",
+    "steps": 282,
+    "final_score": 71,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "snake/playjev-0.8b-dagger2_5013.json",
+    "steps": 431,
+    "final_score": 121,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "snake/playjev-0.8b-dagger2_5014.json",
+    "steps": 372,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5016,
+    "file": "snake/playjev-0.8b-dagger2_5016.json",
+    "steps": 227,
+    "final_score": 71,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5017,
+    "file": "snake/playjev-0.8b-dagger2_5017.json",
+    "steps": 275,
+    "final_score": 81,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5018,
+    "file": "snake/playjev-0.8b-dagger2_5018.json",
+    "steps": 306,
+    "final_score": 71,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "snake/playjev-0.8b-sft_all1_5000.json",
@@ -1019,6 +1750,294 @@
     "file": "snake/playjev-0.8b-sft_all1_5021.json",
     "steps": 133,
     "final_score": 46,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "snake/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 28,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "snake/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 28,
+    "final_score": 1,
     "truncated": false,
     "frames_per_step": 1
    },
@@ -1511,6 +2530,150 @@
     "frames_per_step": 1
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "tetris/playjev-0.8b-dagger2_5000.json",
+    "steps": 1244,
+    "final_score": 9920,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "tetris/playjev-0.8b-dagger2_5001.json",
+    "steps": 982,
+    "final_score": 8070,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "tetris/playjev-0.8b-dagger2_5002.json",
+    "steps": 526,
+    "final_score": 3670,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "tetris/playjev-0.8b-dagger2_5003.json",
+    "steps": 617,
+    "final_score": 4490,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "tetris/playjev-0.8b-dagger2_5004.json",
+    "steps": 262,
+    "final_score": 930,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "tetris/playjev-0.8b-dagger2_5005.json",
+    "steps": 924,
+    "final_score": 8000,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "tetris/playjev-0.8b-dagger2_5006.json",
+    "steps": 849,
+    "final_score": 6240,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "tetris/playjev-0.8b-dagger2_5007.json",
+    "steps": 393,
+    "final_score": 2660,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "tetris/playjev-0.8b-dagger2_5009.json",
+    "steps": 670,
+    "final_score": 4800,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "tetris/playjev-0.8b-dagger2_5010.json",
+    "steps": 803,
+    "final_score": 5850,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "tetris/playjev-0.8b-dagger2_5011.json",
+    "steps": 861,
+    "final_score": 6550,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "tetris/playjev-0.8b-dagger2_5012.json",
+    "steps": 348,
+    "final_score": 2060,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "tetris/playjev-0.8b-dagger2_5013.json",
+    "steps": 843,
+    "final_score": 6110,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5015,
+    "file": "tetris/playjev-0.8b-dagger2_5015.json",
+    "steps": 569,
+    "final_score": 3620,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5017,
+    "file": "tetris/playjev-0.8b-dagger2_5017.json",
+    "steps": 320,
+    "final_score": 1330,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5021,
+    "file": "tetris/playjev-0.8b-dagger2_5021.json",
+    "steps": 290,
+    "final_score": 1180,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "tetris/playjev-0.8b-sft_all1_5000.json",
@@ -1651,6 +2814,438 @@
     "file": "tetris/playjev-0.8b-sft_all1_5017.json",
     "steps": 226,
     "final_score": 1080,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 132,
+    "final_score": 190,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 105,
+    "final_score": 140,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 180,
+    "final_score": 260,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 162,
+    "final_score": 170,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 144,
+    "final_score": 210,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 86,
+    "final_score": 140,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 148,
+    "final_score": 220,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 125,
+    "final_score": 210,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 129,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 152,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 144,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 174,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 161,
+    "final_score": 250,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 111,
+    "final_score": 170,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 152,
+    "final_score": 220,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 141,
+    "final_score": 210,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 142,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 182,
+    "final_score": 190,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 161,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 157,
+    "final_score": 170,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 146,
+    "final_score": 170,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 159,
+    "final_score": 210,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 194,
+    "final_score": 240,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 125,
+    "final_score": 180,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 121,
+    "final_score": 130,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 149,
+    "final_score": 190,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 166,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 135,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 163,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 175,
+    "final_score": 210,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 195,
+    "final_score": 260,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5017,
+    "file": "tetris/playjev-0.8b-sft_all1_d1_2f_5017.json",
+    "steps": 132,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5000,
+    "file": "tetris/playjev-0.8b-spec_tetris_5000.json",
+    "steps": 676,
+    "final_score": 4180,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5001,
+    "file": "tetris/playjev-0.8b-spec_tetris_5001.json",
+    "steps": 356,
+    "final_score": 1730,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5002,
+    "file": "tetris/playjev-0.8b-spec_tetris_5002.json",
+    "steps": 397,
+    "final_score": 2350,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5003,
+    "file": "tetris/playjev-0.8b-spec_tetris_5003.json",
+    "steps": 234,
+    "final_score": 560,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5004,
+    "file": "tetris/playjev-0.8b-spec_tetris_5004.json",
+    "steps": 187,
+    "final_score": 240,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5005,
+    "file": "tetris/playjev-0.8b-spec_tetris_5005.json",
+    "steps": 314,
+    "final_score": 1490,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5006,
+    "file": "tetris/playjev-0.8b-spec_tetris_5006.json",
+    "steps": 352,
+    "final_score": 1800,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5007,
+    "file": "tetris/playjev-0.8b-spec_tetris_5007.json",
+    "steps": 416,
+    "final_score": 2070,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5009,
+    "file": "tetris/playjev-0.8b-spec_tetris_5009.json",
+    "steps": 385,
+    "final_score": 1850,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5010,
+    "file": "tetris/playjev-0.8b-spec_tetris_5010.json",
+    "steps": 260,
+    "final_score": 840,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5011,
+    "file": "tetris/playjev-0.8b-spec_tetris_5011.json",
+    "steps": 388,
+    "final_score": 1820,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5012,
+    "file": "tetris/playjev-0.8b-spec_tetris_5012.json",
+    "steps": 282,
+    "final_score": 1290,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5013,
+    "file": "tetris/playjev-0.8b-spec_tetris_5013.json",
+    "steps": 318,
+    "final_score": 1330,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5014,
+    "file": "tetris/playjev-0.8b-spec_tetris_5014.json",
+    "steps": 286,
+    "final_score": 950,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5016,
+    "file": "tetris/playjev-0.8b-spec_tetris_5016.json",
+    "steps": 314,
+    "final_score": 1790,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-spec_tetris",
+    "seed": 5018,
+    "file": "tetris/playjev-0.8b-spec_tetris_5018.json",
+    "steps": 276,
+    "final_score": 1090,
     "truncated": false,
     "frames_per_step": 1
    },
@@ -2089,6 +3684,150 @@
     "frames_per_step": 1
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "2048/playjev-0.8b-dagger2_5000.json",
+    "steps": 241,
+    "final_score": 2900,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "2048/playjev-0.8b-dagger2_5001.json",
+    "steps": 294,
+    "final_score": 3500,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "2048/playjev-0.8b-dagger2_5002.json",
+    "steps": 524,
+    "final_score": 7492,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "2048/playjev-0.8b-dagger2_5003.json",
+    "steps": 230,
+    "final_score": 2856,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "2048/playjev-0.8b-dagger2_5005.json",
+    "steps": 464,
+    "final_score": 6724,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "2048/playjev-0.8b-dagger2_5006.json",
+    "steps": 257,
+    "final_score": 3128,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "2048/playjev-0.8b-dagger2_5007.json",
+    "steps": 176,
+    "final_score": 1744,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "2048/playjev-0.8b-dagger2_5009.json",
+    "steps": 368,
+    "final_score": 5364,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "2048/playjev-0.8b-dagger2_5010.json",
+    "steps": 153,
+    "final_score": 1488,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "2048/playjev-0.8b-dagger2_5011.json",
+    "steps": 269,
+    "final_score": 3308,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "2048/playjev-0.8b-dagger2_5012.json",
+    "steps": 174,
+    "final_score": 2100,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "2048/playjev-0.8b-dagger2_5013.json",
+    "steps": 255,
+    "final_score": 2996,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "2048/playjev-0.8b-dagger2_5014.json",
+    "steps": 233,
+    "final_score": 2864,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5015,
+    "file": "2048/playjev-0.8b-dagger2_5015.json",
+    "steps": 251,
+    "final_score": 3080,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5016,
+    "file": "2048/playjev-0.8b-dagger2_5016.json",
+    "steps": 221,
+    "final_score": 2556,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5018,
+    "file": "2048/playjev-0.8b-dagger2_5018.json",
+    "steps": 177,
+    "final_score": 2072,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "2048/playjev-0.8b-sft_all1_5000.json",
@@ -2229,6 +3968,294 @@
     "file": "2048/playjev-0.8b-sft_all1_5016.json",
     "steps": 194,
     "final_score": 1960,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 177,
+    "final_score": 1292,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 94,
+    "final_score": 572,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 462,
+    "final_score": 4616,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 427,
+    "final_score": 4072,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 381,
+    "final_score": 3464,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 494,
+    "final_score": 5436,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 162,
+    "final_score": 1224,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 161,
+    "final_score": 1180,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 238,
+    "final_score": 1688,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 306,
+    "final_score": 3064,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 338,
+    "final_score": 3328,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 474,
+    "final_score": 5072,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 301,
+    "final_score": 2844,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 230,
+    "final_score": 1772,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 226,
+    "final_score": 1792,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5018,
+    "file": "2048/playjev-0.8b-sft_all1_d1_5018.json",
+    "steps": 206,
+    "final_score": 1468,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 176,
+    "final_score": 1316,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 184,
+    "final_score": 1368,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 427,
+    "final_score": 3932,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 370,
+    "final_score": 3412,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 291,
+    "final_score": 2772,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 412,
+    "final_score": 3720,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 240,
+    "final_score": 1752,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 470,
+    "final_score": 5204,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 209,
+    "final_score": 1552,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 485,
+    "final_score": 5436,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 83,
+    "final_score": 360,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 362,
+    "final_score": 3680,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 238,
+    "final_score": 1900,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 316,
+    "final_score": 2708,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 280,
+    "final_score": 2508,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5017,
+    "file": "2048/playjev-0.8b-sft_all1_d1_2f_5017.json",
+    "steps": 301,
+    "final_score": 2864,
     "truncated": false,
     "frames_per_step": 1
    },
@@ -2676,6 +4703,150 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "flappy/playjev-0.8b-dagger2_5000.json",
+    "steps": 594,
+    "final_score": 30,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "flappy/playjev-0.8b-dagger2_5001.json",
+    "steps": 366,
+    "final_score": 16,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "flappy/playjev-0.8b-dagger2_5002.json",
+    "steps": 510,
+    "final_score": 25,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "flappy/playjev-0.8b-dagger2_5003.json",
+    "steps": 243,
+    "final_score": 9,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "flappy/playjev-0.8b-dagger2_5004.json",
+    "steps": 532,
+    "final_score": 26,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "flappy/playjev-0.8b-dagger2_5006.json",
+    "steps": 392,
+    "final_score": 18,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "flappy/playjev-0.8b-dagger2_5007.json",
+    "steps": 460,
+    "final_score": 22,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "flappy/playjev-0.8b-dagger2_5009.json",
+    "steps": 275,
+    "final_score": 11,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "flappy/playjev-0.8b-dagger2_5010.json",
+    "steps": 292,
+    "final_score": 12,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "flappy/playjev-0.8b-dagger2_5011.json",
+    "steps": 426,
+    "final_score": 20,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "flappy/playjev-0.8b-dagger2_5012.json",
+    "steps": 208,
+    "final_score": 7,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "flappy/playjev-0.8b-dagger2_5013.json",
+    "steps": 325,
+    "final_score": 14,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "flappy/playjev-0.8b-dagger2_5014.json",
+    "steps": 124,
+    "final_score": 2,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5017,
+    "file": "flappy/playjev-0.8b-dagger2_5017.json",
+    "steps": 191,
+    "final_score": 6,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5018,
+    "file": "flappy/playjev-0.8b-dagger2_5018.json",
+    "steps": 107,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5020,
+    "file": "flappy/playjev-0.8b-dagger2_5020.json",
+    "steps": 124,
+    "final_score": 2,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "flappy/playjev-0.8b-sft_all1_5000.json",
@@ -2816,6 +4987,438 @@
     "file": "flappy/playjev-0.8b-sft_all1_5021.json",
     "steps": 157,
     "final_score": 4,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 93,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 91,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 92,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 91,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 95,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 91,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 91,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 92,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 92,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "flappy/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5000,
+    "file": "flappy/playjev-0.8b-spec_flappy_5000.json",
+    "steps": 92,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5002,
+    "file": "flappy/playjev-0.8b-spec_flappy_5002.json",
+    "steps": 477,
+    "final_score": 23,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5003,
+    "file": "flappy/playjev-0.8b-spec_flappy_5003.json",
+    "steps": 343,
+    "final_score": 15,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5004,
+    "file": "flappy/playjev-0.8b-spec_flappy_5004.json",
+    "steps": 260,
+    "final_score": 10,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5005,
+    "file": "flappy/playjev-0.8b-spec_flappy_5005.json",
+    "steps": 712,
+    "final_score": 37,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5006,
+    "file": "flappy/playjev-0.8b-spec_flappy_5006.json",
+    "steps": 392,
+    "final_score": 18,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5007,
+    "file": "flappy/playjev-0.8b-spec_flappy_5007.json",
+    "steps": 224,
+    "final_score": 8,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5009,
+    "file": "flappy/playjev-0.8b-spec_flappy_5009.json",
+    "steps": 93,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5010,
+    "file": "flappy/playjev-0.8b-spec_flappy_5010.json",
+    "steps": 90,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5011,
+    "file": "flappy/playjev-0.8b-spec_flappy_5011.json",
+    "steps": 427,
+    "final_score": 20,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5012,
+    "file": "flappy/playjev-0.8b-spec_flappy_5012.json",
+    "steps": 224,
+    "final_score": 8,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5013,
+    "file": "flappy/playjev-0.8b-spec_flappy_5013.json",
+    "steps": 392,
+    "final_score": 18,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5014,
+    "file": "flappy/playjev-0.8b-spec_flappy_5014.json",
+    "steps": 124,
+    "final_score": 2,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5015,
+    "file": "flappy/playjev-0.8b-spec_flappy_5015.json",
+    "steps": 276,
+    "final_score": 11,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5017,
+    "file": "flappy/playjev-0.8b-spec_flappy_5017.json",
+    "steps": 93,
+    "final_score": 0,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_flappy",
+    "seed": 5020,
+    "file": "flappy/playjev-0.8b-spec_flappy_5020.json",
+    "steps": 124,
+    "final_score": 2,
     "truncated": false,
     "frames_per_step": 5
    },
@@ -3263,6 +5866,150 @@
     "frames_per_step": 6
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "pacman/playjev-0.8b-dagger2_5000.json",
+    "steps": 321,
+    "final_score": 1700,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "pacman/playjev-0.8b-dagger2_5001.json",
+    "steps": 343,
+    "final_score": 2050,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "pacman/playjev-0.8b-dagger2_5002.json",
+    "steps": 183,
+    "final_score": 1240,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "pacman/playjev-0.8b-dagger2_5003.json",
+    "steps": 1500,
+    "final_score": 7010,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "pacman/playjev-0.8b-dagger2_5004.json",
+    "steps": 1079,
+    "final_score": 5430,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "pacman/playjev-0.8b-dagger2_5005.json",
+    "steps": 231,
+    "final_score": 1330,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "pacman/playjev-0.8b-dagger2_5006.json",
+    "steps": 1500,
+    "final_score": 8260,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "pacman/playjev-0.8b-dagger2_5007.json",
+    "steps": 1444,
+    "final_score": 7540,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "pacman/playjev-0.8b-dagger2_5009.json",
+    "steps": 1500,
+    "final_score": 7030,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "pacman/playjev-0.8b-dagger2_5010.json",
+    "steps": 415,
+    "final_score": 2320,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "pacman/playjev-0.8b-dagger2_5011.json",
+    "steps": 87,
+    "final_score": 500,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "pacman/playjev-0.8b-dagger2_5012.json",
+    "steps": 1041,
+    "final_score": 5600,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "pacman/playjev-0.8b-dagger2_5013.json",
+    "steps": 930,
+    "final_score": 4700,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "pacman/playjev-0.8b-dagger2_5014.json",
+    "steps": 221,
+    "final_score": 1450,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5017,
+    "file": "pacman/playjev-0.8b-dagger2_5017.json",
+    "steps": 485,
+    "final_score": 2420,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5022,
+    "file": "pacman/playjev-0.8b-dagger2_5022.json",
+    "steps": 122,
+    "final_score": 650,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "pacman/playjev-0.8b-sft_all1_5000.json",
@@ -3412,6 +6159,294 @@
     "file": "pacman/playjev-0.8b-sft_all1_5021.json",
     "steps": 166,
     "final_score": 1300,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 145,
+    "final_score": 510,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 164,
+    "final_score": 460,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 54,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 239,
+    "final_score": 690,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 378,
+    "final_score": 560,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 267,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 64,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 151,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 40,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 181,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 236,
+    "final_score": 1420,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 257,
+    "final_score": 460,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 176,
+    "final_score": 660,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 167,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 137,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5018,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_5018.json",
+    "steps": 119,
+    "final_score": 650,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 271,
+    "final_score": 720,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 38,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 46,
+    "final_score": 190,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 415,
+    "final_score": 1080,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 48,
+    "final_score": 290,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 341,
+    "final_score": 1350,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 264,
+    "final_score": 780,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 246,
+    "final_score": 1150,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 38,
+    "final_score": 210,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 127,
+    "final_score": 740,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 48,
+    "final_score": 290,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 176,
+    "final_score": 800,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 116,
+    "final_score": 650,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 56,
+    "final_score": 330,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5019,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5019.json",
+    "steps": 157,
+    "final_score": 500,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5021,
+    "file": "pacman/playjev-0.8b-sft_all1_d1_2f_5021.json",
+    "steps": 48,
+    "final_score": 290,
     "truncated": false,
     "frames_per_step": 6
    },
@@ -3850,6 +6885,150 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "breakout/playjev-0.8b-dagger2_5000.json",
+    "steps": 159,
+    "final_score": 470,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "breakout/playjev-0.8b-dagger2_5001.json",
+    "steps": 384,
+    "final_score": 1565,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "breakout/playjev-0.8b-dagger2_5002.json",
+    "steps": 523,
+    "final_score": 2390,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "breakout/playjev-0.8b-dagger2_5003.json",
+    "steps": 637,
+    "final_score": 2365,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "breakout/playjev-0.8b-dagger2_5004.json",
+    "steps": 590,
+    "final_score": 8700,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "breakout/playjev-0.8b-dagger2_5005.json",
+    "steps": 214,
+    "final_score": 750,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "breakout/playjev-0.8b-dagger2_5006.json",
+    "steps": 387,
+    "final_score": 3740,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "breakout/playjev-0.8b-dagger2_5007.json",
+    "steps": 907,
+    "final_score": 8635,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "breakout/playjev-0.8b-dagger2_5010.json",
+    "steps": 107,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "breakout/playjev-0.8b-dagger2_5011.json",
+    "steps": 246,
+    "final_score": 1025,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "breakout/playjev-0.8b-dagger2_5012.json",
+    "steps": 233,
+    "final_score": 825,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "breakout/playjev-0.8b-dagger2_5014.json",
+    "steps": 273,
+    "final_score": 5125,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5016,
+    "file": "breakout/playjev-0.8b-dagger2_5016.json",
+    "steps": 283,
+    "final_score": 3865,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5017,
+    "file": "breakout/playjev-0.8b-dagger2_5017.json",
+    "steps": 140,
+    "final_score": 2055,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5018,
+    "file": "breakout/playjev-0.8b-dagger2_5018.json",
+    "steps": 189,
+    "final_score": 1420,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5020,
+    "file": "breakout/playjev-0.8b-dagger2_5020.json",
+    "steps": 107,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "breakout/playjev-0.8b-sft_all1_5000.json",
@@ -3999,6 +7178,438 @@
     "file": "breakout/playjev-0.8b-sft_all1_5022.json",
     "steps": 72,
     "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 109,
+    "final_score": 385,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 117,
+    "final_score": 435,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 104,
+    "final_score": 255,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 432,
+    "final_score": 1640,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 57,
+    "final_score": 120,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 298,
+    "final_score": 1665,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 273,
+    "final_score": 3350,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 140,
+    "final_score": 2530,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 186,
+    "final_score": 1400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 107,
+    "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 87,
+    "final_score": 425,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 72,
+    "final_score": 150,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 297,
+    "final_score": 1070,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 57,
+    "final_score": 120,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 160,
+    "final_score": 1590,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5018,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_5018.json",
+    "steps": 88,
+    "final_score": 310,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 124,
+    "final_score": 305,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 270,
+    "final_score": 1300,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 129,
+    "final_score": 350,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 201,
+    "final_score": 740,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 206,
+    "final_score": 3025,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 171,
+    "final_score": 575,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 161,
+    "final_score": 630,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 78,
+    "final_score": 205,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 89,
+    "final_score": 565,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 125,
+    "final_score": 305,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 193,
+    "final_score": 765,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 135,
+    "final_score": 360,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 72,
+    "final_score": 200,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 92,
+    "final_score": 225,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5017,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5017.json",
+    "steps": 67,
+    "final_score": 165,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5018,
+    "file": "breakout/playjev-0.8b-sft_all1_d1_2f_5018.json",
+    "steps": 92,
+    "final_score": 335,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5000,
+    "file": "breakout/playjev-0.8b-spec_breakout_5000.json",
+    "steps": 179,
+    "final_score": 470,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5001,
+    "file": "breakout/playjev-0.8b-spec_breakout_5001.json",
+    "steps": 297,
+    "final_score": 1975,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5002,
+    "file": "breakout/playjev-0.8b-spec_breakout_5002.json",
+    "steps": 141,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5003,
+    "file": "breakout/playjev-0.8b-spec_breakout_5003.json",
+    "steps": 342,
+    "final_score": 1325,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5004,
+    "file": "breakout/playjev-0.8b-spec_breakout_5004.json",
+    "steps": 245,
+    "final_score": 4070,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5005,
+    "file": "breakout/playjev-0.8b-spec_breakout_5005.json",
+    "steps": 388,
+    "final_score": 2325,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5006,
+    "file": "breakout/playjev-0.8b-spec_breakout_5006.json",
+    "steps": 158,
+    "final_score": 715,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5007,
+    "file": "breakout/playjev-0.8b-spec_breakout_5007.json",
+    "steps": 234,
+    "final_score": 1755,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5010,
+    "file": "breakout/playjev-0.8b-spec_breakout_5010.json",
+    "steps": 183,
+    "final_score": 555,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5011,
+    "file": "breakout/playjev-0.8b-spec_breakout_5011.json",
+    "steps": 241,
+    "final_score": 1610,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5012,
+    "file": "breakout/playjev-0.8b-spec_breakout_5012.json",
+    "steps": 204,
+    "final_score": 850,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5014,
+    "file": "breakout/playjev-0.8b-spec_breakout_5014.json",
+    "steps": 284,
+    "final_score": 5100,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5015,
+    "file": "breakout/playjev-0.8b-spec_breakout_5015.json",
+    "steps": 297,
+    "final_score": 1600,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5017,
+    "file": "breakout/playjev-0.8b-spec_breakout_5017.json",
+    "steps": 198,
+    "final_score": 2895,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5018,
+    "file": "breakout/playjev-0.8b-spec_breakout_5018.json",
+    "steps": 189,
+    "final_score": 1075,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-spec_breakout",
+    "seed": 5019,
+    "file": "breakout/playjev-0.8b-spec_breakout_5019.json",
+    "steps": 180,
+    "final_score": 1430,
     "truncated": false,
     "frames_per_step": 5
    },
@@ -4455,6 +8066,150 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "invaders/playjev-0.8b-dagger2_5000.json",
+    "steps": 167,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "invaders/playjev-0.8b-dagger2_5001.json",
+    "steps": 177,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "invaders/playjev-0.8b-dagger2_5002.json",
+    "steps": 167,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "invaders/playjev-0.8b-dagger2_5003.json",
+    "steps": 177,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "invaders/playjev-0.8b-dagger2_5004.json",
+    "steps": 170,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "invaders/playjev-0.8b-dagger2_5005.json",
+    "steps": 231,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "invaders/playjev-0.8b-dagger2_5006.json",
+    "steps": 221,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "invaders/playjev-0.8b-dagger2_5007.json",
+    "steps": 173,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "invaders/playjev-0.8b-dagger2_5009.json",
+    "steps": 185,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "invaders/playjev-0.8b-dagger2_5010.json",
+    "steps": 167,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "invaders/playjev-0.8b-dagger2_5011.json",
+    "steps": 188,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "invaders/playjev-0.8b-dagger2_5012.json",
+    "steps": 174,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "invaders/playjev-0.8b-dagger2_5013.json",
+    "steps": 167,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "invaders/playjev-0.8b-dagger2_5014.json",
+    "steps": 167,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5015,
+    "file": "invaders/playjev-0.8b-dagger2_5015.json",
+    "steps": 177,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5016,
+    "file": "invaders/playjev-0.8b-dagger2_5016.json",
+    "steps": 177,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "invaders/playjev-0.8b-sft_all1_5000.json",
@@ -4594,6 +8349,294 @@
     "seed": 5016,
     "file": "invaders/playjev-0.8b-sft_all1_5016.json",
     "steps": 203,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 364,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 225,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 271,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 245,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 270,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 271,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 446,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 246,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 311,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 248,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 236,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 243,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 185,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 303,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 209,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5017,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_5017.json",
+    "steps": 211,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 293,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 194,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 210,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 231,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 213,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 170,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 296,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 246,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 343,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 251,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 217,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 258,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 195,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 267,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 203,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "invaders/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 217,
     "final_score": 400,
     "truncated": false,
     "frames_per_step": 5
@@ -5033,6 +9076,150 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5000,
+    "file": "racer/playjev-0.8b-dagger2_5000.json",
+    "steps": 1438,
+    "final_score": 6710,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "racer/playjev-0.8b-dagger2_5001.json",
+    "steps": 1395,
+    "final_score": 6709.9,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "racer/playjev-0.8b-dagger2_5002.json",
+    "steps": 1476,
+    "final_score": 6713.6,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "racer/playjev-0.8b-dagger2_5003.json",
+    "steps": 1438,
+    "final_score": 6712.4,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "racer/playjev-0.8b-dagger2_5004.json",
+    "steps": 1494,
+    "final_score": 6710.7,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "racer/playjev-0.8b-dagger2_5005.json",
+    "steps": 1472,
+    "final_score": 6712,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "racer/playjev-0.8b-dagger2_5006.json",
+    "steps": 1439,
+    "final_score": 6709.2,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "racer/playjev-0.8b-dagger2_5007.json",
+    "steps": 1404,
+    "final_score": 6713.1,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "racer/playjev-0.8b-dagger2_5009.json",
+    "steps": 1459,
+    "final_score": 6709.3,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "racer/playjev-0.8b-dagger2_5010.json",
+    "steps": 1407,
+    "final_score": 6714,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "racer/playjev-0.8b-dagger2_5011.json",
+    "steps": 1448,
+    "final_score": 6713,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "racer/playjev-0.8b-dagger2_5012.json",
+    "steps": 1434,
+    "final_score": 6713.3,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "racer/playjev-0.8b-dagger2_5013.json",
+    "steps": 1451,
+    "final_score": 6712.3,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "racer/playjev-0.8b-dagger2_5014.json",
+    "steps": 1463,
+    "final_score": 6712.4,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5015,
+    "file": "racer/playjev-0.8b-dagger2_5015.json",
+    "steps": 1451,
+    "final_score": 6711,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5016,
+    "file": "racer/playjev-0.8b-dagger2_5016.json",
+    "steps": 1500,
+    "final_score": 6631.3,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "racer/playjev-0.8b-sft_all1_5000.json",
@@ -5177,6 +9364,294 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 1500,
+    "final_score": 5235.1,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 1500,
+    "final_score": 4917.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 1500,
+    "final_score": 4702.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 1500,
+    "final_score": 4755,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 1500,
+    "final_score": 5049.1,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 1500,
+    "final_score": 5324.2,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 1500,
+    "final_score": 4929.3,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 1500,
+    "final_score": 4035.2,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 1500,
+    "final_score": 4266.2,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 1500,
+    "final_score": 3946.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 1500,
+    "final_score": 5315.1,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 1500,
+    "final_score": 5095.3,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 1500,
+    "final_score": 4811.6,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 1500,
+    "final_score": 4846.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 1500,
+    "final_score": 5365.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "racer/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 1500,
+    "final_score": 5371.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 1500,
+    "final_score": 4593.5,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 1500,
+    "final_score": 4840.1,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 1500,
+    "final_score": 5194.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 1500,
+    "final_score": 4753.3,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 1500,
+    "final_score": 4896.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 1500,
+    "final_score": 4735.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 1500,
+    "final_score": 4616.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 1500,
+    "final_score": 5022.4,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 1500,
+    "final_score": 4852,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 1500,
+    "final_score": 5080.4,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 1500,
+    "final_score": 3520.1,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 1500,
+    "final_score": 5991,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 1500,
+    "final_score": 5111,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 1500,
+    "final_score": 4577.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 1500,
+    "final_score": 3597.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "racer/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 1500,
+    "final_score": 4011.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
     "policy": "random",
     "seed": 5000,
     "file": "racer/random_5000.json",
@@ -5317,6 +9792,582 @@
     "file": "racer/random_5016.json",
     "steps": 1500,
     "final_score": 242.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5000,
+    "file": "racer/transfer-racer-10kf-base_5000.json",
+    "steps": 1500,
+    "final_score": 336.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5001,
+    "file": "racer/transfer-racer-10kf-base_5001.json",
+    "steps": 1500,
+    "final_score": 648.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5002,
+    "file": "racer/transfer-racer-10kf-base_5002.json",
+    "steps": 1500,
+    "final_score": 606.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5003,
+    "file": "racer/transfer-racer-10kf-base_5003.json",
+    "steps": 1500,
+    "final_score": 1131.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5004,
+    "file": "racer/transfer-racer-10kf-base_5004.json",
+    "steps": 1500,
+    "final_score": 717.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5005,
+    "file": "racer/transfer-racer-10kf-base_5005.json",
+    "steps": 1500,
+    "final_score": 435.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5006,
+    "file": "racer/transfer-racer-10kf-base_5006.json",
+    "steps": 1500,
+    "final_score": 612.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5007,
+    "file": "racer/transfer-racer-10kf-base_5007.json",
+    "steps": 1500,
+    "final_score": 570.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5009,
+    "file": "racer/transfer-racer-10kf-base_5009.json",
+    "steps": 1500,
+    "final_score": 681.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5010,
+    "file": "racer/transfer-racer-10kf-base_5010.json",
+    "steps": 1500,
+    "final_score": 609.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5011,
+    "file": "racer/transfer-racer-10kf-base_5011.json",
+    "steps": 1500,
+    "final_score": 406,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5012,
+    "file": "racer/transfer-racer-10kf-base_5012.json",
+    "steps": 1500,
+    "final_score": 693.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5013,
+    "file": "racer/transfer-racer-10kf-base_5013.json",
+    "steps": 1500,
+    "final_score": 726.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5014,
+    "file": "racer/transfer-racer-10kf-base_5014.json",
+    "steps": 1500,
+    "final_score": 684.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5015,
+    "file": "racer/transfer-racer-10kf-base_5015.json",
+    "steps": 1500,
+    "final_score": 615.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-base",
+    "seed": 5016,
+    "file": "racer/transfer-racer-10kf-base_5016.json",
+    "steps": 1500,
+    "final_score": 369.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5000,
+    "file": "racer/transfer-racer-10kf-hold8_5000.json",
+    "steps": 1500,
+    "final_score": 6624.5,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5001,
+    "file": "racer/transfer-racer-10kf-hold8_5001.json",
+    "steps": 1500,
+    "final_score": 5686.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5002,
+    "file": "racer/transfer-racer-10kf-hold8_5002.json",
+    "steps": 1475,
+    "final_score": 6710,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5003,
+    "file": "racer/transfer-racer-10kf-hold8_5003.json",
+    "steps": 1500,
+    "final_score": 5896.3,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5004,
+    "file": "racer/transfer-racer-10kf-hold8_5004.json",
+    "steps": 1500,
+    "final_score": 6379.4,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5005,
+    "file": "racer/transfer-racer-10kf-hold8_5005.json",
+    "steps": 1500,
+    "final_score": 6344.5,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5006,
+    "file": "racer/transfer-racer-10kf-hold8_5006.json",
+    "steps": 1500,
+    "final_score": 6458,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5007,
+    "file": "racer/transfer-racer-10kf-hold8_5007.json",
+    "steps": 1500,
+    "final_score": 6626.5,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5009,
+    "file": "racer/transfer-racer-10kf-hold8_5009.json",
+    "steps": 1500,
+    "final_score": 6503.6,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5010,
+    "file": "racer/transfer-racer-10kf-hold8_5010.json",
+    "steps": 1479,
+    "final_score": 6714,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5011,
+    "file": "racer/transfer-racer-10kf-hold8_5011.json",
+    "steps": 1500,
+    "final_score": 6374.6,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5012,
+    "file": "racer/transfer-racer-10kf-hold8_5012.json",
+    "steps": 1500,
+    "final_score": 6669.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5013,
+    "file": "racer/transfer-racer-10kf-hold8_5013.json",
+    "steps": 1500,
+    "final_score": 5772.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5014,
+    "file": "racer/transfer-racer-10kf-hold8_5014.json",
+    "steps": 1500,
+    "final_score": 6585.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5015,
+    "file": "racer/transfer-racer-10kf-hold8_5015.json",
+    "steps": 1500,
+    "final_score": 5654.2,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-10kf-hold8",
+    "seed": 5016,
+    "file": "racer/transfer-racer-10kf-hold8_5016.json",
+    "steps": 1500,
+    "final_score": 6012.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5000,
+    "file": "racer/transfer-racer-1kf-base_5000.json",
+    "steps": 1500,
+    "final_score": 45.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5001,
+    "file": "racer/transfer-racer-1kf-base_5001.json",
+    "steps": 1500,
+    "final_score": 41.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5002,
+    "file": "racer/transfer-racer-1kf-base_5002.json",
+    "steps": 1500,
+    "final_score": 41.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5003,
+    "file": "racer/transfer-racer-1kf-base_5003.json",
+    "steps": 1500,
+    "final_score": 53.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5004,
+    "file": "racer/transfer-racer-1kf-base_5004.json",
+    "steps": 1500,
+    "final_score": 41.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5005,
+    "file": "racer/transfer-racer-1kf-base_5005.json",
+    "steps": 1500,
+    "final_score": 65.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5006,
+    "file": "racer/transfer-racer-1kf-base_5006.json",
+    "steps": 1500,
+    "final_score": 65.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5007,
+    "file": "racer/transfer-racer-1kf-base_5007.json",
+    "steps": 1500,
+    "final_score": 49.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5009,
+    "file": "racer/transfer-racer-1kf-base_5009.json",
+    "steps": 1500,
+    "final_score": 45.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5010,
+    "file": "racer/transfer-racer-1kf-base_5010.json",
+    "steps": 1500,
+    "final_score": 57.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5011,
+    "file": "racer/transfer-racer-1kf-base_5011.json",
+    "steps": 1500,
+    "final_score": 33.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5012,
+    "file": "racer/transfer-racer-1kf-base_5012.json",
+    "steps": 1500,
+    "final_score": 41.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5013,
+    "file": "racer/transfer-racer-1kf-base_5013.json",
+    "steps": 1500,
+    "final_score": 53.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5014,
+    "file": "racer/transfer-racer-1kf-base_5014.json",
+    "steps": 1500,
+    "final_score": 53.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5015,
+    "file": "racer/transfer-racer-1kf-base_5015.json",
+    "steps": 1500,
+    "final_score": 41.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-base",
+    "seed": 5016,
+    "file": "racer/transfer-racer-1kf-base_5016.json",
+    "steps": 1500,
+    "final_score": 37.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5000,
+    "file": "racer/transfer-racer-1kf-hold8_5000.json",
+    "steps": 1500,
+    "final_score": 4890.2,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5001,
+    "file": "racer/transfer-racer-1kf-hold8_5001.json",
+    "steps": 1500,
+    "final_score": 4837.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5002,
+    "file": "racer/transfer-racer-1kf-hold8_5002.json",
+    "steps": 1500,
+    "final_score": 5110.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5003,
+    "file": "racer/transfer-racer-1kf-hold8_5003.json",
+    "steps": 1500,
+    "final_score": 4178.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5004,
+    "file": "racer/transfer-racer-1kf-hold8_5004.json",
+    "steps": 1500,
+    "final_score": 4890.1,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5005,
+    "file": "racer/transfer-racer-1kf-hold8_5005.json",
+    "steps": 1500,
+    "final_score": 4255.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5006,
+    "file": "racer/transfer-racer-1kf-hold8_5006.json",
+    "steps": 1500,
+    "final_score": 4727.9,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5007,
+    "file": "racer/transfer-racer-1kf-hold8_5007.json",
+    "steps": 1500,
+    "final_score": 5036.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5009,
+    "file": "racer/transfer-racer-1kf-hold8_5009.json",
+    "steps": 1500,
+    "final_score": 5068.5,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5010,
+    "file": "racer/transfer-racer-1kf-hold8_5010.json",
+    "steps": 1500,
+    "final_score": 4974.2,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5011,
+    "file": "racer/transfer-racer-1kf-hold8_5011.json",
+    "steps": 1500,
+    "final_score": 4981.3,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5012,
+    "file": "racer/transfer-racer-1kf-hold8_5012.json",
+    "steps": 1500,
+    "final_score": 5127.8,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5013,
+    "file": "racer/transfer-racer-1kf-hold8_5013.json",
+    "steps": 1500,
+    "final_score": 5435.6,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5014,
+    "file": "racer/transfer-racer-1kf-hold8_5014.json",
+    "steps": 1500,
+    "final_score": 4588.5,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5015,
+    "file": "racer/transfer-racer-1kf-hold8_5015.json",
+    "steps": 1500,
+    "final_score": 5365.7,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "transfer-racer-1kf-hold8",
+    "seed": 5016,
+    "file": "racer/transfer-racer-1kf-hold8_5016.json",
+    "steps": 1500,
+    "final_score": 4402.6,
     "truncated": true,
     "frames_per_step": 5
    }
@@ -5611,6 +10662,150 @@
     "frames_per_step": 1
    },
    {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5001,
+    "file": "sokoban/playjev-0.8b-dagger2_5001.json",
+    "steps": 47,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5002,
+    "file": "sokoban/playjev-0.8b-dagger2_5002.json",
+    "steps": 61,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5003,
+    "file": "sokoban/playjev-0.8b-dagger2_5003.json",
+    "steps": 1,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5004,
+    "file": "sokoban/playjev-0.8b-dagger2_5004.json",
+    "steps": 45,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5005,
+    "file": "sokoban/playjev-0.8b-dagger2_5005.json",
+    "steps": 47,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5006,
+    "file": "sokoban/playjev-0.8b-dagger2_5006.json",
+    "steps": 83,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5007,
+    "file": "sokoban/playjev-0.8b-dagger2_5007.json",
+    "steps": 64,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5009,
+    "file": "sokoban/playjev-0.8b-dagger2_5009.json",
+    "steps": 76,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5010,
+    "file": "sokoban/playjev-0.8b-dagger2_5010.json",
+    "steps": 34,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5011,
+    "file": "sokoban/playjev-0.8b-dagger2_5011.json",
+    "steps": 26,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5012,
+    "file": "sokoban/playjev-0.8b-dagger2_5012.json",
+    "steps": 37,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5013,
+    "file": "sokoban/playjev-0.8b-dagger2_5013.json",
+    "steps": 82,
+    "final_score": 104,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5014,
+    "file": "sokoban/playjev-0.8b-dagger2_5014.json",
+    "steps": 64,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5015,
+    "file": "sokoban/playjev-0.8b-dagger2_5015.json",
+    "steps": 23,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5016,
+    "file": "sokoban/playjev-0.8b-dagger2_5016.json",
+    "steps": 60,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger2",
+    "seed": 5017,
+    "file": "sokoban/playjev-0.8b-dagger2_5017.json",
+    "steps": 44,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "sokoban/playjev-0.8b-sft_all1_5000.json",
@@ -5752,6 +10947,294 @@
     "steps": 64,
     "final_score": 104,
     "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5000,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5000.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5001,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5001.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5002,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5002.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5003,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5003.json",
+    "steps": 1,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5004,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5004.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5005,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5005.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5006,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5006.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5007,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5007.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5009,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5009.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5010,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5010.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5011,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5011.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5012,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5012.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5013,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5013.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5014,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5014.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5015,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5015.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1",
+    "seed": 5016,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_5016.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5000,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5000.json",
+    "steps": 500,
+    "final_score": 1,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5001,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5001.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5002,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5002.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5003,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5003.json",
+    "steps": 1,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5004,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5004.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5005,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5005.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5006,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5006.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5007,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5007.json",
+    "steps": 500,
+    "final_score": 1,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5009,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5009.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5010,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5010.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5011,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5011.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5012,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5012.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5013,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5013.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5014,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5014.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5015,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5015.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-sft_all1_d1_2f",
+    "seed": 5016,
+    "file": "sokoban/playjev-0.8b-sft_all1_d1_2f_5016.json",
+    "steps": 500,
+    "final_score": 0,
+    "truncated": true,
     "frames_per_step": 1
    },
    {

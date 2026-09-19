@@ -386,6 +386,49 @@ def build_results(games: dict[str, dict], results_dir: Path, preferred: str | No
             "results_dir": relpath(results_dir), "note": note, "rows": rows}
 
 
+def build_handover(results_dir: Path, games: dict[str, dict], prefer: str | None = None) -> dict | None:
+    """The System One / System Two curve: below a confidence threshold the teacher decides instead of the model.
+    One series per game of (share of steps handed over, score), plus the control that hands over the same share of
+    steps chosen at random. runs/results/handover_<model>.json, written by scripts/collect_handover.py."""
+    files = sorted(results_dir.glob("handover_*.json"))
+    if not files:
+        return None
+    models = {}
+    for f in files:
+        model = f.stem[len("handover_"):]
+        for r in json.loads(f.read_text()):
+            if r["game"] not in games:
+                continue
+            g = models.setdefault(model, {}).setdefault(r["game"], {"confidence": [], "random": [], "invert": []})
+            pt = {"rate": round(r["handover_rate"], 4), "score": r["score_mean"], "conf_mean": round(r.get("conf_mean", 0), 4)}
+            if r.get("handover_tau") is None:
+                g["random"].append(pt)
+            else:
+                # the inverted trigger carries a tau too; it is a control, not a point on the confidence curve
+                pt["tau"] = r["handover_tau"]
+                g["invert" if r.get("handover_invert") else "confidence"].append(pt)
+    for m in models.values():
+        for g in m.values():
+            for k in g:
+                g[k].sort(key=lambda x: x["rate"])
+    # show the checkpoint the rest of the page is about, as long as its curve has a control to compare against
+    have_control = [m for m in models if any(g["random"] for g in models[m].values())]
+    pick = next((m for m in have_control if prefer and m in prefer), None) \
+        or max(have_control or list(models), key=lambda m: sum(len(g["random"]) for g in models[m].values()))
+    return {"model": pick, "models": {m: v for m, v in models.items()},
+            "note": "Each point is 16 episodes. The model plays every step whose Jev confidence is at or above the "
+                    "threshold and the teacher plays the rest; the horizontal axis is the share of steps the teacher "
+                    "actually took, so the left end is the model alone and the right end is the teacher alone. The "
+                    "control hands the same share of steps to the teacher, chosen at random instead of by confidence."}
+
+
+def build_transfer(results_dir: Path) -> dict | None:
+    """Learning a held-out game from N frames, starting either from the raw base model or from the eight-game model
+    that never saw it. runs/results/transfer.json, written by scripts/collect_transfer.py."""
+    f = results_dir / "transfer.json"
+    return json.loads(f.read_text()) if f.is_file() else None
+
+
 def check_prompt_against_notes(games: dict[str, dict]) -> None:
     notes = ROOT / "docs" / "MODEL_NOTES.md"
     if "snake" not in games or not notes.is_file():
@@ -440,6 +483,16 @@ def main() -> None:
 
     log("results")
     results = build_results(games, Path(a.results), a.model_policy or None)
+    model_policy = next((r["model"]["policy"] for r in results["rows"] if r.get("model")), None)
+    handover = build_handover(Path(a.results), games, model_policy)
+    transfer = build_transfer(Path(a.results))
+    if handover:
+        results["handover"] = handover
+        log(f"  handover: {len(handover['models'])} model(s), default {handover['model']}, "
+            f"{sum(len(g['confidence']) + len(g['random']) for g in handover['models'][handover['model']].values())} points")
+    if transfer:
+        results["transfer"] = transfer
+        log(f"  transfer: {sum(len(g['runs']) for g in transfer['games'])} runs across {len(transfer['games'])} games")
     (out / "results.json").write_text(json.dumps(results, indent=1))
 
     data = {"generated": replays_doc["generated"], "games": list(games.values()), "replays": index, "policies": policies,
