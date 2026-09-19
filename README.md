@@ -1,5 +1,17 @@
 # PlayJev
 
+[![live demo](https://img.shields.io/badge/demo-play_it-2F80ED?style=flat-square)](https://omnijev.github.io/PlayJev/)
+[![model](https://img.shields.io/badge/model-Qwen3.5--0.8B--Base-16181c?style=flat-square)](https://huggingface.co/Qwen/Qwen3.5-0.8B-Base)
+[![games](https://img.shields.io/badge/games-10-6d747e?style=flat-square)](#the-ten-games)
+[![decision](https://img.shields.io/badge/decision-43_ms-6d747e?style=flat-square)](#how-a-decision-is-made)
+[![licence](https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square)](LICENSE)
+
+![Ten browser games with the model playing each one](docs/assets/board.png)
+
+Every picture above is the trained model playing. Each is a frame from a recorded held-out episode
+with the score it had reached by then, and the [live demo](https://omnijev.github.io/PlayJev/) replays
+those same episodes in the real game, step by step, with the probabilities drawn beside the picture.
+
 An open System One model that plays ten classic browser games from raw pixels. PlayJev is
 Qwen3.5-0.8B-Base fine-tuned so that one forward pass turns a game frame into a calibrated
 probability over the game's moves. Nothing is generated and nothing is parsed: the answer is read
@@ -13,10 +25,8 @@ frame (JPEG, 448 px) ─┐
 option list ──────────┘
 ```
 
-**[Live demo: omnijev.github.io/PlayJev](https://omnijev.github.io/PlayJev/)**. Every tile is the real game
-replaying an episode of the trained model step by step, with the model's probabilities drawn beside the picture.
-The source is in `demo/`, built by `scripts/build_demo.py` from the games and the recorded runs; serve that
-directory and open `index.html` to run it locally.
+The demo source is in `demo/`, built by `scripts/build_demo.py` from the games and the recorded runs.
+Serve that directory and open `index.html` to run it locally.
 
 ## Why pixels
 
@@ -36,6 +46,11 @@ visited, and the model trains one more epoch (lr 1e-5) on those plus the earlier
 Closed loop on 16 held-out episodes per game, argmax move, episodes capped at 1500 steps; random and teacher play
 the same seeds through the same harness. "vs teacher" is (model - random) / (teacher - random): 0 is random play,
 1 is the teacher.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/chart-dark.png">
+  <img alt="Score against the teacher for each game, after behaviour cloning and after each DAgger round" src="docs/assets/chart.png">
+</picture>
 
 | game | random | sft_all1 | dagger1 | dagger2 | teacher | vs teacher, sft_all1 | dagger1 | dagger2 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -166,18 +181,18 @@ All plain HTML5/JS, vendored under `games/<id>/` with their licences and a `vend
 Each game exposes the same tiny hook (`window.pj`: `start(seed)`, `step(action)`, `frame()`, `score()`, `done()`,
 `actions`), and the same page serves as environment and demo.
 
-| game | upstream | licence | moves |
-|---|---|---|---|
-| Infinite Mario | robertkleffner/mariohtml5 | Unlicense (code) | noop, left, right, jump, right jump, right run, right run jump |
-| Snake | patorjk/JavaScript-Snake | MIT | up, down, left, right |
-| Tetris | jakesgordon/javascript-tetris | MIT | left, right, rotate, drop, none |
-| 2048 | gabrielecirulli/2048 | MIT | up, down, left, right |
-| Floppy Bird | nebez/floppybird | Apache-2.0 (code) | flap, wait |
-| Pacman | daleharvey/pacman | WTFPL (code) | up, down, left, right |
-| Breakout | jakesgordon/javascript-breakout | MIT | left, right, stay |
-| Space Invaders | StrykerKKD/SpaceInvaders | MIT | left, right, noop |
-| Javascript Racer | jakesgordon/javascript-racer | MIT (code) | left, right, faster, slower, left faster, right faster |
-| Sokoban | taniarascia/sokoban, Microban levels by David Skinner | MIT | up, down, left, right |
+|   | game | upstream | licence | moves |
+|---|---|---|---|---|
+| <img src="docs/assets/thumbs/mario.png" width="150"> | Infinite Mario | [robertkleffner/mariohtml5](https://github.com/robertkleffner/mariohtml5) | Unlicense (code) | noop, left, right, jump, right jump, right run, right run jump |
+| <img src="docs/assets/thumbs/snake.png" width="150"> | Snake | [patorjk/JavaScript-Snake](https://github.com/patorjk/JavaScript-Snake) | MIT | up, down, left, right |
+| <img src="docs/assets/thumbs/tetris.png" width="150"> | Tetris | [jakesgordon/javascript-tetris](https://github.com/jakesgordon/javascript-tetris) | MIT | left, right, rotate, drop, none |
+| <img src="docs/assets/thumbs/2048.png" width="150"> | 2048 | [gabrielecirulli/2048](https://github.com/gabrielecirulli/2048) | MIT | up, down, left, right |
+| <img src="docs/assets/thumbs/flappy.png" width="150"> | Floppy Bird | [nebez/floppybird](https://github.com/nebez/floppybird) | Apache-2.0 (code) | flap, wait |
+| <img src="docs/assets/thumbs/pacman.png" width="150"> | Pacman | [daleharvey/pacman](https://github.com/daleharvey/pacman) | WTFPL (code) | up, down, left, right |
+| <img src="docs/assets/thumbs/breakout.png" width="150"> | Breakout | [jakesgordon/javascript-breakout](https://github.com/jakesgordon/javascript-breakout) | MIT | left, right, stay |
+| <img src="docs/assets/thumbs/invaders.png" width="150"> | Space Invaders | [StrykerKKD/SpaceInvaders](https://github.com/StrykerKKD/SpaceInvaders) | MIT | left, right, noop |
+| <img src="docs/assets/thumbs/racer.png" width="150"> | Javascript Racer | [jakesgordon/javascript-racer](https://github.com/jakesgordon/javascript-racer) | MIT (code) | left, right, faster, slower, left faster, right faster |
+| <img src="docs/assets/thumbs/sokoban.png" width="150"> | Sokoban | [taniarascia/sokoban](https://github.com/taniarascia/sokoban), Microban levels by David Skinner | MIT | up, down, left, right |
 
 Three of the upstream projects say in their own READMEs that their art is not theirs to license. Infinite Mario's
 sprites are Nintendo's, Floppy Bird's are extracted from the original Android game and are Dong Nguyen's and
@@ -191,6 +206,12 @@ or demo, was ever produced with sound.
 
 The model never sees a game's name. It sees the current frame and the option list, rendered with the frozen
 OpenJev prompt, and its answer is the next token after `Answer:`.
+
+![The demo showing one Mario frame, the probability the model puts on each of the seven moves, and its confidence through the episode](docs/assets/decision.png)
+
+This is the demo's single game view, and it is the whole model in one picture: the frame on the left is the
+only input, the bars on the right are the seven numbers that come out of the forward pass, and the line below
+them is how sure the model was at every step of the episode so far.
 
 ```
 Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.
