@@ -29,16 +29,25 @@ each a frame from a recorded held-out episode with the score it had reached by t
 ## 🎮 The Ten Games
 
 Plain HTML5/JS with one hook each (`window.pj`: `start(seed)`, `step(action)`, `frame()`, `score()`, `done()`,
-`actions`), and the same page is both training environment and demo tile. Every name opens that game's board on
-the demo, with the model playing.
+`actions`), and the same page is both training environment and demo tile. Every tile below opens that game on
+the demo, with the model playing it.
 
-|   | Game | Moves |   | Game | Moves |
-|---|---|---:|---|---|---:|
-| [<img src="docs/assets/thumbs/tetris.png" width="180">][tetris] | [Tetris][tetris] | 5 | [<img src="docs/assets/thumbs/snake.png" width="180">][snake] | [Snake][snake] | 4 |
-| [<img src="docs/assets/thumbs/pacman.png" width="180">][pacman] | [Pacman][pacman] | 4 | [<img src="docs/assets/thumbs/racer.png" width="180">][racer] | [Javascript Racer][racer] | 6 |
-| [<img src="docs/assets/thumbs/invaders.png" width="180">][invaders] | [Space Invaders][invaders] | 3 | [<img src="docs/assets/thumbs/sokoban.png" width="180">][sokoban] | [Sokoban][sokoban] | 4 |
-| [<img src="docs/assets/thumbs/mario.png" width="180">][mario] | [Infinite Mario][mario] | 7 | [<img src="docs/assets/thumbs/flappy.png" width="180">][flappy] | [Floppy Bird][flappy] | 2 |
-| [<img src="docs/assets/thumbs/breakout.png" width="180">][breakout] | [Breakout][breakout] | 3 | [<img src="docs/assets/thumbs/2048.png" width="180">][2048] | [2048][2048] | 4 |
+<table align="center">
+  <tr>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=tetris"><img src="docs/assets/thumbs/tetris.png" width="150"><br><b>Tetris</b></a><br>5 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=snake"><img src="docs/assets/thumbs/snake.png" width="150"><br><b>Snake</b></a><br>4 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=pacman"><img src="docs/assets/thumbs/pacman.png" width="150"><br><b>Pacman</b></a><br>4 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=racer"><img src="docs/assets/thumbs/racer.png" width="150"><br><b>Javascript Racer</b></a><br>6 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=invaders"><img src="docs/assets/thumbs/invaders.png" width="150"><br><b>Space Invaders</b></a><br>3 moves</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=sokoban"><img src="docs/assets/thumbs/sokoban.png" width="150"><br><b>Sokoban</b></a><br>4 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=mario"><img src="docs/assets/thumbs/mario.png" width="150"><br><b>Infinite Mario</b></a><br>7 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=flappy"><img src="docs/assets/thumbs/flappy.png" width="150"><br><b>Floppy Bird</b></a><br>2 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=breakout"><img src="docs/assets/thumbs/breakout.png" width="150"><br><b>Breakout</b></a><br>3 moves</td>
+    <td align="center"><a href="https://omnijev.github.io/PlayJev/?game=2048"><img src="docs/assets/thumbs/2048.png" width="150"><br><b>2048</b></a><br>4 moves</td>
+  </tr>
+</table>
 
 ## 🔍 Why Pixels
 
@@ -341,13 +350,3 @@ The roster ships silent. Every sound and music file was deleted, which costs not
 aborted every audio request (`playjev/env.py`), the shim forces media elements muted, and Chromium runs with
 `--mute-audio`. Every frame in this repository, training or demo, was produced in silence.
 
-[mario]: https://omnijev.github.io/PlayJev/?game=mario
-[snake]: https://omnijev.github.io/PlayJev/?game=snake
-[tetris]: https://omnijev.github.io/PlayJev/?game=tetris
-[2048]: https://omnijev.github.io/PlayJev/?game=2048
-[flappy]: https://omnijev.github.io/PlayJev/?game=flappy
-[pacman]: https://omnijev.github.io/PlayJev/?game=pacman
-[breakout]: https://omnijev.github.io/PlayJev/?game=breakout
-[invaders]: https://omnijev.github.io/PlayJev/?game=invaders
-[racer]: https://omnijev.github.io/PlayJev/?game=racer
-[sokoban]: https://omnijev.github.io/PlayJev/?game=sokoban

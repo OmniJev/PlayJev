@@ -17,8 +17,6 @@ tags:
 
 <h1 align="center">PlayJev: A Multimodal JEV-Like Model for Small Games</h1>
 
-<p align="center"><b>Ten classic browser games. Raw pixels in, one move out. 43 ms per decision.</b></p>
-
 <p align="center">
   <a href="https://omnijev.github.io/PlayJev/#gallery"><img alt="gallery" src="https://img.shields.io/badge/gallery-play_it-eda100?style=flat-square&labelColor=16181c"></a>
   <a href="https://github.com/OmniJev/PlayJev"><img alt="code" src="https://img.shields.io/badge/code-OmniJev%2FPlayJev-2a78d6?style=flat-square&logo=github&logoColor=white&labelColor=16181c"></a>
