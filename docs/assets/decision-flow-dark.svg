@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 252" width="960" height="252" role="img" aria-label="A game frame and an option list go into one forward pass, which gives a probability for every move">
+  <rect width="960" height="252" fill="#0c0d0f"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect x="30" y="38" width="200" height="76" rx="12" fill="#15171a" stroke="#262a30" stroke-width="1.5"/>
+  <text x="130.0" y="70.0" text-anchor="middle" font-size="19" font-weight="600" fill="#e9eaec">game frame</text>
+  <text x="130.0" y="94.0" text-anchor="middle" font-size="14.5" fill="#8f97a2">the only input</text>
+  <rect x="30" y="142" width="200" height="76" rx="12" fill="#15171a" stroke="#262a30" stroke-width="1.5"/>
+  <text x="130.0" y="174.0" text-anchor="middle" font-size="19" font-weight="600" fill="#e9eaec">option list</text>
+  <text x="130.0" y="198.0" text-anchor="middle" font-size="14.5" fill="#8f97a2">up &#183; down &#183; left &#183; right</text>
+  <path d="M 230 76 H 262 V 180 H 230" stroke="#3a3f47" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+  <path d="M 262 128 L 291 128" stroke="#3a3f47" stroke-width="2.4" fill="none"/>
+  <path d="M 300 128 L 289 121.5 L 289 134.5 Z" fill="#3a3f47"/>
+  <rect x="300" y="72" width="240" height="112" rx="14" fill="#15171a" stroke="#3987e5" stroke-width="2"/>
+  <text x="420" y="122" text-anchor="middle" font-size="21" font-weight="700" fill="#e9eaec">one forward pass</text>
+  <text x="420" y="148" text-anchor="middle" font-size="14.5" fill="#8f97a2">PlayJev 0.8B</text>
+  <path d="M 540 128 L 587 128" stroke="#3a3f47" stroke-width="2.4" fill="none"/>
+  <path d="M 596 128 L 585 121.5 L 585 134.5 Z" fill="#3a3f47"/>
+  <text x="656" y="52" font-size="14.5" fill="#8f97a2">a probability for every move</text>
+  <text x="654" y="91.5" text-anchor="end" font-size="16" fill="#e9eaec">up</text>
+  <rect x="668" y="77" width="200" height="20" rx="4" fill="#1b1e22"/>
+  <rect x="668" y="77" width="10" height="20" rx="4" fill="#1f4878"/>
+  <text x="882" y="91.5" font-size="16" font-weight="400" fill="#8f97a2">0.05</text>
+  <text x="654" y="125.5" text-anchor="end" font-size="16" fill="#e9eaec">down</text>
+  <rect x="668" y="111" width="200" height="20" rx="4" fill="#1b1e22"/>
+  <rect x="668" y="111" width="4" height="20" rx="4" fill="#1f4878"/>
+  <text x="882" y="125.5" font-size="16" font-weight="400" fill="#8f97a2">0.02</text>
+  <text x="654" y="159.5" text-anchor="end" font-size="16" fill="#e9eaec">left</text>
+  <rect x="668" y="145" width="200" height="20" rx="4" fill="#1b1e22"/>
+  <rect x="668" y="145" width="180" height="20" rx="4" fill="#3987e5"/>
+  <text x="882" y="159.5" font-size="16" font-weight="700" fill="#e9eaec">0.90</text>
+  <text x="654" y="193.5" text-anchor="end" font-size="16" fill="#e9eaec">right</text>
+  <rect x="668" y="179" width="200" height="20" rx="4" fill="#1b1e22"/>
+  <rect x="668" y="179" width="6" height="20" rx="4" fill="#1f4878"/>
+  <text x="882" y="193.5" font-size="16" font-weight="400" fill="#8f97a2">0.03</text>
+  </g>
+</svg>

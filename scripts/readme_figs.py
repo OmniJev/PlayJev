@@ -121,7 +121,7 @@ def social(W=1280, H=640, cols=5, cell=(224, 166), gut=12, pad=56):
 def chart(dark=False):
     bg, fg, muted, track = ("#0c0d0f", "#e9eaec", "#8f97a2", "#24272c") if dark else \
                            ("#ffffff", "#16181c", "#6d747e", "#ececeb")
-    c1, c2, c3 = ("#1f3f6b", "#2563b8", "#4f9bff") if dark else ("#c3d9f7", "#6aa3f0", "#2F80ED")
+    c1, c2, c3 = ("#184f95", "#2a78d6", "#86b6ef") if dark else ("#86b6ef", "#3987e5", "#1c5cab")
     pad, lab, right = 34, 236, 92
     barh, gap, rowgap = 15, 5, 26
     rowh = 3 * barh + 2 * gap + rowgap
@@ -136,7 +136,7 @@ def chart(dark=False):
 
     # legend
     lx = x0
-    for name, col in (("sft", c1), ("dagger 1", c2), ("dagger 2", c3)):
+    for name, col in (("cloning", c1), ("version 1", c2), ("version 2", c3)):
         d.rectangle([lx, 22, lx + 26, 22 + 13], fill=col)
         d.text((lx + 34, 28), name, font=fb, fill=fg, anchor="lm")
         lx += 34 + int(d.textlength(name, font=fb)) + 30
