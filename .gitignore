@@ -20,3 +20,9 @@ docs/DESIGN.md
 
 # dead: the figures are built from docs/assets/games/
 shots/
+
+# generated, and nothing on the page or in the README uses them
+docs/assets/board.gif
+docs/assets/board.png
+docs/assets/social.png
+demo/shots/
