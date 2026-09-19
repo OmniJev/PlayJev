@@ -164,7 +164,7 @@
         const tr = this.trace = el('div', 'trace');
         tr.appendChild(el('span', 'tlabel', 'confidence through the episode'));
         const svg = this.traceSvg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('viewBox', '0 0 240 96'); svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('aria-hidden', 'true');
         tr.appendChild(svg); root.appendChild(tr);
         this.traceInit(null);
       }
@@ -226,6 +226,15 @@
       this.iframe.style.clipPath = `inset(${r.y.toFixed(2)}px ${(V.width - r.x - r.w).toFixed(2)}px ${(V.height - r.y - r.h).toFixed(2)}px ${r.x.toFixed(2)}px)`;
       this.iframe.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${s.toFixed(5)})`;
       this.iframe.classList.add('shown');
+      // The trace is sized by the room left in the readout, so a resize redraws it at the new size.
+      if (this.traceSteps) {
+        const b = this.traceSvg.getBoundingClientRect();
+        if (Math.abs(b.width - this.traceW) > 1 || Math.abs(b.height - this.traceH) > 1) {
+          const last = this.traceLast, steps = this.traceSteps;
+          this.traceInit(steps);
+          if (last) this.traceAt(last[0], last[1], last[2]);
+        }
+      }
       if (this.onFit) this.onFit(r);
     }
     showOverlay(text, err) { if (text == null) { this.overlay.hidden = true; return; } this.overlay.hidden = false; this.overlay.textContent = text; this.overlay.classList.toggle('err', !!err); }
@@ -247,21 +256,39 @@
     traceInit(steps) {
       if (!this.trace) return;
       const svg = this.traceSvg; while (svg.firstChild) svg.removeChild(svg.firstChild);
-      this.traceRect = null;
-      const W = 240, H = 96, TOP = 4, BASE = 72;
+      this.traceRect = null; this.traceLast = null; this.traceSteps = steps || null;
+      // The box is whatever the readout column has left over, and the line is drawn in its own pixels.
+      const box = svg.getBoundingClientRect();
+      const W = this.traceW = Math.max(120, Math.round(box.width) || 240);
+      const H = this.traceH = Math.max(64, Math.round(box.height) || 96);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      const TOP = 5, BASE = H - 16;
       svgEl(svg, 'line', { x1: 0, y1: BASE, x2: W, y2: BASE }, 'tbase');
       if (!steps || steps.length < 2) return;
       const N = steps.length;
       const X = (i) => (i / (N - 1)) * W, Y = (c) => TOP + (1 - Math.max(0, Math.min(1, c))) * (BASE - TOP);
-      const stride = Math.max(1, Math.ceil(N / 300));
-      let d = '';
-      for (let i = 0; i < N; i += stride) d += (d ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(confidence(steps[i].p)).toFixed(1);
-      d += 'L' + X(N - 1).toFixed(1) + ' ' + Y(confidence(steps[N - 1].p)).toFixed(1);
+      // A long episode has more steps than the box has pixels, so each point is the mean of the steps behind it:
+      // taking every nth step instead would turn a thousand-step game into noise.
+      const M = Math.max(2, Math.min(N, Math.round(W / 2)));
+      let d = '', x0 = 0, x1 = 0;
+      for (let b = 0; b < M; b++) {
+        const s0 = Math.floor((b * N) / M), s1 = Math.max(s0 + 1, Math.floor(((b + 1) * N) / M));
+        let sum = 0;
+        for (let i = s0; i < s1; i++) sum += confidence(steps[i].p);
+        const x = X((s0 + s1 - 1) / 2);
+        if (!d) x0 = x;
+        x1 = x;
+        d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + Y(sum / (s1 - s0)).toFixed(1);
+      }
+      // The same shape closed down to the baseline: the fill is what carries the line across a tall box.
+      const da = d + 'L' + x1.toFixed(1) + ' ' + BASE + 'L' + x0.toFixed(1) + ' ' + BASE + 'Z';
+      svgEl(svg, 'path', { d: da }, 'tafull');
       svgEl(svg, 'path', { d }, 'tfull');
       this.traceUid = (this.traceUid || 0) + 1;
       const cid = 'tc-' + this.game.id + '-' + this.traceUid;
       const clip = document.createElementNS(NS, 'clipPath'); clip.setAttribute('id', cid); svg.appendChild(clip);
       this.traceRect = svgEl(clip, 'rect', { x: -4, y: 0, width: 0, height: H });
+      svgEl(svg, 'path', { d: da, 'clip-path': 'url(#' + cid + ')' }, 'taplayed');
       svgEl(svg, 'path', { d, 'clip-path': 'url(#' + cid + ')' }, 'tplayed');
       let ticks = '';
       for (let i = 0; i < N; i++) if (steps[i].h) ticks += 'M' + X(i).toFixed(1) + ' ' + (BASE + 5) + 'v7';
@@ -272,6 +299,7 @@
     }
     traceAt(i, c, h) {
       if (!this.traceRect) return;
+      this.traceLast = [i, c, h];
       const x = this.traceX(i), y = this.traceY(c);
       this.traceRect.setAttribute('width', (x + 4).toFixed(1));
       this.traceNow.setAttribute('x1', x.toFixed(1)); this.traceNow.setAttribute('x2', x.toFixed(1));
