@@ -90,8 +90,6 @@ pip install -r requirements.txt && playwright install chromium
 | `playjev.serve --ckpt <ckpt> --port 18732` | the checkpoint at `/v1/systemone` in the OpenJev request shape; the demo switches every tile to it with `?server=http://127.0.0.1:18732` |
 | `python scripts/build_demo.py` | rebuild `demo/` from the games and the recorded runs, then serve it and open `index.html` |
 
-The PBS job scripts we used are under `hpc/`.
-
 ## 📊 Results
 
 One model for all ten games, playing 16 held-out episodes per game, argmax move, episodes capped at 1500
@@ -310,7 +308,6 @@ games/_shared/     pj_shim.js: virtual clock, seeded Math.random, synthetic keys
 playjev/           env.py (Playwright driver), collect.py, teachers/, model.py, train_sft.py, play.py, serve.py
 demo/              the GitHub Pages site; scripts/build_demo.py assembles it from games/ and runs/replays/
 docs/              HARNESS.md (the hook contract), DESIGN.md, BASELINES.md, MODEL_NOTES.md, TRAIN_NOTES.md
-hpc/               PBS job scripts for collection, training and closed-loop play
 ```
 
 ## 🔗 Related
