@@ -13,9 +13,10 @@ frame (JPEG, 448 px) ─┐
 option list ──────────┘
 ```
 
-The demo is in `demo/`, built by `scripts/build_demo.py` from the games and the recorded runs: every tile is the
-real game replaying an episode of the trained model step by step, with the model's probabilities drawn beside the
-picture. Serve the directory and open `index.html`.
+**[Live demo: omnijev.github.io/PlayJev](https://omnijev.github.io/PlayJev/)**. Every tile is the real game
+replaying an episode of the trained model step by step, with the model's probabilities drawn beside the picture.
+The source is in `demo/`, built by `scripts/build_demo.py` from the games and the recorded runs; serve that
+directory and open `index.html` to run it locally.
 
 ## Why pixels
 
