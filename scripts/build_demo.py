@@ -181,9 +181,13 @@ def build_game(game_id: str, out_games: Path) -> dict:
     html = EXTERNAL_TAG_RE.sub("", html)
     entry_dir = (dst / entry_rel).parent
     rel = lambda target: os.path.relpath(target, entry_dir).replace(os.sep, "/")  # noqa: E731
-    inject = (f'<script src="{rel(out_games / "_shared" / "pj_shim.js")}"></script>'
+    inject = (f'<script src="{rel(DEMO / "pj_silence.js")}"></script>'
+              f'<script src="{rel(out_games / "_shared" / "pj_shim.js")}"></script>'
               f'<script src="{rel(dst / "pj_hook.js")}"></script>'
               f'<script src="{rel(DEMO / "pj_bridge.js")}"></script>')
+    # the sound files are deleted from the roster, so a <source> pointing at one is a 404 in the
+    # console of anyone who opens the demo; the <audio> element itself stays, games look it up by id
+    html = re.sub(r"""\s*<source\b[^>]*\.(?:mp3|ogg|wav|m4a|oga|flac)["'][^>]*>""", "", html, flags=re.I)
     if not re.search(r"<head[^>]*>", html, re.I):
         raise SystemExit(f"{game_id}: entry page has no <head>")
     html = re.sub(r"(<head[^>]*>)", lambda mm: mm.group(1) + inject, html, count=1, flags=re.I)
