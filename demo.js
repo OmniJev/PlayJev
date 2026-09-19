@@ -14,7 +14,14 @@
   const fmtScore = (x) => (x == null ? '' : Number.isInteger(x) ? String(x) : (Math.round(x * 10) / 10).toString());
   const confidence = (p) => { const K = p.length; if (K < 2) return 0; return (Math.max(...p) - 1 / K) / (1 - 1 / K); };
   const argmax = (p) => p.reduce((b, v, i) => (v > p[b] ? i : b), 0);
+  const shortPolicy = (p) => String(p).replace(/^playjev-[\d.]+b-/i, '');
   const policyRank = (n) => { const s = String(n).toLowerCase(); return s === 'live' ? -1 : s.startsWith('playjev') ? 0 : s === 'teacher' ? 1 : s === 'random' ? 2 : 3; };
+  const remember = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* private window */ } };
+  const remembered = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (parent, tag, attrs, cls) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (cls) e.setAttribute('class', cls); parent.appendChild(e); return e; };
+  const svgText = (parent, x, y, s, anchor) => { const t = svgEl(parent, 'text', { x, y }, 'txt'); if (anchor) t.setAttribute('text-anchor', anchor); t.textContent = s; return t; };
+  const tip = (node, s) => { const t = document.createElementNS(NS, 'title'); t.textContent = s; node.appendChild(t); return node; };
 
   function normaliseServer(s) {
     if (!s) return null;
@@ -25,15 +32,20 @@
     } catch (e) { console.warn('bad ?server= url', s); return null; }
   }
 
-  // ---------------------------------------------------------------- theme
+  // ---------------------------------------------------------------- chrome
   (function theme() {
     const root = document.documentElement, btn = document.getElementById('theme');
     let stored = null; try { stored = localStorage.getItem('pj-theme'); } catch (e) {}
     if (stored === 'dark' || stored === 'light') root.dataset.theme = stored;
     const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    const label = () => { btn.textContent = isDark() ? 'light mode' : 'dark mode'; };
-    btn.addEventListener('click', () => { root.dataset.theme = isDark() ? 'light' : 'dark'; try { localStorage.setItem('pj-theme', root.dataset.theme); } catch (e) {} label(); });
+    const label = () => { btn.textContent = isDark() ? 'light' : 'dark'; btn.title = isDark() ? 'switch to light' : 'switch to dark'; };
+    btn.addEventListener('click', () => { root.dataset.theme = isDark() ? 'light' : 'dark'; remember('pj-theme', root.dataset.theme); label(); });
     label();
+  })();
+  (function stickyLine() {
+    const top = document.querySelector('.top'); if (!top) return;
+    const onScroll = () => top.classList.toggle('stuck', window.scrollY > 4);
+    window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
   })();
 
   // ---------------------------------------------------------------- replay loading (fetch, or a script tag on file://)
@@ -64,16 +76,36 @@
 
   // ---------------------------------------------------------------- tiles
   const tiles = [];
+  let applyMode = null;  // set by buildGrid: switches the grid between all-at-once and one-at-a-time
+  let lazyOff = false;   // pjDemo.startAll() turns the lazy sections on for good, for screenshots and verification
+
+  // Run these tiles only while `host` is near the viewport, so a section far down the page costs nothing until read.
+  // `want` decides which of them start when the section comes into view (in one-at-a-time mode, only the active one).
+  function lazyWhileVisible(ts, host, want) {
+    if (typeof IntersectionObserver !== 'function') return;
+    for (const t of ts) t.suspended = true;
+    let on = false;
+    const io = new IntersectionObserver((entries) => {
+      if (lazyOff) return;
+      const vis = entries.some((e) => e.isIntersecting);
+      if (vis === on) return;
+      on = vis;
+      for (const t of ts) { if (!vis) t.suspend(); else if (!want || want(t)) t.start(); }
+    }, { rootMargin: '300px' });
+    io.observe(host);
+  }
   window.addEventListener('message', (ev) => {
     const m = ev.data; if (!m || m.pjDemo !== true) return;
     for (const t of tiles) if (t.iframe && ev.source === t.iframe.contentWindow) { t.onMessage(m); return; }
   });
 
   class Tile {
-    constructor(game, entries) {
+    constructor(game, entries, opts) {
+      opts = opts || {};
       this.game = game; this.entries = entries || []; this.K = game.actions.length;
       this.speed = 1; this.playing = true; this.gen = 0; this.pending = new Map(); this.seq = 0;
-      this.iframe = null; this.rect = null; this.errors = []; this.result = null; this.autoAdvance = true;
+      this.iframe = null; this.rect = null; this.errors = []; this.result = null; this.autoAdvance = true; this.suspended = false;
+      this.hero = !!opts.hero; this.fixed = !!opts.fixed; this.tag = opts.tag || null;
       // the table's trained-model policy for this game plays by default; other recordings stay selectable
       const row = ((D.results && D.results.rows) || []).find((r) => r.game === this.game.id);
       const preferred = row && row.model ? row.model.policy : null;
@@ -86,11 +118,34 @@
 
     build() {
       const g = this.game;
-      const root = this.root = el('section', 'tile'); root.dataset.game = g.id;
-      const head = el('div', 'head'); head.appendChild(el('span', 'title', g.title));
+      const root = this.root = el('section', 'tile'); 
+      // Only the grid tiles carry data-game, so `.tile[data-game=x]` names exactly one board on the page.
+      if (this.tag) root.dataset[this.tag] = g.id; else root.dataset.game = g.id;
+      if (this.hero) root.classList.add('hero');
+
+      const head = el('div', 'head');
+      head.appendChild(el('span', 'title', g.title));
       const mark = el('span', 'mark'); mark.title = 'replayed score differs from the recording'; head.appendChild(mark);
+      this.scoreEl = el('span', 'score', 'score 0'); head.appendChild(this.scoreEl);
       root.appendChild(head);
-      this.view = el('div', 'view'); this.overlay = el('div', 'overlay', 'loading'); this.view.appendChild(this.overlay); root.appendChild(this.view);
+
+      const board = this.board = el('div', 'board');
+      this.view = el('div', 'view'); this.overlay = el('div', 'overlay', 'loading');
+      this.view.appendChild(this.overlay); board.appendChild(this.view);
+      const c = this.ctrl = el('div', 'controls');
+      this.ppBtn = el('button', 'pp', 'pause'); this.ppBtn.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
+      const seg = el('span', 'seg'); this.speedBtns = {};
+      for (const s of [1, 2, 4]) { const b = el('button', s === 1 ? 'on' : '', s + 'x'); b.addEventListener('click', () => this.setSpeed(s)); seg.appendChild(b); this.speedBtns[s] = b; }
+      const restart = el('button', '', 'restart'); restart.addEventListener('click', () => this.restart());
+      const next = el('button', '', 'next'); next.title = 'next recorded episode'; next.addEventListener('click', () => this.next());
+      c.append(this.ppBtn, seg, restart, next);
+      if (this.policies.length > 1) {
+        const sel = el('select'); sel.title = 'which recording to replay';
+        for (const p of this.policies) { const o = el('option', '', p === 'live' ? 'live server' : shortPolicy(p)); o.value = p; o.title = p; sel.appendChild(o); }
+        sel.value = this.policy; sel.addEventListener('change', () => this.selectPolicy(sel.value)); c.appendChild(sel); this.sel = sel;
+      }
+      board.appendChild(c); root.appendChild(board);
+
       this.bars = el('div', 'bars'); this.rows = [];
       for (const a of g.actions) {
         const row = el('div', 'row'); row.title = a.description;
@@ -100,23 +155,11 @@
       }
       root.appendChild(this.bars);
       this.conf = el('div', 'conf'); root.appendChild(this.conf);
-      this.bars = root.querySelector('.bars');
-      this.status = el('div', 'status');
-      this.stepEl = el('span', 'step', 'step 0'); this.scoreEl = el('span', 'score', 'score 0'); this.recEl = el('span', 'rec', ''); this.warnEl = el('span', 'warn', '');
-      this.status.append(this.stepEl, this.scoreEl, this.recEl, this.warnEl); root.appendChild(this.status);
-      const c = el('div', 'controls');
-      this.ppBtn = el('button', 'pp', 'pause'); this.ppBtn.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
-      const seg = el('span', 'seg'); this.speedBtns = {};
-      for (const s of [1, 2, 4]) { const b = el('button', s === 1 ? 'on' : '', s + 'x'); b.addEventListener('click', () => this.setSpeed(s)); seg.appendChild(b); this.speedBtns[s] = b; }
-      const restart = el('button', '', 'restart'); restart.addEventListener('click', () => this.restart());
-      const next = el('button', '', 'next'); next.title = 'next recorded episode'; next.addEventListener('click', () => this.next());
-      c.append(this.ppBtn, seg, restart, next);
-      if (this.policies.length > 1) {
-        const sel = el('select'); sel.title = 'which recording to replay';
-        for (const p of this.policies) { const o = el('option', '', p === 'live' ? 'live server' : p); o.value = p; sel.appendChild(o); }
-        sel.value = this.policy; sel.addEventListener('change', () => this.selectPolicy(sel.value)); c.appendChild(sel); this.sel = sel;
-      }
-      root.appendChild(c);
+
+      const foot = el('div', 'foot');
+      this.stepEl = el('span', 'step', 'step 0'); this.recEl = el('span', 'rec', ''); this.warnEl = el('span', 'warn', '');
+      foot.append(this.stepEl, this.recEl, this.warnEl); root.appendChild(foot);
+
       if (!this.entries.length && !SERVER) { restart.disabled = true; next.disabled = true; this.ppBtn.disabled = true; }
       this.renderBars(null, -1); this.renderRec();
     }
@@ -160,9 +203,10 @@
     }
     fit() {
       if (!this.iframe) return;
-      const B = this.view.clientWidth || 200, r = this.rect || { x: 0, y: 0, w: this.game.viewport.width, h: this.game.viewport.height };
-      const s = Math.min(B / r.w, B / r.h);
-      const tx = (B - r.w * s) / 2 - r.x * s, ty = (B - r.h * s) / 2 - r.y * s;
+      const BW = this.view.clientWidth || 200, BH = this.view.clientHeight || BW;
+      const r = this.rect || { x: 0, y: 0, w: this.game.viewport.width, h: this.game.viewport.height };
+      const s = Math.min(BW / r.w, BH / r.h);
+      const tx = (BW - r.w * s) / 2 - r.x * s, ty = (BH - r.h * s) / 2 - r.y * s;
       const V = this.game.viewport;
       // Only the game area shows; the rest of the game page (menus, footers, score panels) is clipped away.
       this.iframe.style.clipPath = `inset(${r.y.toFixed(2)}px ${(V.width - r.x - r.w).toFixed(2)}px ${(V.height - r.y - r.h).toFixed(2)}px ${r.x.toFixed(2)}px)`;
@@ -180,13 +224,14 @@
         r.row.classList.toggle('taken', i === taken);
       }
       this.bars.classList.toggle('s2', !!s2);
-      this.conf.innerHTML = p ? `confidence <b>${confidence(p).toFixed(2)}</b>` + (s2 ? ' <span class="s2tag">System Two decided</span>' : '')
-                              + (this.latency != null ? ` <span>latency ${Math.round(this.latency)} ms</span>` : '') : '\u00a0';
+      this.conf.innerHTML = p ? `confidence <b>${confidence(p).toFixed(2)}</b>` + (s2 ? ' <span class="s2tag">the teacher decided this one</span>' : '')
+                              + (this.latency != null ? ` <span>latency ${Math.round(this.latency)} ms</span>` : '') : ' ';
     }
     renderRec() {
       const pol = this.policy;
       if (!pol) { this.recEl.textContent = 'no recording yet'; this.recEl.classList.remove('random'); return; }
-      this.recEl.textContent = pol === 'live' ? 'live: ' + new URL(SERVER).host : 'recording: ' + pol;
+      this.recEl.textContent = pol === 'live' ? 'live: ' + new URL(SERVER).host : shortPolicy(pol);
+      this.recEl.title = pol === 'live' ? SERVER : 'recording: ' + pol;
       this.recEl.classList.toggle('random', pol === 'random');
     }
     renderStatus(i, total, score, tail) {
@@ -198,16 +243,25 @@
     // ---- controls
     setSpeed(s) { this.speed = s; for (const k in this.speedBtns) this.speedBtns[k].classList.toggle('on', Number(k) === s); }
     pause() { this.playing = false; this.ppBtn.textContent = 'play'; }
-    play() { this.playing = true; this.ppBtn.textContent = 'pause'; if (this._resume) { const r = this._resume; this._resume = null; r(); } else if (!this.running) this.start(); }
+    play() { if (this.suspended) return; this.playing = true; this.ppBtn.textContent = 'pause'; if (this._resume) { const r = this._resume; this._resume = null; r(); } else if (!this.running) this.start(); }
+    // Stop this tile and throw its game frame away. Ten live games is more than most machines can paint at once, so
+    // the page can keep one running and hold the rest here; start() brings a tile back.
+    suspend() {
+      this.suspended = true; this.gen++;
+      for (const p of this.pending.values()) p.reject(new Error('tile suspended')); this.pending.clear();
+      if (this.iframe) { this.iframe.remove(); this.iframe = null; }
+      this.running = false; this.rect = null; this._resume = null;
+      this.renderBars(null, -1); this.setMismatch(''); this.showOverlay('paused');
+    }
     waitResume() { return new Promise((res) => { this._resume = res; }); }
     currentEntries() { return this.entries.filter((e) => e.policy === this.policy); }
-    selectPolicy(p) { this.policy = p; this.epi = 0; this.renderRec(); if (this.sel) this.sel.value = p; this.start(); }
+    selectPolicy(p) { this.policy = p; this.epi = 0; this.renderRec(); if (this.sel) this.sel.value = p; if (!this.suspended) this.start(); }
     restart() { this.start(); }
     next() { const n = this.currentEntries().length; if (n) this.epi = (this.epi + 1) % n; this.start(); }
 
     // Start (or restart) the current episode; keeps the page cycling through the recordings while playing.
     async start() {
-      const gen = ++this.gen; this.running = true; this._resume = null;
+      const gen = ++this.gen; this.running = true; this._resume = null; this.suspended = false;
       if (!this.playing) this.play();
       if (location.protocol === 'file:' && this.game.modules) {
         this.showOverlay('this game is written as ES modules, which browsers refuse to load from file://; open the page over http (a local server or GitHub Pages)', true);
@@ -258,14 +312,14 @@
         // The bars belong to the picture on screen: decision i was made from the frame before action i, so show
         // it first, hold for the step's duration, then apply the move (otherwise the model looks one beat late).
         if (st.h) handed++;
-        this.renderBars(st.p, st.a, !!st.h); this.renderStatus(i, N, obs.score, handed ? `(System Two ${handed} of ${i + 1})` : '');
+        this.renderBars(st.p, st.a, !!st.h); this.renderStatus(i, N, obs.score, handed ? `(teacher took ${handed} of ${i + 1})` : '');
         const speed0 = opts.speed || this.speed;
         const hold = stepMs / speed0 - (performance.now() - tick); if (hold > 0) await sleep(hold);
         if (gen !== this.gen) return null;
         if (!this.playing) { await this.waitResume(); if (gen !== this.gen) return null; }
         obs = await this.call('step', { a: st.a }); if (gen !== this.gen) return null;
         i++;
-        this.renderStatus(i, N, obs.score, handed ? `(System Two ${handed} of ${i})` : '');
+        this.renderStatus(i, N, obs.score, handed ? `(teacher took ${handed} of ${i})` : '');
         if (obs.errors && obs.errors.length) for (const e of obs.errors) this.noteError(e);
         if (divergedAt == null && st.score != null && obs.score !== st.score) {
           divergedAt = i; console.warn(`[${g.id}] ${entry.policy}_${entry.seed}: score ${obs.score} at step ${i}, recording says ${st.score}`);
@@ -280,7 +334,7 @@
         console.warn(`[${g.id}] replay mismatch:`, result);
         this.setMismatch(i < N ? `ended at step ${i} of ${N}, score ${fmtScore(obs.score)}, recording ${fmtScore(rec.final_score)}` : `score ${fmtScore(obs.score)}, recording says ${fmtScore(rec.final_score)}`);
       } else if (divergedAt != null) { this.setMismatch(`score path differed at step ${divergedAt}, same final score`); }
-      this.renderStatus(i, N, obs.score, (obs.done ? '(over)' : i === N ? '(end of recording)' : '') + (handed ? ` System Two decided ${handed} of ${i} steps` : ''));
+      this.renderStatus(i, N, obs.score, (obs.done ? '(over)' : i === N ? '(end of recording)' : '') + (handed ? ` the teacher took ${handed} of ${i}` : ''));
       this.result = result; return result;
     }
 
@@ -327,6 +381,8 @@
 
     // Verification: every recording of this tile at a given speed, sequentially; returns the records.
     async verify(speed, policies) {
+      // The featured board is a second copy of a game that the grid already verifies; it steps aside instead.
+      if (this.hero) { this.gen++; this.pause(); return []; }
       const out = []; const gen = ++this.gen; this.running = true; this.autoAdvance = false; this.playing = true; this.ppBtn.textContent = 'pause';
       try {
         for (let k = 0; k < this.entries.length; k++) {
@@ -343,50 +399,162 @@
     }
   }
 
+  // ---------------------------------------------------------------- the featured board
+  // One large board at the top with a name for every game next to it. Switching throws the old frame away and
+  // builds a new tile, so only one featured game is ever running.
+  function buildStage() {
+    const stage = document.getElementById('stage'), picker = document.getElementById('picker');
+    if (!stage || !picker) return;
+    const games = (D.games || []).slice();
+    if (!games.length) return;
+    const nRec = (g) => ((D.replays && D.replays[g.id]) || []).length;
+    let cur = null;
+    const show = (g, start) => {
+      if (cur) { cur.suspend(); cur.root.remove(); const i = tiles.indexOf(cur); if (i >= 0) tiles.splice(i, 1); }
+      const t = new Tile(g, (D.replays && D.replays[g.id]) || [], { hero: true, tag: 'heroGame' });
+      tiles.push(t); stage.appendChild(t.root); cur = t;
+      for (const b of picker.children) b.classList.toggle('on', b.dataset.game === g.id);
+      remember('pj-hero', g.id);
+      if (start) t.start();
+    };
+    for (const g of games) {
+      const b = el('button', '', g.title); b.type = 'button'; b.dataset.game = g.id;
+      b.addEventListener('click', () => show(g, true)); picker.appendChild(b);
+    }
+    const want = remembered('pj-hero');
+    show(games.find((g) => g.id === want && nRec(g)) || games.find((g) => g.id === 'snake' && nRec(g)) || games.find(nRec) || games[0], false);
+  }
+
+  // Two boards of the same game from the same seed, side by side: the model on its own and the model with the
+  // teacher behind it. Everything else is identical, so the only difference on screen is who took the hard steps.
+  function buildDuel() {
+    const host = document.getElementById('duel'); if (!host) return null;
+    const block = host.closest('.duel-block') || host;
+    const rows = (D.results && D.results.rows) || [];
+    const table = [...new Set(rows.filter((r) => r.model).map((r) => r.model.policy))];
+    let cand = [];
+    for (const g of D.games || []) {
+      const eps = (D.replays && D.replays[g.id]) || [];
+      for (const s2 of [...new Set(eps.map((e) => e.policy).filter((p) => /-s2$/.test(p)))]) {
+        const base = s2.replace(/-s2$/, '');
+        for (const a of eps.filter((e) => e.policy === base)) {
+          const b = eps.find((e) => e.policy === s2 && e.seed === a.seed);
+          if (b && a.final_score != null && b.final_score > a.final_score) cand.push({ g, a, b, base, gap: b.final_score / Math.max(1, a.final_score) });
+        }
+      }
+    }
+    if (!cand.length) { block.remove(); return null; }
+    // one checkpoint for the pair, the table's if it was recorded with a teacher behind it
+    const bases = [...new Set(cand.map((c) => c.base))];
+    const useBase = bases.find((b) => table.includes(b)) || bases.sort((x, y) => policyRank(x) - policyRank(y) || y.localeCompare(x))[0];
+    cand = cand.filter((c) => c.base === useBase);
+    // Tetris first, because a board filling up reads at a glance; then the seed whose gap is the median of that
+    // game's seeds, so the pair on screen is a typical one rather than the best one.
+    const byGame = {}; for (const c of cand) (byGame[c.g.id] = byGame[c.g.id] || []).push(c);
+    const gid = byGame.tetris ? 'tetris' : Object.keys(byGame).sort((x, y) => byGame[y].length - byGame[x].length)[0];
+    const seeds = byGame[gid].sort((x, y) => x.gap - y.gap);
+    const { g, a, b } = seeds[Math.floor(seeds.length / 2)];
+    const nSeeds = seeds.length;
+    const sameAsTable = table.includes(useBase);
+    const mk = (entry, title, lead) => {
+      const t = new Tile(g, [entry], { fixed: true, tag: 'duelGame' }); t.autoAdvance = true;
+      t.root.querySelector('.head .title').textContent = title;
+      if (lead) t.root.classList.add('lead-board');
+      tiles.push(t); host.appendChild(t.root); return t;
+    };
+    const ta = mk(a, g.title + ', the model alone', false);
+    const tb = mk(b, g.title + ', with the teacher behind it', true);
+    lazyWhileVisible([ta, tb], host);
+    const note = document.getElementById('duel-note');
+    if (note) note.textContent = `Both boards are ${g.title} from seed ${a.seed}, the same game with the same `
+      + `pieces in the same order. On the left the model plays every step and scores ${fmtScore(a.final_score)}. On `
+      + `the right it keeps the steps it is confident about and the teacher takes the rest, and the same seed reaches `
+      + `${fmtScore(b.final_score)}${b.truncated ? ' by the time the recording hits the step cap' : ''}. This seed is `
+      + `the median of the ${nSeeds} recorded here, not the widest gap.`
+      + (sameAsTable ? '' : ` Both recordings are ${useBase}, the checkpoint the handover sweep below ran on, `
+        + `rather than the newer one in the table above.`);
+    return { g, a, b };
+  }
+
   // ---------------------------------------------------------------- page sections
   function buildGrid() {
     const grid = document.getElementById('grid');
+    const section = document.getElementById('games');
     for (const g of D.games) { const t = new Tile(g, (D.replays && D.replays[g.id]) || []); tiles.push(t); grid.appendChild(t.root); }
     const all = document.getElementById('all');
     document.getElementById('all-pp').addEventListener('click', (ev) => {
-      const anyPlaying = tiles.some((t) => t.playing);
-      for (const t of tiles) (anyPlaying ? t.pause() : t.play());
+      const gt = tiles.filter((t) => t.root.parentElement === grid);
+      const anyPlaying = gt.some((t) => t.playing);
+      for (const t of gt) (anyPlaying ? t.pause() : t.play());
       ev.target.textContent = anyPlaying ? 'play all' : 'pause all';
     });
     for (const b of all.querySelectorAll('[data-speed]')) b.addEventListener('click', () => {
       for (const t of tiles) t.setSpeed(Number(b.dataset.speed));
       for (const x of all.querySelectorAll('[data-speed]')) x.classList.toggle('on', x === b);
     });
-    // who plays on every tile: the model alone, the model with System Two (the teacher takes the low-confidence
-    // steps), or random; a tile without such a recording keeps what it has
+    // who plays on every tile: the model alone, the model with the teacher behind it (the teacher takes the
+    // low-confidence steps), or random; a tile without such a recording keeps what it has
     const pick = (t, which) => {
       const row = ((D.results && D.results.rows) || []).find((r) => r.game === t.game.id);
       const base = row && row.model ? row.model.policy : (t.policies.find((p) => String(p).startsWith('playjev')) || null);
       if (which === 'random') return t.policies.includes('random') ? 'random' : null;
-      if (which === 's2') return t.policies.find((p) => p === base + '-s2') || null;
+      if (which === 's2') return t.policies.find((p) => p === base + '-s2') || t.policies.find((p) => /-s2$/.test(p)) || null;
       return base;
     };
     const hasS2 = tiles.some((t) => pick(t, 's2'));
     for (const b of all.querySelectorAll('[data-who]')) {
       if (b.dataset.who === 's2' && !hasS2) { b.remove(); continue; }
       b.addEventListener('click', () => {
-        for (const t of tiles) { const p = pick(t, b.dataset.who); if (p && p !== t.policy) t.selectPolicy(p); }
+        for (const t of tiles) { if (t.fixed) continue; const p = pick(t, b.dataset.who); if (p && p !== t.policy) t.selectPolicy(p); }
         for (const x of all.querySelectorAll('[data-who]')) x.classList.toggle('on', x === b);
       });
     }
+    // How many games run at once. Ten live iframes is more than a laptop can paint, so the page offers to keep one
+    // game running and collapse the other nine to names; the choice is remembered per browser.
+    const gridTiles = () => tiles.filter((t) => t.root.parentElement === grid);
+    const modeBtns = [...all.querySelectorAll('[data-mode]')];
+    let solo = false, activeTile = null;
+    function activate(t) {
+      if (!solo || !t || t === activeTile) return;
+      for (const o of gridTiles()) if (o !== t) { o.root.classList.remove('active'); if (!o.suspended) o.suspend(); }
+      activeTile = t; t.root.classList.add('active'); remember('pj-tile-game', t.game.id); t.start();
+    }
+    applyMode = (next, initial) => {
+      solo = !!next; grid.classList.toggle('solo', solo); remember('pj-tile-mode', solo ? 'solo' : 'all');
+      for (const b of modeBtns) b.classList.toggle('on', (b.dataset.mode === 'solo') === solo);
+      const gt = gridTiles();
+      if (solo) {
+        const want = remembered('pj-tile-game');
+        const keep = (activeTile && gt.includes(activeTile) ? activeTile : null) || gt.find((o) => o.game.id === want) || gt[0];
+        for (const o of gt) if (o !== keep) { o.root.classList.remove('active'); if (!o.suspended) o.suspend(); else o.suspended = true; }
+        activeTile = null; if (keep) { if (initial) { keep.root.classList.add('active'); activeTile = keep; remember('pj-tile-game', keep.game.id); } else activate(keep); }
+      } else {
+        activeTile = null;
+        for (const o of gt) { o.root.classList.remove('active'); if (o.suspended && !initial) o.start(); }
+      }
+    };
+    for (const b of modeBtns) b.addEventListener('click', () => applyMode(b.dataset.mode === 'solo', false));
+    for (const t of gridTiles()) t.root.addEventListener('click', (ev) => {
+      if (!solo || ev.target.closest('.controls')) return;   // the tile's own buttons keep working
+      activate(t);
+    });
+    applyMode(remembered('pj-tile-mode') === 'solo', true);
+    // The ten only run while the section is on screen: the featured board above it is what loads first.
+    lazyWhileVisible(gridTiles(), section, (t) => !solo || t.root.classList.contains('active'));
+
     let resizeTimer = null;
     window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => tiles.forEach((t) => t.fit()), 60); });
     const notice = document.getElementById('notice');
-    const pols = (D.policies || []).filter((p) => p !== 'live');
     const nRec = Object.values(D.replays || {}).reduce((s, l) => s + l.length, 0);
-    if (SERVER) { notice.textContent = `Live mode: frames go to ${SERVER} and its probabilities pick every move.`; notice.classList.add('live'); }
+    if (SERVER) { notice.textContent = `Live mode: frames go to ${SERVER} and its probabilities pick every move.`; }
     else if (!nRec) notice.textContent = 'No recordings have been built into this page yet; the games load and wait.';
-    else notice.textContent = `${nRec} recorded episode${nRec === 1 ? '' : 's'} on this page, from: ${pols.join(', ')}. ` +
-      (pols.some((p) => p.startsWith('playjev')) ? '' : 'The trained model has no recordings here yet; what plays is the recorded policy named on each tile.');
+    else notice.textContent = `Nothing here is played live: the page carries ${nRec} recorded episodes and replays `
+      + 'them inside the real games, so what you see is the game itself and the model\'s own probabilities.';
   }
 
   function buildResults() {
-    const R = D.results; const tb = document.getElementById('results-body'); if (!R || !R.rows) return;
+    const R = D.results; if (!R || !R.rows) return;
+    const tb = document.getElementById('results-body');
     const cell = (v, cls) => { const td = el('td', cls); if (v == null) { td.textContent = 'pending'; td.classList.add('pending'); } else td.textContent = v; return td; };
     for (const r of R.rows) {
       const tr = el('tr');
@@ -398,32 +566,146 @@
       tr.appendChild(cell(r.vs_teacher != null ? (Math.round(r.vs_teacher * 100) / 100).toFixed(2) : null, 'num'));
       tb.appendChild(tr);
     }
+    // The same column as a chart: 0 is the random player's score, 1 is the teacher's, the bar is where the model lands.
+    const host = document.getElementById('score-chart');
+    if (host) {
+      const done = R.rows.filter((r) => r.vs_teacher != null).sort((a, b) => b.vs_teacher - a.vs_teacher);
+      const rest = R.rows.filter((r) => r.vs_teacher == null);
+      const top = Math.max(1, ...done.map((r) => r.vs_teacher));
+      const at = (v) => (Math.max(0, Math.min(v, top)) / top * 100).toFixed(2) + '%';
+      const scale = el('div', 'scale');
+      const ticks = el('div', 'ticks');
+      const tick = (v, s) => { const x = el('span', '', s); x.style.left = at(v); ticks.appendChild(x); };
+      tick(0, 'random play'); if (top > 1.02) tick(top, fmtScore(Math.round(top * 100) / 100)); tick(1, 'the teacher');
+      scale.append(el('span'), ticks, el('span'));
+      const rows = el('div', 'rows');
+      for (const r of done.concat(rest)) {
+        rows.appendChild(el('div', 'name', r.title));
+        const lane = el('div', 'lane');
+        for (const v of [0, 1]) { const gl = el('i', 'grid-line'); gl.style.left = at(v); lane.appendChild(gl); }
+        if (r.vs_teacher != null) {
+          const fill = el('b', 'fill' + (r.vs_teacher <= 0 ? ' zero' : '')); fill.style.width = at(r.vs_teacher);
+          lane.title = `${r.title}: random ${r.random ? fmtScore(r.random.score) : '?'}, the model `
+            + `${r.model ? fmtScore(r.model.score) : '?'}, the teacher ${r.teacher && r.teacher.score != null ? fmtScore(r.teacher.score) : '?'}`;
+          lane.appendChild(fill);
+        }
+        rows.appendChild(lane);
+        rows.appendChild(el('div', 'value' + (r.vs_teacher == null ? ' pending' : ''), r.vs_teacher == null ? 'pending' : (Math.round(r.vs_teacher * 100) / 100).toFixed(2)));
+      }
+      host.append(scale, rows);
+    }
     const hasModel = R.rows.some((r) => r.model);
     const foot = document.getElementById('results-note');
     foot.textContent = (R.note || 'Mean score per policy through the same harness, episodes capped at 1500 steps.') + ' '
-      + (hasModel ? `Trained model: ${[...new Set(R.rows.filter((r) => r.model).map((r) => r.model.policy))].join(', ')}.` : 'The trained model columns fill in when its results land.');
+      + (hasModel ? `The model here is ${[...new Set(R.rows.filter((r) => r.model).map((r) => r.model.policy))].join(', ')}.` : 'The model columns fill in when its results land.');
   }
 
   function buildCalibration() {
     const rows = ((D.results && D.results.rows) || []).filter((r) => r.calibration && r.calibration.bins && r.calibration.bins.length);
-    const sec = document.getElementById('calibration'); if (!rows.length) { sec.remove(); return; }
+    const sec = document.getElementById('calibration'); if (!sec) return;
+    if (!rows.length) { sec.remove(); return; }
     const box = sec.querySelector('.calib');
+    const W = 184, P = 24, S = W - 2 * P;
     for (const r of rows) {
-      const fig = el('figure'); const W = 150, P = 18, S = W - 2 * P; const ns = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${W}`);
-      const line = (x1, y1, x2, y2, cls) => { const l = document.createElementNS(ns, 'line'); l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2); l.setAttribute('class', cls); svg.appendChild(l); };
-      const text = (x, y, s, anchor) => { const t = document.createElementNS(ns, 'text'); t.setAttribute('x', x); t.setAttribute('y', y); t.setAttribute('class', 'txt'); if (anchor) t.setAttribute('text-anchor', anchor); t.textContent = s; svg.appendChild(t); };
-      line(P, W - P, W - P, W - P, 'axis'); line(P, P, P, W - P, 'axis'); line(P, W - P, W - P, P, 'diag');
-      text(P, W - 4, '0', 'middle'); text(W - P, W - 4, '1', 'middle'); text(P - 4, W - P + 3, '0', 'end'); text(P - 4, P + 3, '1', 'end');
-      text(W / 2, W - 4, 'p(chosen move)', 'middle');
+      const fig = el('figure');
+      const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${W}`);
+      svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', `${r.title}: stated probability against how often the move was the teacher's`);
+      svgEl(svg, 'line', { x1: P, y1: W - P, x2: W - P, y2: W - P }, 'axis');
+      svgEl(svg, 'line', { x1: P, y1: P, x2: P, y2: W - P }, 'axis');
+      svgEl(svg, 'line', { x1: P, y1: W - P, x2: W - P, y2: P }, 'diag');
+      svgText(svg, P, W - 8, '0', 'middle'); svgText(svg, W - P, W - 8, '1', 'middle');
+      svgText(svg, P - 5, W - P + 3, '0', 'end'); svgText(svg, P - 5, P + 3, '1', 'end');
+      svgText(svg, P + S / 2, W - 1, 'p of the move it chose', 'middle');
       const maxN = Math.max(1, ...r.calibration.bins.map((b) => b.n || 0));
       for (const b of r.calibration.bins) {
-        const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', P + b.p * S); c.setAttribute('cy', W - P - b.acc * S);
-        c.setAttribute('r', (2 + 4 * Math.sqrt((b.n || 0) / maxN)).toFixed(1)); c.setAttribute('class', 'pt');
-        const t = document.createElementNS(ns, 'title'); t.textContent = `p ${b.p.toFixed(2)}, agreed ${b.acc.toFixed(2)}, n ${b.n}`; c.appendChild(t); svg.appendChild(c);
+        const c = svgEl(svg, 'circle', { cx: (P + b.p * S).toFixed(1), cy: (W - P - b.acc * S).toFixed(1), r: (3 + 4.5 * Math.sqrt((b.n || 0) / maxN)).toFixed(1) }, 'pt');
+        tip(c, `said ${b.p.toFixed(2)}, agreed with the teacher ${b.acc.toFixed(2)} of the time, ${b.n} decisions`);
       }
-      fig.appendChild(svg); fig.appendChild(el('figcaption', '', r.title + (r.calibration.policy ? ` (${r.calibration.policy})` : ''))); box.appendChild(fig);
+      fig.appendChild(svg); fig.appendChild(el('figcaption', '', r.title)); box.appendChild(fig);
     }
+    const pols = [...new Set(rows.map((r) => r.calibration.policy).filter(Boolean))];
+    const note = document.getElementById('calib-note');
+    if (note) note.textContent = 'Dots on the diagonal mean the stated probability is the rate it achieves, above it means it is underselling itself.'
+      + (pols.length ? ` These bins come from ${pols.join(', ')}.` : '');
+  }
+
+  function buildHandover() {
+    const H = D.results && D.results.handover;
+    const sec = document.getElementById('help');
+    const box = sec && sec.querySelector('.curves');
+    if (!box) return;
+    const block = box.closest('.curves-block') || box;
+    if (!H || !H.models || !H.models[H.model]) { block.remove(); return; }
+    const refs = {};
+    for (const r of ((D.results && D.results.rows) || [])) {
+      if (r.random && r.teacher && r.teacher.score != null && r.teacher.score !== r.random.score) {
+        refs[r.game] = { lo: r.random.score, hi: r.teacher.score, title: r.title };
+      }
+    }
+    const per = H.models[H.model];
+    // most headroom first: the games the model already plays as well as the teacher have a flat curve and say nothing
+    const solo = (g) => { const c = per[g].confidence[0]; return c ? (c.score - refs[g].lo) / (refs[g].hi - refs[g].lo) : 1; };
+    const ids = (D.games || []).map((g) => g.id).filter((g) => per[g] && per[g].confidence.length && refs[g])
+      .sort((a, b) => (per[b].random.length > 0) - (per[a].random.length > 0) || solo(a) - solo(b));
+    if (!ids.length) { block.remove(); return; }
+    const W = 200, P = 34, S = W - 2 * P;
+    for (const g of ids) {
+      const ref = refs[g]; const norm = (v) => (v - ref.lo) / (ref.hi - ref.lo);
+      const pts = per[g].confidence.map((d) => ({ x: d.rate, y: norm(d.score), tau: d.tau, score: d.score }));
+      const ctl = per[g].random.map((d) => ({ x: d.rate, y: norm(d.score), score: d.score }));
+      const ys = pts.concat(ctl).map((d) => d.y);
+      const top = Math.max(1, ...ys), bot = Math.min(0, ...ys);
+      const px = (x) => P + x * S, py = (y) => W - P - ((y - bot) / (top - bot)) * S;
+      const fig = el('figure');
+      const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${W}`);
+      svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', `${ref.title}: score against the share of steps the teacher took`);
+      svgEl(svg, 'line', { x1: P, y1: W - P, x2: W - P, y2: W - P }, 'axis');
+      svgEl(svg, 'line', { x1: P, y1: P, x2: P, y2: W - P }, 'axis');
+      svgEl(svg, 'line', { x1: P, y1: py(1), x2: W - P, y2: py(1) }, 'diag');      // the teacher's own score
+      const path = (list, cls) => { if (list.length > 1) svgEl(svg, 'path', { d: list.map((d, i) => `${i ? 'L' : 'M'}${px(d.x).toFixed(1)} ${py(d.y).toFixed(1)}`).join(' ') }, cls); };
+      path(ctl, 'ctlline'); path(pts, 'line');
+      for (const d of ctl) tip(svgEl(svg, 'circle', { cx: px(d.x).toFixed(1), cy: py(d.y).toFixed(1), r: 4 }, 'ctl'), `the same share handed over at random: ${(d.x * 100).toFixed(0)}% of steps, score ${fmtScore(d.score)}`);
+      for (const d of pts) tip(svgEl(svg, 'circle', { cx: px(d.x).toFixed(1), cy: py(d.y).toFixed(1), r: 4 }, 'pt'), `below confidence ${d.tau}: the teacher takes ${(d.x * 100).toFixed(0)}% of steps, score ${fmtScore(d.score)}`);
+      svgText(svg, P, W - P + 12, 'model'); svgText(svg, W - P, W - P + 12, 'teacher', 'end');
+      svgText(svg, P - 4, py(1) + 3, 'teacher', 'end'); svgText(svg, P - 4, py(0) + 3, 'alone', 'end');
+      fig.appendChild(svg); fig.appendChild(el('figcaption', '', ref.title)); box.appendChild(fig);
+    }
+    const legend = el('div', 'legend');
+    const key = (cls, text) => { const s = el('span'); const i = el('i', cls); s.append(i, document.createTextNode(text)); legend.appendChild(s); };
+    key('', 'the teacher takes the steps the model is least sure about');
+    key('c', 'the teacher takes the same share of steps at random');
+    box.parentNode.insertBefore(legend, box.nextSibling);
+    const note = document.getElementById('handover-note');
+    const withCtl = ids.filter((g) => per[g].random.length);
+    if (note) note.textContent = (H.note || '') + ` Checkpoint: ${H.model}.`
+      + (withCtl.length ? ` The control ran for ${withCtl.length} of ${ids.length} games.` : '');
+  }
+
+  function buildTransfer() {
+    const T = D.results && D.results.transfer;
+    const sec = document.getElementById('transfer');
+    if (!sec) return;
+    if (!T || !T.games || !T.games.length) { sec.remove(); return; }
+    const tb = document.getElementById('transfer-body');
+    const INIT = { base: 'the base model', hold8: 'eight other games', shuf: 'eight other games, labels shuffled' };
+    const titles = {}; for (const r of ((D.results && D.results.rows) || [])) titles[r.game] = r.title;
+    for (const g of T.games) {
+      let first = true;
+      for (const r of g.runs) {
+        const tr = el('tr'); if (first) tr.classList.add('sep');
+        tr.appendChild(el('td', '', first ? (titles[g.game] || g.game) : ''));
+        first = false;
+        tr.appendChild(el('td', '', (INIT[r.init] || r.init) + (r.lr ? ` (lr ${r.lr})` : '')));
+        tr.appendChild(el('td', 'num', r.frames.toLocaleString()));
+        const cell = (v, cls) => { const td = el('td', 'num ' + (cls || '')); if (v == null) { td.textContent = 'pending'; td.classList.add('pending'); } else td.textContent = v; return td; };
+        tr.appendChild(cell(r.agreement != null ? r.agreement.toFixed(3) : null));
+        tr.appendChild(cell(r.score != null ? fmtScore(r.score) : null));
+        tr.appendChild(cell(r.vs_teacher != null ? r.vs_teacher.toFixed(2) : null, r.init === 'hold8' ? 'hi' : ''));
+        tb.appendChild(tr);
+      }
+    }
+    document.getElementById('transfer-note').textContent = (T.note || '') + ' '
+      + T.games.map((g) => `${titles[g.game] || g.game}: random ${fmtScore(g.random)}, teacher ${fmtScore(g.teacher)}.`).join(' ');
   }
 
   function buildPrompt() {
@@ -441,9 +723,12 @@
   }
 
   // ---------------------------------------------------------------- go
-  buildGrid(); buildResults(); buildCalibration(); buildPrompt();
+  buildGrid(); buildStage(); buildResults(); buildCalibration(); buildDuel(); buildHandover(); buildTransfer(); buildPrompt();
+  // the handover section is two independent blocks; if the data for neither is here, the heading goes too
+  const help = document.getElementById('help');
+  if (help && !help.querySelector('.duel-block, .curves-block')) help.remove();
   document.getElementById('generated').textContent = D.generated ? 'built ' + D.generated.replace('T', ' ') : '';
-  for (const t of tiles) t.start();
+  for (const t of tiles) if (!t.suspended && !t.running) t.start();
 
   window.pjDemo = {
     tiles, data: D,
@@ -454,5 +739,7 @@
       return res.flat();
     },
     pauseAll() { tiles.forEach((t) => t.pause()); }, playAll() { tiles.forEach((t) => t.play()); },
+    // Wake every parked tile and keep it awake: what the screenshot and verification runs want.
+    startAll() { lazyOff = true; if (applyMode) applyMode(false, false); for (const t of tiles) if (t.suspended) t.start(); },
   };
 })();
