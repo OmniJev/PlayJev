@@ -121,22 +121,24 @@ more epoch. Bold is the released model.
 | 2048 | 1021 | 3174 | 2170 | **3386** | 19593 | 0.13 |
 | **mean vs teacher** | | 0.37 | 0.49 | **0.53** | | |
 
-Zero-shot the base model puts 0.7 on option A whatever the frame. Three games end up at their teacher, the mean
-at 0.53, and three problems stay open.
+Zero-shot the base model puts 0.7 on option A whatever the frame. Three games end up at their teacher and the
+mean at 0.53. What separates the other seven from their teachers is one of four things, and the two rounds
+close or halve three of them.
 
-| What was wrong | Games | How we know | What the rounds did |
+| Problem | Games | How we know | What the rounds did |
 |---|---|---|---|
 | Covariate shift | Sokoban, Racer, Snake, Pacman | agreement on the teacher's frames 0.95 / 0.84 / 0.99 / 0.87, on their own 0.91 / 0.56 / 0.93 / 0.92 | round 1 brings three of them to the teacher and triples Pacman |
 | One frame shows no motion | Breakout, Mario | 16 percent agreement on its own play: cloning learned to read the paddle, which sits under the ball on every teacher frame | 47 percent after round 1, and round 2 doubles the score again |
 | Single-step precision | Floppy Bird, Tetris | Flappy matches the teacher on 99.8 percent of frames and dies at 9 pipes on the one it misses | a few hundred such moments in 40k frames, so it takes both rounds |
-| Reading tile digits at 448 px | 2048 | 0.48 agreement either way, and the model knows it: confidence 0.25 | still open |
+| Reading tile digits at 448 px | 2048 | 0.48 agreement either way, and the model knows it: confidence 0.25 | relabelling cannot help where the digits are unreadable, resolution can |
 
 The rest of what we measured, one line each.
 
-- **Snake goes backwards in round 2**, 107.9 to 89.5, lower on 12 of the 14 held-out seeds the two rounds share,
-  sign-flip permutation p = 0.0073. Both agreement instruments call it an improvement, because agreement averages
-  over the frames the model visits and those frames changed: 455 steps per episode down to 348, the mean shifting
-  to the easy early game. Only the closed loop sees it.
+- **Agreement can move against the score.** Snake scores 89.5 in round 2 against 107.9 in round 1, lower on 12 of
+  the 14 held-out seeds the two rounds share (sign-flip permutation p = 0.0073), while its on-policy agreement
+  rises more than any other game's. Agreement averages over the frames the model visits and those frames changed,
+  455 steps per episode down to 348, so the mean shifts to the easy early game. The closed loop is the instrument
+  that sees it.
 - **The second frame has to be its own image.** Merged into the vision tower's temporal patch it does nothing; as
   a separate image Breakout gains .096 validation agreement, the largest effect in the ablation, while Mario and
   Racer, the two games whose camera translates, lose at every point.

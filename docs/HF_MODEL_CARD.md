@@ -123,12 +123,12 @@ two DAgger rounds where it plays 40k frames per game and the teachers relabel wh
 fine-tuning, one epoch per round, batch 64, learning rate 2e-5, fp32 master weights with bf16 autocast.
 The trainer is [playjev/train_sft.py](https://github.com/OmniJev/PlayJev/blob/main/playjev/train_sft.py).
 
-## ⚠️ Limits
+## 🔭 Open Problems
 
-- 🏃 **Motion from a single frame** (Breakout, Mario): one still frame shows no velocity.
-- 🎯 **Single-step precision** (Floppy Bird, Tetris): one move a step early ends the episode.
-- 🔍 **Reading tile digits at 448 px** (2048): still open.
-- ⏱️ **Latency**: one step of delay, which is what real time costs at 83 to 100 ms per step, takes the reflex games apart.
+- 🏃 **Motion** (Breakout, Mario): one still frame carries no velocity, so the previous frame goes in as a second image.
+- 🎯 **Single-step precision** (Floppy Bird, Tetris): the move that decides the episode is a few hundred frames out of 40k.
+- 🔍 **Tile digits at 448 px** (2048): relabelling cannot help where the digits are unreadable, resolution can.
+- ⏱️ **Latency**: at 83 to 100 ms per step the decision lands one step late, and training on labels shifted one step buys part of it back.
 
 ## 📄 Licence
 
