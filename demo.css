@@ -207,9 +207,13 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 
 .tile .board { position: relative; min-width: 0; }
 .tile .view {
-  position: relative; width: 100%; aspect-ratio: 1 / 1; background: var(--board); overflow: hidden;
+  position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden;
+  background-color: var(--board); background-image: var(--poster, none);
+  background-size: cover; background-repeat: no-repeat;
   border-radius: 8px; isolation: isolate;
 }
+/* the hero tile letterboxes the game instead of filling, so its still does the same */
+.tile.hero .view { background-size: contain; }
 .tile .view iframe {
   position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none;
   background: transparent; visibility: hidden;

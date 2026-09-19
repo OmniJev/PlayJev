@@ -211,6 +211,12 @@
 
       const board = this.board = el('div', 'board');
       this.view = el('div', 'view'); this.overlay = el('div', 'overlay', T('ui.loading'));
+      // a still of the game sits under the frame, so a tile is never a black square before the
+      // iframe paints or between episodes; it is aligned the way the live view is cropped, so
+      // nothing jumps when the game takes over
+      const py = FILL_Y[this.game.id] != null ? FILL_Y[this.game.id] : .5;
+      this.view.style.setProperty('--poster', `url(assets/poster/${this.game.id}.webp)`);
+      this.view.style.backgroundPosition = `center ${(py * 100).toFixed(0)}%`;
       this.view.appendChild(this.overlay); board.appendChild(this.view);
       const c = this.ctrl = el('div', 'controls');
       this.ppBtn = el('button', 'pp', T('ui.pause')); this.ppBtn.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
@@ -599,12 +605,16 @@
       if (cur) { cur.suspend(); cur.root.remove(); const i = tiles.indexOf(cur); if (i >= 0) tiles.splice(i, 1); }
       const t = new Tile(g, (D.replays && D.replays[g.id]) || [], { hero: true, tag: 'heroGame' });
       tiles.push(t); stage.appendChild(t.root); cur = t;
-      for (const b of picker.children) b.classList.toggle('on', b.dataset.game === g.id);
+      for (const b of picker.children) {
+        const on = b.dataset.game === g.id;
+        b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false');
+      }
       remember('pj-hero', g.id);
       if (start) t.start();
     };
     for (const g of games) {
       const b = el('button', '', gameTitle(g)); b.type = 'button'; b.dataset.game = g.id;
+      b.setAttribute('role', 'tab');            // the strip announces itself as a tablist
       b.addEventListener('click', () => show(g, true)); picker.appendChild(b);
     }
     const want = WANT || remembered('pj-hero');
