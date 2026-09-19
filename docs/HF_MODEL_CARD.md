@@ -15,34 +15,20 @@ tags:
   <img src="assets/board.webp" alt="Ten browser games, each one being played by PlayJev, with the score it had reached" width="100%">
 </p>
 
-<h1 align="center">🕹️ PlayJev 0.8B</h1>
+<h1 align="center">PlayJev: A Multimodal JEV-Like Model for Small Games</h1>
 
 <p align="center"><b>Ten classic browser games. Raw pixels in, one move out. 43 ms per decision.</b></p>
 
 <p align="center">
-  <a href="https://omnijev.github.io/PlayJev/"><img alt="live demo" src="https://img.shields.io/badge/live_demo-play_it-eda100?style=flat-square&labelColor=16181c"></a>
+  <a href="https://omnijev.github.io/PlayJev/#gallery"><img alt="gallery" src="https://img.shields.io/badge/gallery-play_it-eda100?style=flat-square&labelColor=16181c"></a>
   <a href="https://github.com/OmniJev/PlayJev"><img alt="code" src="https://img.shields.io/badge/code-OmniJev%2FPlayJev-2a78d6?style=flat-square&logo=github&logoColor=white&labelColor=16181c"></a>
-  <img alt="ten games" src="https://img.shields.io/badge/games-10-1baf7a?style=flat-square&labelColor=16181c">
+  <img alt="0.8B params" src="https://img.shields.io/badge/params-0.8B-8a63d2?style=flat-square&labelColor=16181c">
   <img alt="43 ms per move" src="https://img.shields.io/badge/per_move-43_ms-eb6834?style=flat-square&labelColor=16181c">
+  <img alt="0.53 vs teacher" src="https://img.shields.io/badge/vs_teacher-0.53-1baf7a?style=flat-square&labelColor=16181c">
+  <img alt="Apache 2.0" src="https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square&labelColor=16181c">
 </p>
 
-<p align="center">
-  <img alt="pixels only" src="https://img.shields.io/badge/input-pixels_only-1c5cab?style=flat-square">
-  <img alt="863k frames" src="https://img.shields.io/badge/training-863k_frames-3987e5?style=flat-square">
-  <img alt="0.53 vs teacher" src="https://img.shields.io/badge/vs_teacher-0.53-eda100?style=flat-square">
-  <img alt="0.8B params" src="https://img.shields.io/badge/params-0.8B-8a63d2?style=flat-square">
-  <img alt="Apache 2.0" src="https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square">
-</p>
-
-Qwen3.5-0.8B-Base fine-tuned to play ten classic browser games from raw pixels. One frame goes in, one forward
-pass runs, one move comes out, 43 ms on an H200. The model never sees the game's state and is never told which
-game it is playing. Every picture above is the trained model playing, each a frame from a recorded held-out
-episode with the score it had reached by then.
-
-- 💻 Code, harness and the ten games: [github.com/OmniJev/PlayJev](https://github.com/OmniJev/PlayJev)
-- 🎮 Live demo, every game playable in the browser: [omnijev.github.io/PlayJev](https://omnijev.github.io/PlayJev/)
-
-## 🎮 The Ten Games
+## 🎮 Gallery
 
 One model, one prompt, ten games. Every tile opens that game on the demo with the model playing; the number
 under each is its score against the teacher (1.00 = matches the teacher, 0 = random play).
