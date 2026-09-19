@@ -5,3 +5,7 @@ data/
 runs/
 /tmp/
 .scratch/
+
+# site-specific, never committed (see hpc/site.env.example)
+site.env
+docs/HANDOVER.md

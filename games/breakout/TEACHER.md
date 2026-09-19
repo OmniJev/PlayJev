@@ -84,7 +84,7 @@ left-right flips in 400 steps afterwards, all after a brick hit changed the land
 
 Cost: `act()` mean 0.32 ms per step (0.14 ms without the look-ahead), max 11 ms on a replan
 in a dense layout (level 8, 250 bricks, five candidates times their follow-ups); replans happen once per
-landing, so the env throughput with 8 pages is unchanged within noise (700 to 900 env-steps/s on local-workstation, the
+landing, so the env throughput with 8 pages is unchanged within noise (700 to 900 env-steps/s on the local workstation, the
 in-page cost dominates). Pure Python, no dependencies.
 
 ## Collection defaults

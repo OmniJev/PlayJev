@@ -71,7 +71,7 @@ pinged an external server on every episode reset. The driver now also aborts eve
 request, so this is belt and braces; the page still should not carry a tracker. Nothing else changed
 (`git diff` in games/flappy).
 
-## Numbers (bench, 8 pages, 200 steps, local-workstation)
+## Numbers (bench, 8 pages, 200 steps, local workstation)
 
 About 630 to 800 env-steps/s over a 200-step bench (about 1050 in steady state; page reloads at
 episode ends, 1.2 s for 8 pages, dominate the average because random episodes are short). Random

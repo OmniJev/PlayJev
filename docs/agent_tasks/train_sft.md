@@ -6,9 +6,9 @@ same string.
 
 ## Data collection (first stage of the job, on the compute node's 12 CPU cores)
 
-Rollouts run on the cluster, not on local-workstation. Inside the training job, before training, run `python -m playjev.collect
+Rollouts run on the cluster, not on the local workstation. Inside the training job, before training, run `python -m playjev.collect
 <game> --steps N --pages 8 --epsilon 0.1 --shard <job>_<k>` for every game with a registered teacher, three collector
-processes at a time (each drives 8 Chromium pages; about 300 to 1000 env-steps/s per process on local-workstation, expect similar
+processes at a time (each drives 8 Chromium pages; about 300 to 1000 env-steps/s per process on the local workstation, expect similar
 on the node). Start with N = 100,000 frames per game (about 800 MB per game as JPEG). Frames whose seed satisfies
 `seed % 10 == 0` are validation by construction (the collector's seeds start at --seed0 and increase; pass a seed0
 that is a multiple of 10 so both splits exist). Mario and racer episodes are long, snake and flappy random-heavy
@@ -37,7 +37,7 @@ same distributions.
 
 Full fine-tuning of the 0.8B model in bf16 with AdamW (lr 2e-5, cosine, warmup 3 percent, weight decay 0.0),
 vision tower trainable too (flag `--freeze-vision` to compare). Batch about 64 frames (gradient accumulation as needed),
-1 to 3 epochs. Gradient checkpointing on. Save a checkpoint every N steps to the PROJECT project scratch, keep last 2.
+1 to 3 epochs. Gradient checkpointing on. Save a checkpoint every N steps to $CKPT_ROOT, keep last 2.
 
 ## Evaluation (every eval interval and at the end)
 
@@ -73,6 +73,6 @@ vision tower trainable too (flag `--freeze-vision` to compare). Batch about 64 f
 
 ## Deliverables
 
-`playjev/train_sft.py`, `hpc/train_sft.pbs` (1 H200, smallx via `-q autox`, walltime 12 h, `-P PROJECT`),
+`playjev/train_sft.py`, `hpc/train_sft.pbs` (1 H200, smallx via `-q autox`, walltime 12 h, project code from `site.env`),
 `docs/TRAIN_NOTES.md` with the numbers (loss curves as text, per-game agreement, ECE, closed-loop scores),
 and the checkpoint path.

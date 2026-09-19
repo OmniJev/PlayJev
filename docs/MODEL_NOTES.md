@@ -7,8 +7,8 @@ hopper (`$WORK/repo/runs/smoke/`).
 
 ## 1. Environment on hopper
 
-`bash hpc/env_setup.sh` on the login node builds `$WORK/.venv` (Python 3.12, uv). The UV cache
-had to move to `$SCRATCH/.cache/uv`: `~/.bashrc` points it at `/tmp`, which has 1.4 GB free, and the cu128
+`bash hpc/env_setup.sh` on the login node builds `$PLAYJEV_WORK/.venv` (Python 3.12, uv). The UV cache
+had to move to `$WORK/.cache/uv`: `~/.bashrc` points it at `/tmp`, which has 1.4 GB free, and the cu128
 stack downloads about 4 GB of wheels.
 
 | package | version |
@@ -22,7 +22,7 @@ stack downloads about 4 GB of wheels.
 | pillow / playwright / einops | latest / 1.63.0 (matches chromium build 1243 on scratch) / latest |
 | causal-conv1d | not installed: no prebuilt wheel for torch 2.10 and no nvcc on the login node; the conv runs on the torch fallback |
 
-Weights (HF cache `$PROJ/hf_home/hub`, all complete):
+Weights (HF cache `$HF_HOME/hub`, all complete):
 `Qwen3.5-0.8B-Base` snapshot `dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68` (1.7 GB), `Qwen3.5-2B-Base` (4.3 GB),
 `Qwen3.5-0.8B` instruct snapshot `2fc06364715b967f1860aea9cf38778875588b17`.
 
@@ -205,7 +205,7 @@ Reading the table:
 ### 3.3 Chromium on the compute node
 
 `python -m playjev.bench snake --pages 8 --steps 100` ran inside the job with the playjev venv (playwright 1.63.0)
-and `PLAYWRIGHT_BROWSERS_PATH=$SCRATCH/ms-playwright`: 8 pages reset in 1.10 s, 345 env-steps/s over 8 pages,
+and `PLAYWRIGHT_BROWSERS_PATH=$WORK/ms-playwright`: 8 pages reset in 1.10 s, 345 env-steps/s over 8 pages,
 77 random episodes ended in 100 steps (random snake dies within a few moves, so page reloads dominate this number),
 no page errors, no missing shared libraries. The headless shell lives at
 `chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell` (the `ldd` line in smoke.pbs
@@ -245,7 +245,7 @@ the teacher runs on `info()` and the model only trains.
 - `AutoProcessor` for Qwen3.5 needs torchvision (both the fast image processor and `Qwen3VLVideoProcessor` refuse to
   import without it); torchvision 0.25.0+cu128 was added to the stack and to `env_setup.sh`.
 - `~/.bashrc` puts the uv cache in `/tmp` on the login node, which had 1.4 GB free; the build script overrides
-  `UV_CACHE_DIR` and `TMPDIR` to `$SCRATCH/...`.
+  `UV_CACHE_DIR` and `TMPDIR` to `$WORK/...`.
 - causal-conv1d has no prebuilt wheel for torch 2.10 and the login node has no nvcc; skipped, conv on the torch path.
 - transformers 5.17 requires `mm_token_type_ids` alongside any multimodal input (it raises otherwise); the processor
   returns it by default and `PlayJevModel` passes it through.

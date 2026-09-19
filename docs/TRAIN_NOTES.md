@@ -2,7 +2,7 @@
 
 Code: `playjev/data.py` (records, permutation, collate), `playjev/train_sft.py` (trainer + eval), `playjev/play.py`
 `LocalPolicy` (closed loop with the checkpoint in-process), `hpc/train_sft.pbs` (collect + train + play in one
-smallx job). Checkpoints: `$WORK/ckpt/<run>/{step-N,final}` (bf16,
+smallx job). Checkpoints: `$CKPT_ROOT/<run>/{step-N,final}` (bf16,
 HF format, `PlayJevModel(path)` loads them). Logs: `$WORK/logs/train_<run>_<job>_live.log` and
 `<ckpt>/log.jsonl` (one JSON line per logged step and per eval).
 
@@ -69,7 +69,7 @@ Closed loop, 16 episodes each on seeds 5000+ (argmax actions, 8 pages, cap 2000 
 The pixel model reaches 69 percent of the teacher's score from frames alone after 25 minutes of training;
 zero-shot it was at chance. Play throughput with the model in the loop: 84 env-steps/s over 8 pages (the model
 forward per step at batch 8 is about 50 ms, see MODEL_NOTES 3.2). Checkpoint:
-`$WORK/ckpt/sft_snake1/final` (step-800 and step-1200 kept as well).
+`$CKPT_ROOT/sft_snake1/final` (step-800 and step-1200 kept as well).
 
 ## Run 2: all ten games, 0.8B-Base, one epoch (`sft_all1`, jobs 621575 then 621580)
 
@@ -115,7 +115,7 @@ Training took 4 h 11 min on hopper-15 (56 samples/s, 17 GB peak); train loss 2.1
 7500, 0.70 to 0.73 over the last thousand steps; validation loss 0.708 at the end. Three games are still far from
 their teacher at one epoch: 2048 (.475, flat since step 9000), mario (.627) and breakout (.715); sokoban (.949),
 flappy (.998) and snake (tie-aware .990) are at the ceiling of what argmax agreement can show. Checkpoint
-`$WORK/ckpt/sft_all1/final` (step-10500 and step-12000 kept).
+`$CKPT_ROOT/sft_all1/final` (step-10500 and step-12000 kept).
 
 Closed loop on held-out seeds 5000+, 16 episodes per game and policy, 8 pages, cap 1500 steps, all on
 `sft_all1/final` (job 621580: argmax, sampled actions, random, teacher; job 621686: argmax with `--delay 1`, the
@@ -141,7 +141,7 @@ Job 621580 finished at 12:45 (5 h 24 min in all). Read as the model's share of t
 (model - random) / (teacher - random), on the same seeds: invaders 1.00 (every policy but random clears the
 waves), racer 0.92, snake 0.68, sokoban 0.54, then a cliff: mario 0.15, pacman 0.15, flappy 0.11, tetris 0.06,
 breakout 0.01, 2048 below random (the argmax loop). Validation agreement does not predict this order: flappy
-(.998) and tetris (.810) sit at the bottom in play while their agreement is near the top, and session's step by
+(.998) and tetris (.810) sit at the bottom in play while their agreement is near the top, and the step by
 step relabel of a flappy death shows why: 89 of 90 decisions match the teacher and the one miss is a recovery move
 (a second consecutive flap) that the teacher's own trajectories almost never contain. Covariate shift, so the next
 round is DAgger (job 621845, `dagger1`: the model plays 40k frames per game, the teacher labels, one more epoch
@@ -149,7 +149,7 @@ from the `sft_all1` checkpoint on those plus run 1's shard a).
 
 ### The same checkpoint under the executor rule (job 621844, 12:49 to 13:38)
 
-`play.py` default since commit 26f9cfa (session): a move whose step left the observation unchanged (same frame
+`play.py` default since commit 26f9cfa: a move whose step left the observation unchanged (same frame
 bytes, same score, not done) is banned on that observation and the best other move is taken; the ban clears when the
 observation changes; the recorded probabilities are untouched, only the executed index. Same seeds, cap and episode
 count as above; random and teacher rerun under the same rule (both recorded for the demo). Games whose frames always
@@ -306,7 +306,7 @@ model can compare by attention do better.
 
 ## Run 5: DAgger round 1 (`dagger1`, job 621962, hopper-13, collection 14:18 to 15:05, training from 15:06)
 
-Why: the closed-loop deaths of `sft_all1` are missed corrections in states the teacher never visits (session's
+Why: the closed-loop deaths of `sft_all1` are missed corrections in states the teacher never visits (the
 step-by-step relabel of a flappy death: 89 of 90 decisions agree, the miss is a second consecutive flap). So the
 model plays and the teacher labels: `playjev.collect --actor local --ckpt sft_all1/final --epsilon 0.05` (argmax
 with the executor rule, 5 percent random moves), 3 x 13,336 frames per game, seeds 700000 / 800000 / 900000, 4 to
@@ -367,7 +367,7 @@ random: seven games at or above 0.45 were four before the round.
 
 ## Run 6: eight games, snake and racer held out (`sft_hold8`, job 622160, hopper, from 16:08)
 
-The base for the transfer experiment (session's plan: fine-tune `sft_hold8/final` on 1k / 3k / 10k frames of
+The base for the transfer experiment (the plan: fine-tune `sft_hold8/final` on 1k / 3k / 10k frames of
 snake and racer against the base model on the same frames). Exactly the `sft_all1` recipe on the `sft_all1`
 shards of the other eight games: 686k train records, 10,715 steps, same schedule. Columns for snake and racer are
 empty by construction.
@@ -667,11 +667,11 @@ marginal and destroys only the frame-to-action mapping, so a checkpoint trained 
 the marginal and no game skill. If the shuffled start lands on the base arm's plateau, then `hold8 - shuf` is the
 part that is actual transferred game knowledge and `shuf - base` is the part that is just knowing how to answer.
 
-## Real-time latency (decided 2026-09-18, relayed by session)
+## Real-time latency (decided 2026-09-18)
 
 The deployed model sees frame k and its answer is applied at step k+1 (one step, 83 to 100 ms in the real-time
 games, which covers the 43 ms batch-1 inference). `playjev.play --delay 1` reproduces that in the closed loop; the
-unmodified teachers collapse under it (snake 108 to 1, flappy 30 to 0 pipes, measured by session). Training for it
+unmodified teachers collapse under it (snake 108 to 1, flappy 30 to 0 pipes, measured on the same harness). Training for it
 needs no new data: `--label-delay 1` in `playjev/data.py` labels frame k with the teacher's decision at record k+1
 of the same episode (consecutive steps only, each episode's last record dropped), and the validation metrics of a
 delayed run are computed against those shifted targets.

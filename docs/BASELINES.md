@@ -1,4 +1,4 @@
-# Baselines (local-workstation, 8 pages, 8 episodes per policy, episode cap 1500 steps, 2026-09-18)
+# Baselines (local workstation, 8 pages, 8 episodes per policy, episode cap 1500 steps, 2026-09-18)
 
 Random and teacher policies played through the same harness the model will use. Scores are the hooks' own
 score definitions (see each `games/<id>/NOTES.md`). A length of 1500 means the cap ended the episode.

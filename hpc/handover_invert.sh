@@ -3,7 +3,7 @@
 # low. If the trigger carries signal, this has to come out below the random control, not just below the real one.
 #   bash hpc/handover_invert.sh <ckpt> <tag> <game> <tau> [<game> <tau> ...]
 set -u
-WORK=${WORK:-$WORK}
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
 CKPT=$1; TAG=$2; shift 2
 while [ $# -ge 2 ]; do
   GAME=$1; TAU=$2; shift 2

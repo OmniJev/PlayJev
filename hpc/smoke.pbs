@@ -1,15 +1,14 @@
 #!/bin/bash
-#PBS -P PROJECT
 #PBS -N pj_smoke
 #PBS -l select=1:ngpus=1:ncpus=12:mem=225GB:gpu_model=H200
 #PBS -l walltime=01:00:00
 #PBS -q autox
 #PBS -j oe
-#PBS -o $WORK/logs/
 # PlayJev smoke test on one H200: driver and versions, zero-shot snake probabilities for the Qwen3.5 checkpoints,
 # a latency / memory grid, and the Playwright bench to prove Chromium runs on a compute node.
-#   cd $WORK && qsub repo/hpc/smoke.pbs
-WORK=$WORK
+#   cd $WORK && bash repo/hpc/q.sh repo/hpc/smoke.pbs
+WORK=${PLAYJEV_WORK:-${PBS_O_WORKDIR:-$PWD}}   # work tree: repo/ .venv/ logs/ site.env
+if [ -f "$WORK/site.env" ]; then . "$WORK/site.env"; fi
 REPO=$WORK/repo
 JOB=${PBS_JOBID%%.*}
 exec > $WORK/logs/smoke_${JOB}_live.log 2>&1   # PBS -o only lands when the job ends
@@ -17,9 +16,9 @@ set -x
 date; hostname
 cd $REPO
 source $WORK/.venv/bin/activate
-export HF_HOME=$PROJ/hf_home
+export HF_HOME=${HF_HOME:-$WORK/hf_home}
 export HF_HUB_CACHE=$HF_HOME/hub HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
-export PLAYWRIGHT_BROWSERS_PATH=$SCRATCH/ms-playwright
+export PLAYWRIGHT_BROWSERS_PATH=${PLAYWRIGHT_BROWSERS_PATH:-$WORK/ms-playwright}
 export PYTHONUNBUFFERED=1
 HUB=$HF_HOME/hub
 M08B=$HUB/models--Qwen--Qwen3.5-0.8B-Base/snapshots/dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68
@@ -58,7 +57,7 @@ fi
 ldd $PLAYWRIGHT_BROWSERS_PATH/chromium_headless_shell-*/chrome-linux/headless_shell | grep "not found" || echo "headless_shell: all shared libraries resolve"
 if ! timeout 900 python -u -m playjev.bench snake --pages 8 --steps 100; then
     echo "BENCH FAILED in the playjev venv; retrying with probe_games_venv"
-    timeout 900 $SCRATCH/probe_games_venv/bin/python -u -m playjev.bench snake --pages 8 --steps 100 || echo "BENCH FAILED in probe_games_venv too"
+    timeout 900 ${PROBE_VENV:-$WORK/probe_games_venv}/bin/python -u -m playjev.bench snake --pages 8 --steps 100 || echo "BENCH FAILED in probe_games_venv too"
 fi
 
 date

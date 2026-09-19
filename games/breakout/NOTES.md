@@ -125,7 +125,7 @@ DOM outside the canvas and are not.
 ## Numbers
 
 `python -m playjev.bench breakout --pages 8 --steps 200`: **720 to 820 env-steps/s** over 8 pages
-on local-workstation (varies with machine load; the in-page cost is 1.2 ms per step, 1.0 ms of it the JPEG), no
+on the local workstation (varies with machine load; the in-page cost is 1.2 ms per step, 1.0 ms of it the JPEG), no
 errors, 11 episodes ended, mean random score 242.27 (identical across repeated runs).
 
 Random policy over 88 episodes (8 pages x 1500 steps, seeds from the bench RNG): mean score 739,

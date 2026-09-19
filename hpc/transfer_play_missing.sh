@@ -2,7 +2,7 @@
 # Play the transfer checkpoints whose closed loop never got written (the copy line postdates the first chain).
 #   bash hpc/transfer_play_missing.sh tr_racer_1000_base tr_pacman_1000_base
 set -u
-WORK=$WORK
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
 for run in "$@"; do
   OUT=$WORK/ckpt/$run; GAME=$(echo $run | cut -d_ -f2)
   if [ ! -d $OUT/final ]; then echo "[$run] no final checkpoint, skipped"; continue; fi

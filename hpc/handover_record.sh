@@ -3,7 +3,9 @@
 # roughly a third of the steps are handed over) the teacher decides; steps decided by the teacher carry "h": 1.
 #   bash hpc/handover_record.sh [ckpt] [policy-name]
 set -u
-CKPT=${1:-$WORK/ckpt/dagger1/final}
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
+CKPT_ROOT=${CKPT_ROOT:-$WORK/ckpt}
+CKPT=${1:-$CKPT_ROOT/dagger1/final}
 NAME=${2:-playjev-0.8b-dagger1-s2}
 declare -A TAU=( [breakout]=0.4 [tetris]=0.6 [2048]=0.2 [pacman]=0.6 [flappy]=0.8 [snake]=0.4 [racer]=0.6 [sokoban]=0.8 [mario]=0.4 [invaders]=0.4 )
 for g in breakout tetris pacman flappy 2048 snake mario racer sokoban invaders; do

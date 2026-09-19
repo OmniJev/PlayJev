@@ -42,7 +42,7 @@ settings UI needs no interaction (defaults: high resolution, 3 lanes, road width
   curve, curveAhead ([10, 30, 60] segments ahead), slope, lapTime, lastLapTime, carsAhead (up to 6 within 60
   segments: dz in units, x offset, speed), steps`.
 
-## Numbers (local-workstation, 8 pages)
+## Numbers (local workstation, 8 pages)
 - Bench: 305 to 362 env-steps/s across runs (the machine is shared), reset of 8 pages 0.35 s, no errors. In-page cost is about 1.3 ms per step (5 updates,
   5 renders, JPEG); the rest is the Playwright round trip. Rendering at the game's 480 x 360 "Low" setting
   saved nothing measurable, so the default 1024 x 768 is kept.

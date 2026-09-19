@@ -2,25 +2,25 @@
 # Build the PlayJev Python environment on hopper. Run this ON THE LOGIN NODE: compute nodes have no
 # network, so every wheel has to land here first.
 #
-#   bash hpc/env_setup.sh                 # -> $WORK/.venv
+#   PLAYJEV_WORK=<work tree> bash hpc/env_setup.sh        # -> $PLAYJEV_WORK/.venv
 #
 # The stack is the one that runs Qwen3.5 on jvp (driver 550, H200): torch 2.10.0+cu128,
 # transformers 5.17.0, flash-linear-attention 0.5.2 for the linear-attention layers (without it
 # Qwen3.5 is about 2x slower), triton 3.7.1 (see below). causal-conv1d is optional: it needs a prebuilt wheel or nvcc, and
 # the login node has neither for torch 2.10, so the script tries once and moves on.
 # Playwright is pinned to 1.63 because the Chromium build already on scratch is 1243
-# ($SCRATCH/ms-playwright/chromium_headless_shell-1243), which is what 1.63 expects.
+# ($PLAYWRIGHT_BROWSERS_PATH/chromium_headless_shell-1243), which is what 1.63 expects.
 set -euo pipefail
 
-WORK=${PLAYJEV_WORK:-$WORK}
+WORK=${PLAYJEV_WORK:?set PLAYJEV_WORK to the work tree (repo/, .venv/, logs/)}
 VENV=${PLAYJEV_VENV:-$WORK/.venv}
 UV=${UV:-$HOME/.local/bin/uv}
 PYVER=3.12
 
 # The login node's /tmp is 5 GB and ~/.bashrc points UV_CACHE_DIR there; the cu128 torch stack alone
 # downloads about 4 GB of wheels, so cache and temp files go to scratch for this build.
-export UV_CACHE_DIR=${UV_CACHE_DIR:-$SCRATCH/.cache/uv}   # vanda: the personal scratch is full, point both at the project disk
-export TMPDIR=${TMPDIR:-$SCRATCH/tmp}
+export UV_CACHE_DIR=${UV_CACHE_DIR:-$WORK/.cache/uv}   # both need a few GB; point them at a disk that has it
+export TMPDIR=${TMPDIR:-$WORK/tmp}
 mkdir -p "$WORK/logs" "$UV_CACHE_DIR" "$TMPDIR"
 
 log() { echo "[env_setup $(date +%H:%M:%S)] $*"; }

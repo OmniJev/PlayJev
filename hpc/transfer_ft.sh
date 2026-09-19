@@ -6,7 +6,7 @@
 # Output checkpoint ckpt/tr_<game>_<N>_<init>, eval on the full validation split every epoch, closed loop at the end.
 set -u
 GAME=$1; N=$2; INIT=$3; EPOCHS=${4:-3}; LR=${5:-2e-5}
-WORK=${WORK:-$WORK}   # hopper: WORK=$WORK
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
 case $INIT in
   base) MODEL=Qwen/Qwen3.5-0.8B-Base ;;
   hold8) MODEL=$WORK/ckpt/sft_hold8b/final ;;

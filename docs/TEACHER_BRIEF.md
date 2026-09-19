@@ -2,7 +2,7 @@
 
 A teacher plays one game well using the hook's `info()` (internal state the model never sees) and returns a
 probability vector over the game's actions. Its rollouts become the supervised targets for the vision model.
-Repo root `$REPO`, venv `source .venv/bin/activate`.
+Repo root: this checkout, venv `source .venv/bin/activate`.
 
 Read first: `docs/HARNESS.md` (contract), `games/<id>/NOTES.md` and `games/<id>/pj_hook.js` (what `info()`
 contains for your game and what one step means), `playjev/teachers/__init__.py` and `playjev/teachers/snake.py`

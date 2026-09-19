@@ -3,7 +3,7 @@
 #   bash hpc/transfer_zeroshot.sh racer pacman
 # Results land in ckpt/tr_<game>_0_<init>/play_<game>_local_delay0.json, the shape scripts/collect_transfer.py reads.
 set -u
-WORK=${WORK:-$WORK}
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
 for GAME in "$@"; do
   for INIT in base hold8 shuf; do
     case $INIT in

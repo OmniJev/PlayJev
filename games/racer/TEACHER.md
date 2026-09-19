@@ -52,7 +52,7 @@ DEADBAND 0.06, P_MAIN 0.8`. Tried and rejected: `ROAD_EDGE 0.85` (1407 vs 1402 s
 collisions); a 0.15 floor on far-car urgency (made distant cars veto good targets; caused a 130-step pile-up behind one
 slow car); unpruned targets (planned for unreachable positions on curve holds).
 
-## Numbers (local-workstation, 8 pages, this session)
+## Numbers (local workstation, 8 pages, this session)
 
 `python -m playjev.teacher_eval racer --pages 8 --episodes 16 --max-steps 2400`: 16/16 laps, score mean 6711.61,
 median 6711.65, max 6714.6, episode length mean 1412 steps (best 1380, worst 1524), capped 0.

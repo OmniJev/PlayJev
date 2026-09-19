@@ -356,7 +356,7 @@ def read_model_results(results_dir: Path, preferred: str | None = None) -> tuple
 
 def build_results(games: dict[str, dict], results_dir: Path, preferred: str | None = None) -> dict:
     """One row per game. Random and teacher come from the results directory when the model's run produced them on
-    the same seeds; otherwise from docs/BASELINES.md (eight episodes on local-workstation). vs_teacher is (model - random) /
+    the same seeds; otherwise from docs/BASELINES.md (eight episodes on the local workstation). vs_teacher is (model - random) /
     (teacher - random): 0 is random play, 1 is the teacher."""
     base = parse_baselines(ROOT / "docs" / "BASELINES.md")
     model, calib, ref = read_model_results(results_dir, preferred)

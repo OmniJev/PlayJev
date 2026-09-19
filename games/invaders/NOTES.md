@@ -48,7 +48,7 @@ The hook sets `game.renderType = Phaser.CANVAS` before boot (Phaser's own fallba
 - info(): `score, lives, health, playerX, playerY, aliensAlive, aliensTotal, lowestAlienRow (0..3), lowestAlienY,
   alienBlockX, alienCols (alive per column), aliens ([x,y] centres), enemyShots ([x,y,vx,vy]), myShots, state`.
 
-## Numbers (local-workstation, 8 pages)
+## Numbers (local workstation, 8 pages)
 - Bench: 449 to 492 env-steps/s across runs (the machine is shared), reset of 8 pages 0.3 to 1.2 s. Random policy:
   4 episodes in 200 steps, mean score 187.5, mean episode length 179 steps;
   in longer runs random play dies after 160 to 320 steps (13 to 27 s of game time) with 170 to 340 points.

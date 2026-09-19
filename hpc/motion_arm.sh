@@ -1,7 +1,7 @@
 #!/bin/bash
 # One motion arm end to end on a hopper node: composite the shards, one SFT epoch, closed loop on held-out seeds.
 #
-#   cd $WORK && qsub -v 'NAME=mo_ghost,CMD=ARM=ghost bash hpc/motion_arm.sh' repo/hpc/hopper_task.pbs
+#   cd $WORK && bash repo/hpc/q.sh -v 'NAME=mo_ghost,CMD=ARM=ghost bash hpc/motion_arm.sh' repo/hpc/hopper_task.pbs
 #
 # ARM: plain (single frame, the control), ghost (threshold-masked trail), rgbt (three frames as R, G, B).
 # The three arms share everything else: same game, same source shards, same hyperparameters, same 16 held-out
@@ -13,7 +13,8 @@ ARM=${ARM:-ghost}
 SRC_SHARDS=${SRC_SHARDS:-sft_all1_a sft_all1_b sft_all1_c}
 RUN=${RUN:-motion_${GAME}_${ARM}}
 CAP=${CAP:-1500}
-CKPT_ROOT=$WORK/ckpt
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
+CKPT_ROOT=${CKPT_ROOT:-$WORK/ckpt}
 OUT=$CKPT_ROOT/$RUN
 MODEL=${MODEL:-$HF_HOME/hub/models--Qwen--Qwen3.5-0.8B-Base/snapshots/dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68}
 mkdir -p $OUT

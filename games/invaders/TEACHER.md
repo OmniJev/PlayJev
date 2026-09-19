@@ -39,7 +39,7 @@ the reverse). Ties among all three moves (nothing to shoot, nothing incoming) co
 Cost per step: **0.95 ms mean, 1.4 ms p95** (pure Python, one page, measured over 884 act() calls), about 6 ms
 max apart from a 20 ms first-call warm-up. The DP touches about H^2 = 800 cells with three transitions each.
 
-## Numbers (local-workstation, 8 pages)
+## Numbers (local workstation, 8 pages)
 
 `python -m playjev.teacher_eval invaders --pages 8 --episodes 16`:
 

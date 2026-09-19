@@ -1,6 +1,6 @@
 # Task: build the PlayJev demo page (docs/DEMO.md is the specification, read it first)
 
-Repo root $REPO. Deliver `demo/` (index.html, demo.css, demo.js, the copied game
+Repo root: this checkout. Deliver `demo/` (index.html, demo.css, demo.js, the copied game
 files, replays/) plus `scripts/build_demo.py` and `scripts/shot_demo.py`. Budget 2.5 hours. Ownership: demo/, those two
 scripts, nothing else (games/ is read-only for you; copy, do not edit).
 
@@ -38,7 +38,7 @@ inline SVGs when calibration data exists (skip silently otherwise), the "how it 
 prompt (copy it from docs/MODEL_NOTES.md section 2), and links (repo, OpenJev). Title: "PlayJev". No game names in
 the prompt display, of course the tile captions do name the games.
 
-Style rules (owner's): plain sentences, no oversized headline with a grey caption under it, no uppercase eyebrow
+Style rules: plain sentences, no oversized headline with a grey caption under it, no uppercase eyebrow
 labels, no em-dashes anywhere, no decorative gradients. Palette: JEV blue #2F80ED for the chosen action's bar, coral
 #F0545C for the "recording: random" state and mismatch marks, greys for the other bars, near-white page in light
 mode and #111 in dark mode via prefers-color-scheme with a manual toggle. System font stack. The game canvases are the

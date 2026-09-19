@@ -28,7 +28,7 @@ the probability bars run side by side.
 
 ## 2. Model
 
-Primary: `Qwen/Qwen3.5-0.8B-Base` (owner's call). Verified from HF `config.json`:
+Primary: `Qwen/Qwen3.5-0.8B-Base`. Verified from HF `config.json`:
 `Qwen3_5ForConditionalGeneration`, `image-text-to-text`, 0.87B parameters in total. Text stack
 24 layers, hidden 1024, hybrid 3 linear-attention + 1 full-attention, vocab 248,320. Vision tower
 12 layers, hidden 768, patch 16, spatial merge 2, temporal patch 2, projecting to 1024.
@@ -102,9 +102,9 @@ zero-shot Qwen3.5-0.8B/2B/4B with the same prompt, teacher ceiling.
 ## 6. Compute plan
 
 hopper `smallx` (1 to 2 H200, walltime up to 144 h, three jobs per user). Envs on the 12 CPU
-cores of the slot, model on the GPU. Weights and data under the PROJECT project scratch, HF
+cores of the slot, model on the GPU. Weights and data under the project scratch, HF
 downloads on the login node with `HF_HUB_DISABLE_XET=1`. Chromium headless shell already
-installed at `$SCRATCH/ms-playwright` (Playwright 1.63, works on the login node;
+installed at `$PLAYWRIGHT_BROWSERS_PATH` (Playwright 1.63, works on the login node;
 verify once inside a compute job).
 
 ## 7. Demo

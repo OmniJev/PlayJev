@@ -78,7 +78,7 @@ Three return objects gained read-only getters, marked `/* PlayJev: read-only acc
 - `PACMAN` module: `"getState"`, `"getTick": getTick`, `"getLevel"`, `"getUser"`, `"getGhosts"`, `"getMap"`
 16 lines inserted, 3 lines changed only by a trailing comma. No logic or rendering change.
 
-## Numbers (bench, 8 pages, 200 steps, local-workstation)
+## Numbers (bench, 8 pages, 200 steps, local workstation)
 
 About 500 to 660 env-steps/s depending on machine load (load average 7 to 9 from other jobs while
 measuring). Random policy: mean score 82, mean episode about 50 steps (5 s of game time; ghosts are

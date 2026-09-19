@@ -1,16 +1,16 @@
 #!/bin/bash
-#PBS -P PROJECT
 #PBS -N pj_vanda
 #PBS -l select=1:ncpus=12:mem=64gb:ngpus=1
 #PBS -l walltime=06:00:00
 #PBS -q auto
 #PBS -j oe
-#PBS -o $WORK/logs/pbs_vanda.out
 # One command from the repo on a vanda A40 node, the PlayJev venv active. Examples (from the vanda login node):
-#   cd $WORK && qsub -v 'NAME=probe,CMD=python -u -m playjev.play snake --policy local --ckpt ckpt/sft_all1/final --episodes 4' repo/hpc/vanda_task.pbs
-#   qsub -v 'NAME=handover_snake,CMD=bash hpc/handover_sweep.sh snake' repo/hpc/vanda_task.pbs
+#   cd $WORK && bash repo/hpc/q.sh -v 'NAME=probe,CMD=python -u -m playjev.play snake --policy local --ckpt ckpt/sft_all1/final --episodes 4' repo/hpc/vanda_task.pbs
+#   bash repo/hpc/q.sh -v 'NAME=handover_snake,CMD=bash hpc/handover_sweep.sh snake' repo/hpc/vanda_task.pbs
 # Variables: NAME (log name), CMD (shell command, run with cwd = the repo), THREADS (OMP threads for torch, default 6).
-WORK=$WORK
+WORK=${PLAYJEV_WORK:-${PBS_O_WORKDIR:-$PWD}}   # work tree: repo/ .venv/ logs/ site.env
+if [ -f "$WORK/site.env" ]; then . "$WORK/site.env"; fi
+export WORK
 REPO=$WORK/repo
 JOB=${PBS_JOBID%%.*}
 NAME=${NAME:-task}
@@ -18,7 +18,7 @@ exec > $WORK/logs/${NAME}_${JOB}_live.log 2>&1
 date; hostname; nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader
 cd $REPO
 source $WORK/.venv/bin/activate
-export HF_HOME=$PROJ/hf_home
+export HF_HOME=${HF_HOME:-$WORK/hf_home}
 export HF_HUB_CACHE=$HF_HOME/hub HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false PYTHONUNBUFFERED=1
 export PLAYWRIGHT_BROWSERS_PATH=$WORK/ms-playwright
 export TRITON_CACHE_DIR=$WORK/.cache/triton

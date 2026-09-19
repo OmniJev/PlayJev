@@ -13,6 +13,6 @@
   done = board state back to 0 after start.
 - Frame: painted from the grid onto an offscreen canvas with the theme's computed colours (field blue, body yellow,
   head white, food red, dead head grey). About 2 ms per frame versus 30 ms for a screenshot.
-- Bench: 8 pages, 360 env-steps/s on local-workstation. Random policy: mean length 1.1, dies within a few moves.
+- Bench: 8 pages, 360 env-steps/s on the local workstation. Random policy: mean length 1.1, dies within a few moves.
   Teacher (BFS to food, largest reachable region fallback): mean 120 to 130, max 186, about 600 moves per episode.
 - Determinism: same seed and action sequence gives identical head traces across pages (checked in bench dev).

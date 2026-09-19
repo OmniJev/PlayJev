@@ -1,7 +1,7 @@
 # Brief for game-hook agents (PlayJev)
 
 You are turning one or two vendored browser games into deterministic, steppable environments.
-Repo root: `$REPO`. Python venv: `source .venv/bin/activate`
+Repo root: this checkout. Python venv: `source .venv/bin/activate`
 (Playwright 1.63, chromium headless shell installed). Node is available for syntax checks
 (`node -e "new Function(require('fs').readFileSync('games/<id>/pj_hook.js','utf8'))"`).
 

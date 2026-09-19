@@ -7,7 +7,7 @@
 # 3. closed loop on the held-out seeds, recorded (policy name playjev-0.8b-spec_<game>).
 set -u
 GAME=$1; FRAMES=${2:-40000}; EPOCHS=${3:-1}; LR=${4:-1e-5}
-WORK=$WORK
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
 CKPT=$WORK/ckpt/sft_all1/final
 RUN=spec_$GAME; OUT=$WORK/ckpt/$RUN; PER=$(( FRAMES / 3 ))
 mkdir -p $OUT

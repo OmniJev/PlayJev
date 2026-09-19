@@ -4,7 +4,7 @@
 # Policy name: transfer-<game>-<N>f-<init>, replays under runs/replays/<game>/.
 set -u
 GAME=$1; SIZES=${2:-1000+10000}; INITS=${3:-base+hold8}; SIZES=${SIZES//+/ }; INITS=${INITS//+/ }
-WORK=${WORK:-$WORK}
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
 for init in $INITS; do for n in $SIZES; do
   OUT=$WORK/ckpt/tr_${GAME}_${n}_${init}
   if [ ! -d $OUT/final ]; then echo "[tr_${GAME}_${n}_${init}] no final checkpoint, skipped"; continue; fi

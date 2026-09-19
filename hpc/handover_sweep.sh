@@ -5,7 +5,9 @@
 # Results: runs/play/<game>_local_handover<tau>.json (score_mean, handover_rate, ...), one per tau.
 set -u
 GAME=$1
-CKPT=${2:-$WORK/ckpt/sft_all1/final}
+WORK=${WORK:-$(cd "$(dirname "$0")/../.." && pwd)}   # the repo sits at $WORK/repo
+CKPT_ROOT=${CKPT_ROOT:-$WORK/ckpt}
+CKPT=${2:-$CKPT_ROOT/sft_all1/final}
 TAUS=${3:-"0 0.2 0.4 0.6 0.8 1.01"}
 RUN=$(basename $(dirname $CKPT))   # ckpt/<run>/final -> <run>; results are also kept under runs/play/<run>_<game>_handover<tau>.json
 for tau in $TAUS; do

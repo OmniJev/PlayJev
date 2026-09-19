@@ -1,7 +1,7 @@
 # PlayJev game roster (decided 2026-09-18)
 
 Ten browser games, all plain HTML5/JS, cloned shallow into `games/js/`. Picked for: colourful
-rendering (owner: 黑白线条的不要), discrete action sets, a numeric score, and a permissive licence.
+rendering (no black-and-white line art), discrete action sets, a numeric score, and a permissive licence.
 Screenshots reviewed in headless Chromium before selection.
 
 | # | Game | Repo | Licence | Entry file | Actions (Choice options) |
