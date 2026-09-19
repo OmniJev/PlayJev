@@ -6,6 +6,7 @@ runs/
 /tmp/
 .scratch/
 
-# site-specific, never committed (see hpc/site.env.example)
+# site-specific and internal: kept locally, never pushed
 site.env
+hpc/
 docs/HANDOVER.md
