@@ -107,6 +107,11 @@ downloads on the login node with `HF_HUB_DISABLE_XET=1`. Chromium headless shell
 installed at `$PLAYWRIGHT_BROWSERS_PATH` (Playwright 1.63, works on the login node;
 verify once inside a compute job).
 
+Cluster-specific paths and the PBS project code are not in the repo. Each machine keeps them
+in `$WORK/site.env` (one level above the repo, gitignored; copy `hpc/site.env.example`), which
+every `hpc/*.pbs` sources and `hpc/q.sh` passes to `qsub` as `-P` and `-o`. Submit with
+`cd $WORK && bash repo/hpc/q.sh [-v ...] repo/hpc/<job>.pbs`.
+
 ## 7. Demo
 
 GitHub Pages on the PlayJev repo. Ten game tiles, each with the live canvas and a bar per
