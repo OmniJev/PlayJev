@@ -161,15 +161,37 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .seg button.on + button { border-left-color: var(--btn-on); }
 
 /* ---------------------------------------------------------------- lead */
-.lead { display: grid; grid-template-columns: minmax(330px, 430px) minmax(0, 1fr); gap: 44px; align-items: start; }
-@media (max-width: 1040px) { .lead { grid-template-columns: minmax(0, 1fr); gap: 26px; } }
-.lead-copy p { font-size: 16.5px; }
-.lead-copy .quiet { margin-top: 16px; }
+/* the project-page header: title, the link buttons, then the board itself */
+.lead { padding-top: 34px; }
+.pagetitle {
+  text-align: center; max-width: 30ch; margin: 0 auto 26px;
+  font-size: clamp(31px, 4.1vw, 52px); line-height: 1.1;
+}
+.hero-buttons { display: flex; justify-content: center; gap: 13px; flex-wrap: wrap; margin: 0 0 30px; }
+.hero-buttons .btn {
+  display: inline-flex; align-items: center; gap: 9px; padding: 11px 23px; border-radius: 10px;
+  font-weight: 600; font-size: 15.5px; color: #fff; border: 0; letter-spacing: -0.01em;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.hero-buttons a.btn:hover { text-decoration: none; transform: translateY(-2px); filter: saturate(1.06); box-shadow: 0 8px 20px rgba(16, 26, 48, .22); }
+.hero-buttons .btn svg { flex: none; }
+.hero-buttons .tagx { font-style: normal; font-size: 11.5px; font-weight: 600; opacity: .78; letter-spacing: .01em; }
+.hero-buttons .soon { background: var(--muted); opacity: .62; cursor: default; }
+.btn-paper { background: #e0424f; }
+.btn-code { background: #2b3446; }
+.btn-model { background: #d68910; }
+.btn-jev { background: var(--accent); }
+.btn-list { background: #6d5ce7; }
+.lead-stage { max-width: 1080px; margin: 0 auto; }
 .stage-note { margin-top: 12px; max-width: 70ch; }
 
-.picker { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.picker button { border-radius: 999px; padding: 4px 12px; font-size: 13px; }
-.picker button.on { font-weight: 600; }
+.tabs { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+.tabs button {
+  background: none; border: 0; border-bottom: 2px solid transparent; border-radius: 9px 9px 0 0;
+  padding: 9px 16px 8px; font-size: 14.5px; font-weight: 550; color: var(--muted); margin-bottom: -1px;
+}
+.tabs button:hover { background: var(--sunk); color: var(--fg); }
+.tabs button.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 660; background: none; }
 
 /* ---------------------------------------------------------------- tiles */
 .tile {
@@ -247,7 +269,7 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .tile.hero { padding: 14px; gap: 10px 16px; }
 @media (min-width: 720px) {
   .tile.hero {
-    display: grid; grid-template-columns: minmax(0, 1fr) 244px;
+    display: grid; grid-template-columns: minmax(0, 1fr) 272px;
     grid-template-areas: "board head" "board bars" "board conf" "board trace" "board foot";
     /* the trace takes whatever room the readout has left, so the column has no hole in it */
     grid-template-rows: auto auto auto 1fr auto;
@@ -260,7 +282,7 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
   .tile.hero .foot { grid-area: foot; align-content: start; margin-top: 0; }
 }
 /* --ar is the game's own width / height, set in fit(); a free board is exactly that shape, never letterboxed */
-.tile.hero { --cap-h: clamp(290px, 45vh, 440px); }
+.tile.hero { --cap-h: clamp(320px, 60vh, 600px); }
 .tile.hero .board, .duel .board { width: min(100%, calc(var(--cap-h) * var(--ar, 1))); margin-inline: auto; }
 .tile.hero .view, .duel .view { width: 100%; height: auto; aspect-ratio: var(--ar, 1); }
 .tile.hero .bars { font-size: 13.5px; row-gap: 6px; }
@@ -412,27 +434,6 @@ footer {
   .bars .row .bar i { transition: none; }
 }
 
-/* ---------------------------------------------------------------- lead: chips and the link block */
-.lead-copy .lead-line { font-size: 17.5px; line-height: 1.62; color: var(--fg-2); max-width: 46ch; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 20px 0 20px; }
-.chips li {
-  display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 12px; border-radius: 999px;
-  background: var(--card); border: 1px solid var(--line); font-size: 13.5px; color: var(--muted);
-  box-shadow: var(--shadow);
-}
-.chips li b { font-size: 15px; font-weight: 680; color: var(--fg); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-.chips li:first-child b, .chips li:nth-child(3) b { color: var(--accent); }
-
-.links { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 6px; }
-.links a, .links .soon {
-  display: inline-flex; align-items: baseline; gap: 7px; padding: 7px 12px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--card); color: var(--fg); font-size: 14px; font-weight: 600;
-  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
-}
-.links a em, .links .soon em { font-style: normal; font-size: 12.5px; font-weight: 500; color: var(--muted); }
-.links a:hover { text-decoration: none; transform: translateY(-1px); border-color: var(--accent); box-shadow: var(--shadow-lift); }
-.links .soon { color: var(--muted); font-weight: 500; border-style: dashed; }
-
 /* ---------------------------------------------------------------- the play deck (name, score, then these) */
 .tile .deck { display: none; }
 .tile.hero .deck, .grid.solo .tile.active .deck {
@@ -467,7 +468,6 @@ footer {
 
 /* ---------------------------------------------------------------- polish */
 .tile:not(.hero):hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
-.picker button.on { background: var(--btn-on); color: var(--btn-on-fg); border-color: var(--btn-on); }
 .top { background: color-mix(in srgb, var(--bg) 82%, transparent); }
 h2 { position: relative; }
 h1 b, h2 b { color: var(--accent); }

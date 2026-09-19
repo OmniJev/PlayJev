@@ -51,12 +51,8 @@ window.PJ_I18N = {
 
     'nav.gallery': '游戏墙', 'nav.results': '结果', 'nav.confidence': '置信度', 'nav.how': '原理',
 
-    'lead.h1': '一个开源 0.8B 模型，只看画面就能玩十款浏览器游戏。',
-    'lead.p': '一帧进去，一次前向，一个动作出来，单卡 43 毫秒。模型看到的只有画面，拿不到游戏内部状态，也从来不知道自己在玩哪一款。',
-    'chip.params': '参数', 'chip.games': '款游戏', 'chip.move': '每步耗时',
-    'chip.frames': '训练帧', 'chip.teacher': '相对老师',
-    'link.code': '代码', 'link.weights': '权重', 'link.server': 'System One 服务',
-    'link.reading': '论文清单', 'link.paper': '论文', 'link.soon': '即将发布',
+    'lead.h1': 'PlayJev：会玩小游戏的多模态 JEV 模型',
+    'btn.paper': '论文', 'btn.code': '代码', 'btn.model': '模型', 'link.soon': '即将发布',
 
     'gallery.h2': '游戏墙',
     'gallery.p': '十款游戏，一套权重，十套不同的可选动作。',

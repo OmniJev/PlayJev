@@ -955,7 +955,9 @@
     for (const node of document.querySelectorAll('[data-soon]')) {
       const url = D.links && D.links[node.dataset.soon]; if (!url) continue;
       const a = el('a'); a.href = url; a.innerHTML = node.innerHTML;
+      a.className = node.className.replace(/\bsoon\b/, '').trim();
       const tag = a.querySelector('em'); if (tag && node.dataset.soonLabel) tag.textContent = node.dataset.soonLabel;
+      const note = a.querySelector('.tagx'); if (note) note.remove();
       node.replaceWith(a);
     }
   }

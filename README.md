@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/board.gif" alt="Ten browser games, each one being played by PlayJev, with the score it had reached">
+  <img src="docs/assets/board.webp" alt="Ten browser games, each one being played by PlayJev, with the score it had reached">
 </p>
 
 <h1 align="center">PlayJev: A Multimodal JEV-Like Model for Small Games</h1>

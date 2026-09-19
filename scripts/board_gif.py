@@ -226,6 +226,13 @@ def main(a):
           f"{1000 / dur:.1f} fps ({dur} ms), {used} colours, loop forever, {mb:.2f} MB")
     if mb >= 5:
         print("over the 5 MB budget: lower --colors, --frames or --width")
+    # The same animation as WebP, which GitHub renders in the README and which carries the full colour of the
+    # frames at about half the bytes. The GIF stays for the places that still want one.
+    if a.webp:
+        w = out.with_suffix(".webp")
+        boards[0].save(w, format="WEBP", save_all=True, append_images=boards[1:], duration=dur, loop=0,
+                       quality=a.quality, method=6, minimize_size=True)
+        print(f"{w}: same frames, quality {a.quality}, {w.stat().st_size / 1e6:.2f} MB")
 
 
 if __name__ == "__main__":
@@ -239,4 +246,7 @@ if __name__ == "__main__":
     p.add_argument("--out", default="board.gif")
     p.add_argument("--cache", default=str(CACHE), help="where the replayed tiles are kept")
     p.add_argument("--reuse", action="store_true", help="recompose from the cache, skip the browser")
+    p.add_argument("--webp", action="store_true", default=True, help="also write the animation as WebP")
+    p.add_argument("--no-webp", dest="webp", action="store_false")
+    p.add_argument("--quality", type=int, default=82, help="WebP quality")
     main(p.parse_args())

@@ -78,20 +78,27 @@ def board(cell=(384, 288), strip=38, gut=8, cols=5):
     return canvas.size
 
 
-def thumbs(size=(220, 150)):
-    """Small letterboxed shots for the roster table."""
+# where the crop sits on a frame taller than the thumbnail: 0 keeps the top, 1 the bottom
+THUMB_Y = {"tetris": .82, "flappy": .16, "pacman": .54, "snake": .5}
+# a tighter crop for the roster thumbnail alone, where the board is a small part of the page
+THUMB_CROP = {"2048": (.02, .27, .98, .89)}
+
+
+def thumbs(size=(240, 180)):
+    """Roster thumbnails, filled edge to edge. The frame is scaled until its short side covers the box and
+    the long side is cropped, so a tall game is zoomed into instead of sitting between two black bars."""
     out = OUT / "thumbs"
     out.mkdir(exist_ok=True)
     tw, th = size
     for gid, *_ in GAMES:
         src = Image.open(SHOTS / f"{gid}.png").convert("RGB")
-        l, t, r, b = CROP.get(gid, (0, 0, 1, 1))
+        l, t, r, b = THUMB_CROP.get(gid) or CROP.get(gid, (0, 0, 1, 1))
         src = src.crop((int(src.width * l), int(src.height * t), int(src.width * r), int(src.height * b)))
-        bg = edge_colour(src)
-        src.thumbnail(size, Image.LANCZOS)
-        tile = Image.new("RGB", (tw, th), bg)
-        tile.paste(src, ((tw - src.width) // 2, (th - src.height) // 2))
-        tile.save(out / f"{gid}.png", optimize=True)
+        k = max(tw / src.width, th / src.height)
+        src = src.resize((max(tw, round(src.width * k)), max(th, round(src.height * k))), Image.LANCZOS)
+        x = round((src.width - tw) * .5)
+        y = round((src.height - th) * THUMB_Y.get(gid, .5))
+        src.crop((x, y, x + tw, y + th)).save(out / f"{gid}.png", optimize=True)
     return len(GAMES), size
 
 
