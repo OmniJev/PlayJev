@@ -10,3 +10,6 @@ runs/
 site.env
 hpc/
 docs/HANDOVER.md
+docs/AGENT_BRIEF.md
+docs/TEACHER_BRIEF.md
+docs/agent_tasks/
