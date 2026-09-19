@@ -2,7 +2,7 @@
   <img src="docs/assets/board.gif" alt="Ten browser games, each one being played by PlayJev, with the score it had reached">
 </p>
 
-<h1 align="center">PlayJev: An Open-Source JEV-Like Model That Plays Small Games</h1>
+<h1 align="center">PlayJev: A Multimodal JEV-Like Model for Small Games</h1>
 
 <p align="center">
   <a href="https://omnijev.github.io/PlayJev/"><img alt="live demo" src="https://img.shields.io/badge/live%20demo-show%20it-eda100?style=flat-square&labelColor=16181c"></a>
@@ -27,22 +27,17 @@ each a frame from a recorded held-out episode with the score it had reached by t
 
 ## 🎮 The Ten Games
 
-Plain HTML5/JS, one hook each (`window.pj`: `start(seed)`, `step(action)`, `frame()`, `score()`, `done()`,
-`actions`), and the same page is both training environment and demo tile. Every name below opens that game's
-board on the demo, with the model playing and the bars showing what it gave each move.
+Plain HTML5/JS with one hook each (`window.pj`: `start(seed)`, `step(action)`, `frame()`, `score()`, `done()`,
+`actions`), and the same page is both training environment and demo tile. Every name opens that game's board on
+the demo, with the model playing.
 
-|   | Game | Moves |
-|---|---|---:|
-| [<img src="docs/assets/thumbs/tetris.png" width="140">][tetris] | [Tetris][tetris] | 5 |
-| [<img src="docs/assets/thumbs/snake.png" width="140">][snake] | [Snake][snake] | 4 |
-| [<img src="docs/assets/thumbs/pacman.png" width="140">][pacman] | [Pacman][pacman] | 4 |
-| [<img src="docs/assets/thumbs/racer.png" width="140">][racer] | [Javascript Racer][racer] | 6 |
-| [<img src="docs/assets/thumbs/invaders.png" width="140">][invaders] | [Space Invaders][invaders] | 3 |
-| [<img src="docs/assets/thumbs/sokoban.png" width="140">][sokoban] | [Sokoban][sokoban] | 4 |
-| [<img src="docs/assets/thumbs/mario.png" width="140">][mario] | [Infinite Mario][mario] | 7 |
-| [<img src="docs/assets/thumbs/flappy.png" width="140">][flappy] | [Floppy Bird][flappy] | 2 |
-| [<img src="docs/assets/thumbs/breakout.png" width="140">][breakout] | [Breakout][breakout] | 3 |
-| [<img src="docs/assets/thumbs/2048.png" width="140">][2048] | [2048][2048] | 4 |
+|   | Game | Moves |   | Game | Moves |
+|---|---|---:|---|---|---:|
+| [<img src="docs/assets/thumbs/tetris.png" width="180">][tetris] | [Tetris][tetris] | 5 | [<img src="docs/assets/thumbs/snake.png" width="180">][snake] | [Snake][snake] | 4 |
+| [<img src="docs/assets/thumbs/pacman.png" width="180">][pacman] | [Pacman][pacman] | 4 | [<img src="docs/assets/thumbs/racer.png" width="180">][racer] | [Javascript Racer][racer] | 6 |
+| [<img src="docs/assets/thumbs/invaders.png" width="180">][invaders] | [Space Invaders][invaders] | 3 | [<img src="docs/assets/thumbs/sokoban.png" width="180">][sokoban] | [Sokoban][sokoban] | 4 |
+| [<img src="docs/assets/thumbs/mario.png" width="180">][mario] | [Infinite Mario][mario] | 7 | [<img src="docs/assets/thumbs/flappy.png" width="180">][flappy] | [Floppy Bird][flappy] | 2 |
+| [<img src="docs/assets/thumbs/breakout.png" width="180">][breakout] | [Breakout][breakout] | 3 | [<img src="docs/assets/thumbs/2048.png" width="180">][2048] | [2048][2048] | 4 |
 
 ## 🔍 Why Pixels
 
@@ -90,22 +85,18 @@ program that plays on the game's internal state, which the model never sees; **v
 | 2048 | 1021 | **3386** | 19593 | 0.13 |
 | **mean** | | | | **0.53** |
 
-- Zero-shot, the base model puts 0.7 on option A whatever the frame. One epoch of cloning puts all ten games
-  above random.
-- Version 1 closes the games whose only problem was covariate shift: Sokoban, Racer and Snake reach the
-  teacher, Pacman triples.
-- Version 2 takes the harder ones: Tetris 3x, Mario and Breakout 2x each.
-- What is still open: motion from a single frame (Breakout, Mario), single-step precision (Floppy Bird,
-  Tetris), and reading tile digits at 448 px (2048).
-- Snake drops in version 2, 107.9 to 89.5, the one column that goes backwards, and both agreement metrics
-  miss it. Only the closed loop sees it.
+Zero-shot the base model puts 0.7 on option A whatever the frame; three games end up at their teacher and the
+mean at 0.53. Three things are still open: motion from a single frame (Breakout, Mario), single-step precision
+(Floppy Bird, Tetris), and reading tile digits at 448 px (2048). Snake is the one column that goes backwards,
+and only the closed loop sees it.
 
 <details>
 <summary>📋 &nbsp;Every version, every game</summary>
 
 `cloning` is one epoch of behaviour cloning on 863k teacher-labelled frames. `version 1` and `version 2` are
-two DAgger rounds on top of it: the current model plays 40k frames per game, the teachers label every frame
-it visited, and the model trains one more epoch on those plus the earlier shards.
+two DAgger rounds on top of it: the current model plays 40k frames per game, the teachers label every frame it
+visited, and the model trains one more epoch on those plus the earlier shards. 4 h 11 min, 3 h 10 min and
+4 h 20 min on one H200.
 
 | Game | Random | Cloning | Version 1 | Version 2 | Teacher |
 |---|---:|---:|---:|---:|---:|
@@ -120,8 +111,6 @@ it visited, and the model trains one more epoch on those plus the earlier shards
 | Breakout | 496 | 611 | 1552 | 2712 | 16547 |
 | 2048 | 1021 | 3174 | 2170 | 3386 | 19593 |
 | **mean vs teacher** | | **0.37** | **0.49** | **0.53** | |
-
-Training cost: 4 h 11 min, 3 h 10 min and 4 h 20 min on one H200.
 </details>
 
 <details>
@@ -134,68 +123,77 @@ Training cost: 4 h 11 min, 3 h 10 min and 4 h 20 min on one H200.
 | Single-step precision | Floppy Bird, Tetris | Flappy matches the teacher on 99.8 percent of frames and dies at 9 pipes on the one it misses, Tetris drops a move early | a few hundred such moments in 40k frames, so round 1 barely moves them, round 2 triples Tetris and lifts Flappy to 0.16 |
 | Reading tile digits at 448 px | 2048 | 0.48 agreement either way, and the model knows it: confidence 0.25 | still open |
 
-**Snake goes backwards in round 2**, 107.9 to 89.5, and it is real: lower on 12 of the 14 held-out seeds the two
-rounds share, paired difference -17.4 (sd 22.5), sign-flip permutation p = 0.0073. Episodes shorten with the
-score, 455 steps to 348, which is what a snake regression looks like. Both agreement instruments miss it:
-validation is flat (.780 to .775) and on-policy agreement, the recorded episodes replayed through the real game
-with the teacher watching, *rises* more than for any other game (.722 to .824). Agreement averages over the
-frames the model visits and those frames changed, 7275 steps to 5568 over the same 16 episodes, so the mean
-shifts to the easy early game where a three-segment snake can hardly be wrong. In a fatal-on-mistake game,
-agreement can move against the score.
+**Snake goes backwards in round 2** and it is real: lower on 12 of the 14 held-out seeds the two rounds share,
+paired difference -17.4 (sd 22.5), sign-flip permutation p = 0.0073. Both agreement instruments miss it, because
+agreement averages over the frames the model visits and those frames changed: the mean shifts to the easy early
+game where a three-segment snake can hardly be wrong. In a fatal-on-mistake game, agreement moves against the
+score.
 
-**The second frame has to stay a second image.** Merged into the vision tower's temporal patch it adds nothing
-outside Breakout. Passed as its own image, which the model can compare by attention, Breakout gains validation
-agreement at every eval point (+.096, the largest effect in the ablation) while Mario and Racer lose at every
-point. Those two are the only games whose camera translates: their frame difference is the global shift of the
-scene, which has to be discounted before any local motion means anything, and the patch convolution mixes that
-shift into every embedding. For a fixed camera the frame difference *is* the object that moved.
+| Snake, round 1 to round 2 | | |
+|---|---:|---|
+| score | 107.9 → 89.5 | the closed loop, held-out seeds |
+| validation agreement | .780 → .775 | flat |
+| on-policy agreement | .722 → .824 | rises more than in any other game |
+| steps per episode | 455 → 348 | fewer frames, and easier ones |
 
-**One game in the mix must have no text shortcut.** An eight-game mix with Snake and Racer held out failed on
-two seeds: five games never left the letter prior, three converged to the most common move for their option
-list, and the image pathway went unused. With Snake back (Racer and Pacman held out instead) every game reads
-the frame by step 1500. Snake's label is a BFS arrow, uniform over the four moves, decided by the board alone.
+Two ablations decided the recipe. Mario and Racer are the only games whose camera translates, so their frame
+difference is a global shift that the patch convolution mixes into every embedding, while for a fixed camera
+the frame difference *is* the object that moved. Snake's label is a BFS arrow, uniform over the four moves and
+decided by the board alone, so no option list predicts it and the image pathway has to be used.
+
+| Ablation | What happened |
+|---|---|
+| second frame merged into the vision tower's temporal patch | nothing outside Breakout |
+| second frame passed as its own image | Breakout +.096 validation agreement at every eval point, the largest effect in the ablation, Mario and Racer lose at every point |
+| eight-game mix with Snake and Racer held out | two seeds collapse: five games never leave the letter prior, three take the most common move for their option list, the image pathway goes unused |
+| same mix with Snake back in | every game reads the frame by step 1500 |
 </details>
 
 <details>
 <summary>👁️ &nbsp;Does it read the move descriptions?</summary>
 
-On 400 validation frames per game, prompt otherwise unchanged (`scripts/probe_options.py`):
+Both halves of an option are read, and a fixed classification head could not be moved by editing a sentence.
+400 validation frames per game, prompt otherwise unchanged (`scripts/probe_options.py`).
 
-- shuffling the moves changes nothing (training permutes them every sample);
-- replacing the names by neutral words (alpha, bravo, ...) and keeping the descriptions loses 0 to 2 points
-  in six games, 7 in Tetris, 8 in Racer, 13 in Invaders;
-- keeping only the names loses nothing, even in Snake, 2048, Pacman and Sokoban, whose names are the same
-  four words: which "up" it is comes from the frame;
-- rotating the descriptions one move along while the names stay: the decision follows the description in
-  Flappy (84 percent), Sokoban (67) and Racer (47), the name in Breakout (95), Mario (82) and Pacman (80),
-  and splits in Snake and Tetris. Both halves are read, and a fixed classification head cannot be moved by
-  editing a sentence;
-- an extra fake move ("hold: keep the current move and do nothing new") gets 2 to 9 percent of the mass in
-  seven games and 13 to 18 in the three the model is least sure about (2048, Invaders, Breakout).
+| Edit to the option list | What the model does |
+|---|---|
+| shuffle the moves | nothing, training permutes them in every sample |
+| neutral names (alpha, bravo, ...), descriptions kept | loses 0 to 2 points in six games, 7 in Tetris, 8 in Racer, 13 in Invaders |
+| names only, descriptions dropped | loses nothing, even in Snake, 2048, Pacman and Sokoban, whose names are the same four words: which "up" it is comes from the frame |
+| descriptions rotated one move along, names left in place | follows the description in Flappy (84%), Sokoban (67) and Racer (47), the name in Breakout (95), Mario (82) and Pacman (80), splits in Snake and Tetris |
+| an extra fake move, "hold: keep the current move and do nothing new" | takes 2 to 9% of the mass in seven games, 13 to 18% in the three it is least sure about (2048, Invaders, Breakout) |
 
-The same probes on a model that never learned to look (the eight-game run above) come out the opposite way:
-when names and descriptions conflict it follows the name 100 percent of the time in every game, neutral names
-collapse it to chance in Flappy and Breakout, and its agreement is at chance wherever a name alone does not
-give the move away.
+The same probes on a model that never learned to look (the eight-game run above) come out the opposite way: it
+follows the name 100 percent of the time wherever the two conflict, neutral names collapse it to chance in
+Flappy and Breakout, and its agreement is at chance wherever a name alone does not give the move away.
 </details>
 
 <details>
 <summary>⚙️ &nbsp;The execution rule and the real-time setting</summary>
 
 **Execution rule.** A move that leaves the observation unchanged (a blocked direction in 2048 or Sokoban is a
-legal no-op) is not repeated on that observation; the next most probable move goes instead. Without it a
+legal no-op) is not repeated on that observation, and the next most probable move goes instead. Without it a
 deterministic policy loops to the step cap and 2048 scores 54. It never fires where the frame changes every
 step, and those numbers are identical with and without it.
 
-**Latency.** One step late (frame k decides step k+1, which is real time at 83 to 100 ms per step) collapses the
-reflex games: Snake 78 to 11, Tetris 1034 to 248, Breakout 611 to 394, Flappy 8.9 to 0.2, Pacman 1036 to 502,
-Sokoban 58 to 6.6, while Invaders and Racer barely move. Training on shifted labels (`--label-delay 1`) buys
-part of it back where the next decision follows from the current frame (Snake to 20, Tetris to 306, Breakout to
-636, Flappy to 2.3, 2048 2191 to 3195) and costs where it depends on what the current move does to the board
-(Mario 820 to 242, standing still to the cap in half the episodes; Pacman 502 to 236; Racer 5885 to 5116;
-Sokoban at random level either way). So the shift has to be per game, and even where it helps the real-time
-score stays a fraction of the undelayed one. Latency has to be attacked in the model too, which is what the
-second frame is for.
+**Latency.** One step late, frame k deciding step k+1, is what real time costs at 83 to 100 ms per step, and it
+takes the reflex games apart. Training on shifted labels buys part of it back where the next decision follows
+from the current frame and costs where the next decision depends on what the current move does to the board, so
+the shift has to be per game. Even where it helps, the real-time score stays a fraction of the undelayed one,
+which is what the second frame is for.
+
+| Cloning model | On time | One step late | Late, `--label-delay 1` |
+|---|---:|---:|---:|
+| Floppy Bird | 8.9 | 0.2 | **2.3** |
+| Sokoban | 57.9 | 6.6 | 6.4 |
+| Snake | 77.8 | 11.4 | **19.6** |
+| Tetris | 1034 | 248 | **306** |
+| Pacman | 1036 | 502 | 236 |
+| Breakout | 611 | 394 | **636** |
+| 2048 | 3174 | 2191 | **3195** |
+| Infinite Mario | 1156 | 820 | 242 |
+| Racer | 6211 | 5885 | 5116 |
+| Space Invaders | 400 | 400 | 400 |
 </details>
 
 <details>
@@ -205,7 +203,7 @@ Low-confidence steps are where the errors are: on its own play Tetris agrees wit
 the steps below confidence 0.5 against 61 overall, Invaders 41 against 97 above 0.9, Racer 34 against 97,
 Sokoban 3 against 94. The operational test is a System Two behind the model: below a confidence threshold the
 decision goes to the teacher (`playjev.play --handover`), and the control hands the same share over at random
-(`--handover-random`). Cloning model, 16 episodes per setting:
+(`--handover-random`). Cloning model, 16 episodes per setting.
 
 | Game | Alone | Handed over | By confidence | At random | Teacher |
 |---|---:|---:|---:|---:|---:|
@@ -224,27 +222,20 @@ decision goes to the teacher (`playjev.play --handover`), and the control hands 
 | Racer | 6214 | 11% | **6634** | | 6712 |
 | | | 39% | **6712** | | |
 
-Handing over a third of Breakout's steps by confidence reaches the teacher's level, and the same share at
-random gets a third of the way. The confidence picks the steps that matter, which is what a System One is
-for: it knows which decisions to keep and which to pass on. Sokoban is the exception (34 percent handed over,
-58 to 71): its failures are boards the model has already deadlocked, and no later decision repairs them.
+A third of Breakout's steps handed over by confidence reaches the teacher's level, the same share at random
+gets a third of the way: the confidence picks the steps that matter, which is what a System One is for.
+Sokoban is the exception (34 percent handed over, 58 to 71): its failures are boards the model has already
+deadlocked, and no later decision repairs them.
 </details>
 
 ## 🏋️ Training Recipe
 
-1. **Teachers.** One program per game plays on the game's internal state: BFS for Snake, expectimax for 2048,
-   Dellacherie placement search for Tetris, A* with deadlock pruning for Sokoban, exact physics search for
-   Floppy Bird, ghost-occupancy propagation for Pacman, ball-flight simulation for Breakout, a dodge-and-aim
-   DP for Space Invaders, lookahead steering for the Racer, physics rollouts for Mario. Each returns a soft
-   target: 0.9 on the best move (split on ties), 0.1 over acceptable moves, 0 on moves that lose.
-2. **Collection.** Teachers play with 2 to 30 percent random moves so the data covers recoveries, and the
-   label is always the teacher's own judgement of the frame. 100k frames per game, 448 px JPEGs, three shards
-   per game collected in parallel on the CPU cores next to the GPU.
-3. **Fine-tuning.** Full fine-tuning of the 0.8B model against the teacher distribution, one epoch over the
-   ten games mixed, batch 64, learning rate 2e-5, fp32 master weights with bf16 autocast.
-4. **Closed loop.** The trained model plays 16 held-out episodes per game through the same harness, against
-   random play and the teacher on the same seeds. Validation also reports agreement, calibration error, and
-   per-position bias.
+| Stage | What it is |
+|---|---|
+| **Teachers** | One program per game, playing on the game's internal state: BFS for Snake, expectimax for 2048, Dellacherie placement search for Tetris, A* with deadlock pruning for Sokoban, exact physics search for Floppy Bird, ghost-occupancy propagation for Pacman, ball-flight simulation for Breakout, a dodge-and-aim DP for Space Invaders, lookahead steering for the Racer, physics rollouts for Mario. Each returns a soft target: 0.9 on the best move, split on ties, 0.1 over acceptable moves, 0 on moves that lose. |
+| **Collection** | Teachers play with 2 to 30 percent random moves so the data covers recoveries, and the label is always the teacher's own judgement of the frame. 100k frames per game, 448 px JPEGs, three shards per game collected in parallel on the CPU cores next to the GPU. |
+| **Fine-tuning** | Full fine-tuning of the 0.8B model against the teacher distribution, one epoch over the ten games mixed, batch 64, learning rate 2e-5, fp32 master weights with bf16 autocast. |
+| **Closed loop** | 16 held-out episodes per game through the same harness, against random play and the teacher on the same seeds. Validation also reports agreement, calibration error and per-position bias. |
 
 Curves and every number: [docs/TRAIN_NOTES.md](docs/TRAIN_NOTES.md), [docs/MODEL_NOTES.md](docs/MODEL_NOTES.md),
 [docs/BASELINES.md](docs/BASELINES.md).
