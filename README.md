@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://omnijev.github.io/PlayJev/"><img alt="live demo" src="https://img.shields.io/badge/live%20demo-show%20it-eda100?style=flat-square&labelColor=16181c"></a>
-  <a href="https://huggingface.co/Qwen/Qwen3.5-0.8B-Base"><img alt="model" src="https://img.shields.io/badge/model-Qwen3.5--0.8B-2a78d6?style=flat-square&logo=huggingface&logoColor=white&labelColor=16181c"></a>
+  <a href="https://huggingface.co/OmniJev/PlayJev-0.8B"><img alt="model" src="https://img.shields.io/badge/model-PlayJev--0.8B-2a78d6?style=flat-square&logo=huggingface&logoColor=white&labelColor=16181c"></a>
   <a href="#-the-ten-games"><img alt="ten games" src="https://img.shields.io/badge/games-10-1baf7a?style=flat-square&labelColor=16181c"></a>
   <a href="#-how-a-decision-is-made"><img alt="43 ms per move" src="https://img.shields.io/badge/per%20move-43%20ms-eb6834?style=flat-square&labelColor=16181c"></a>
 </p>
@@ -23,7 +23,8 @@
 
 PlayJev is Qwen3.5-0.8B-Base fine-tuned to play ten classic browser games from raw pixels. One frame goes in,
 one forward pass runs, one move comes out, 43 ms on an H200. Every picture above is the trained model playing,
-each a frame from a recorded held-out episode with the score it had reached by then.
+each a frame from a recorded held-out episode with the score it had reached by then. The weights are on
+[Hugging Face](https://huggingface.co/OmniJev/PlayJev-0.8B).
 
 ## 🎮 The Ten Games
 
@@ -256,6 +257,7 @@ python -m playjev.teacher_eval snake --episodes 16         # the teacher's score
 python -m playjev.collect snake --steps 4000 --shard s0    # (frame, teacher target) pairs under data/snake/s0
 python -m playjev.train_sft --games snake --model Qwen/Qwen3.5-0.8B-Base --out ckpt/snake1
 python -m playjev.play snake --policy local --ckpt ckpt/snake1/final --record runs/replays
+python -m playjev.play snake --policy local --ckpt OmniJev/PlayJev-0.8B          # the released weights
 ```
 
 `--policy teacher` and `--policy random` give the two reference rows, `--delay 1` applies each decision one

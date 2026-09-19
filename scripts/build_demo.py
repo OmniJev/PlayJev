@@ -83,7 +83,7 @@ LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 # The page reads these. An empty string means "not published yet": the lead shows the name with "soon" next to it
 # and nothing links anywhere, and the moment a URL is filled in here the placeholder becomes a live link.
 LINKS = {"repo": "https://github.com/OmniJev/PlayJev", "openjev": "https://github.com/OmniJev/openJev",
-         "awesome": "https://omnijev.github.io/awesome-jev/", "hf": "", "paper": ""}
+         "awesome": "https://omnijev.github.io/awesome-jev/", "hf": "https://huggingface.co/OmniJev/PlayJev-0.8B", "paper": ""}
 
 
 def log(msg: str) -> None:
@@ -458,7 +458,8 @@ def main() -> None:
     ap.add_argument("--results", default=str(ROOT / "runs" / "results"), help="model results directory")
     ap.add_argument("--games", default=",".join(ORDER), help="comma-separated game ids")
     ap.add_argument("--exclude-policies", default=r"-(delay\d+|sampled|plain)$", help="regex; recordings whose policy name matches stay out of the page")
-    ap.add_argument("--model-policy", default=None, help="policy name for the table's trained-model column and the default recording (default: first playjev row found)")
+    ap.add_argument("--model-policy", default="playjev-0.8b-dagger2",
+                    help="policy name for the table's trained-model column and the default recording")
     ap.add_argument("--out", default=str(DEMO), help="demo directory (default demo/)")
     a = ap.parse_args()
     out = Path(a.out)
