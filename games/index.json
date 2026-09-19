@@ -1,92 +1,6 @@
 {
  "games": [
   {
-   "id": "mario",
-   "title": "Infinite Mario",
-   "upstream": "robertkleffner/mariohtml5",
-   "license": "Unlicense",
-   "entry": "games/mario/main.html",
-   "viewport": {
-    "width": 660,
-    "height": 520
-   },
-   "view": "#canvas",
-   "hide": null,
-   "step_frames": 6,
-   "step_ms": 100.0,
-   "max_steps": null,
-   "actions": [
-    {
-     "name": "noop",
-     "description": "do nothing for a moment"
-    },
-    {
-     "name": "left",
-     "description": "walk to the left"
-    },
-    {
-     "name": "right",
-     "description": "walk to the right"
-    },
-    {
-     "name": "jump",
-     "description": "jump up"
-    },
-    {
-     "name": "right jump",
-     "description": "jump while moving to the right"
-    },
-    {
-     "name": "right run",
-     "description": "run to the right at full speed"
-    },
-    {
-     "name": "right run jump",
-     "description": "run to the right at full speed and jump"
-    }
-   ],
-   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. noop: do nothing for a moment\nB. left: walk to the left\nC. right: walk to the right\nD. jump: jump up\nE. right jump: jump while moving to the right\nF. right run: run to the right at full speed\nG. right run jump: run to the right at full speed and jump\n\nAnswer with one letter: A, B, C, D, E, F, G.\nAnswer:",
-   "externals_removed": 1,
-   "modules": false
-  },
-  {
-   "id": "snake",
-   "title": "Snake",
-   "upstream": "patorjk/JavaScript-Snake",
-   "license": "MIT",
-   "entry": "games/snake/src/index.html",
-   "viewport": {
-    "width": 520,
-    "height": 520
-   },
-   "view": ".snake-playing-field",
-   "hide": ".snake-toolbar,.snake-gamepad{display:none!important}",
-   "step_frames": 1,
-   "step_ms": 150.0,
-   "max_steps": 3000,
-   "actions": [
-    {
-     "name": "up",
-     "description": "turn the snake to move up"
-    },
-    {
-     "name": "down",
-     "description": "turn the snake to move down"
-    },
-    {
-     "name": "left",
-     "description": "turn the snake to move left"
-    },
-    {
-     "name": "right",
-     "description": "turn the snake to move right"
-    }
-   ],
-   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. up: turn the snake to move up\nB. down: turn the snake to move down\nC. left: turn the snake to move left\nD. right: turn the snake to move right\n\nAnswer with one letter: A, B, C, D.\nAnswer:",
-   "externals_removed": 1,
-   "modules": false
-  },
-  {
    "id": "tetris",
    "title": "Tetris",
    "upstream": "jakesgordon/javascript-tetris",
@@ -128,69 +42,40 @@
    "modules": false
   },
   {
-   "id": "2048",
-   "title": "2048",
-   "upstream": "gabrielecirulli/2048",
+   "id": "snake",
+   "title": "Snake",
+   "upstream": "patorjk/JavaScript-Snake",
    "license": "MIT",
-   "entry": "games/2048/index.html",
+   "entry": "games/snake/src/index.html",
    "viewport": {
-    "width": 700,
-    "height": 900
+    "width": 520,
+    "height": 520
    },
-   "view": ".game-container",
-   "hide": null,
+   "view": ".snake-playing-field",
+   "hide": ".snake-toolbar,.snake-gamepad{display:none!important}#snake-snakehead-alive{background-image:none!important;background-color:#ffffff!important;border-radius:3px!important}",
    "step_frames": 1,
    "step_ms": 150.0,
-   "max_steps": 2500,
+   "max_steps": 3000,
    "actions": [
     {
      "name": "up",
-     "description": "slide every tile as far up as it can go and merge equal tiles that meet"
+     "description": "turn the snake to move up"
     },
     {
      "name": "down",
-     "description": "slide every tile as far down as it can go and merge equal tiles that meet"
+     "description": "turn the snake to move down"
     },
     {
      "name": "left",
-     "description": "slide every tile as far left as it can go and merge equal tiles that meet"
+     "description": "turn the snake to move left"
     },
     {
      "name": "right",
-     "description": "slide every tile as far right as it can go and merge equal tiles that meet"
+     "description": "turn the snake to move right"
     }
    ],
-   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. up: slide every tile as far up as it can go and merge equal tiles that meet\nB. down: slide every tile as far down as it can go and merge equal tiles that meet\nC. left: slide every tile as far left as it can go and merge equal tiles that meet\nD. right: slide every tile as far right as it can go and merge equal tiles that meet\n\nAnswer with one letter: A, B, C, D.\nAnswer:",
-   "externals_removed": 0,
-   "modules": false
-  },
-  {
-   "id": "flappy",
-   "title": "Floppy Bird",
-   "upstream": "nebez/floppybird",
-   "license": "Apache-2.0",
-   "entry": "games/flappy/index.html",
-   "viewport": {
-    "width": 320,
-    "height": 525
-   },
-   "view": "#gamescreen",
-   "hide": "#footer{display:none!important}",
-   "step_frames": 5,
-   "step_ms": 83.33,
-   "max_steps": null,
-   "actions": [
-    {
-     "name": "flap",
-     "description": "flap the wings once to rise"
-    },
-    {
-     "name": "wait",
-     "description": "do nothing and let the bird fall"
-    }
-   ],
-   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. flap: flap the wings once to rise\nB. wait: do nothing and let the bird fall\n\nAnswer with one letter: A, B.\nAnswer:",
-   "externals_removed": 0,
+   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. up: turn the snake to move up\nB. down: turn the snake to move down\nC. left: turn the snake to move left\nD. right: turn the snake to move right\n\nAnswer with one letter: A, B, C, D.\nAnswer:",
+   "externals_removed": 1,
    "modules": false
   },
   {
@@ -227,72 +112,6 @@
     }
    ],
    "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. up: head up at the next opening\nB. down: head down at the next opening\nC. left: head left at the next opening\nD. right: head right at the next opening\n\nAnswer with one letter: A, B, C, D.\nAnswer:",
-   "externals_removed": 0,
-   "modules": false
-  },
-  {
-   "id": "breakout",
-   "title": "Breakout",
-   "upstream": "jakesgordon/javascript-breakout",
-   "license": "MIT",
-   "entry": "games/breakout/index.html",
-   "viewport": {
-    "width": 700,
-    "height": 540
-   },
-   "view": "#canvas",
-   "hide": "#levels,#controls,#instructions{display:none!important}",
-   "step_frames": 5,
-   "step_ms": 83.33,
-   "max_steps": null,
-   "actions": [
-    {
-     "name": "left",
-     "description": "move the paddle to the left"
-    },
-    {
-     "name": "right",
-     "description": "move the paddle to the right"
-    },
-    {
-     "name": "stay",
-     "description": "keep the paddle where it is"
-    }
-   ],
-   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. left: move the paddle to the left\nB. right: move the paddle to the right\nC. stay: keep the paddle where it is\n\nAnswer with one letter: A, B, C.\nAnswer:",
-   "externals_removed": 0,
-   "modules": false
-  },
-  {
-   "id": "invaders",
-   "title": "Space Invaders",
-   "upstream": "StrykerKKD/SpaceInvaders",
-   "license": "MIT",
-   "entry": "games/invaders/index.html",
-   "viewport": {
-    "width": 800,
-    "height": 600
-   },
-   "view": "canvas",
-   "hide": null,
-   "step_frames": 5,
-   "step_ms": 83.33,
-   "max_steps": null,
-   "actions": [
-    {
-     "name": "left",
-     "description": "move the ship left"
-    },
-    {
-     "name": "right",
-     "description": "move the ship right"
-    },
-    {
-     "name": "noop",
-     "description": "keep the ship where it is"
-    }
-   ],
-   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. left: move the ship left\nB. right: move the ship right\nC. noop: keep the ship where it is\n\nAnswer with one letter: A, B, C.\nAnswer:",
    "externals_removed": 0,
    "modules": false
   },
@@ -342,6 +161,39 @@
    "modules": false
   },
   {
+   "id": "invaders",
+   "title": "Space Invaders",
+   "upstream": "StrykerKKD/SpaceInvaders",
+   "license": "MIT",
+   "entry": "games/invaders/index.html",
+   "viewport": {
+    "width": 800,
+    "height": 600
+   },
+   "view": "canvas",
+   "hide": null,
+   "step_frames": 5,
+   "step_ms": 83.33,
+   "max_steps": null,
+   "actions": [
+    {
+     "name": "left",
+     "description": "move the ship left"
+    },
+    {
+     "name": "right",
+     "description": "move the ship right"
+    },
+    {
+     "name": "noop",
+     "description": "keep the ship where it is"
+    }
+   ],
+   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. left: move the ship left\nB. right: move the ship right\nC. noop: keep the ship where it is\n\nAnswer with one letter: A, B, C.\nAnswer:",
+   "externals_removed": 0,
+   "modules": false
+  },
+  {
    "id": "sokoban",
    "title": "Sokoban",
    "upstream": "taniarascia/sokoban",
@@ -377,6 +229,154 @@
    "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. up: move one square up, pushing a box ahead if the square behind it is free\nB. down: move one square down, pushing a box ahead if the square behind it is free\nC. left: move one square left, pushing a box ahead if the square behind it is free\nD. right: move one square right, pushing a box ahead if the square behind it is free\n\nAnswer with one letter: A, B, C, D.\nAnswer:",
    "externals_removed": 0,
    "modules": true
+  },
+  {
+   "id": "mario",
+   "title": "Infinite Mario",
+   "upstream": "robertkleffner/mariohtml5",
+   "license": "Unlicense",
+   "entry": "games/mario/main.html",
+   "viewport": {
+    "width": 660,
+    "height": 520
+   },
+   "view": "#canvas",
+   "hide": null,
+   "step_frames": 6,
+   "step_ms": 100.0,
+   "max_steps": null,
+   "actions": [
+    {
+     "name": "noop",
+     "description": "do nothing for a moment"
+    },
+    {
+     "name": "left",
+     "description": "walk to the left"
+    },
+    {
+     "name": "right",
+     "description": "walk to the right"
+    },
+    {
+     "name": "jump",
+     "description": "jump up"
+    },
+    {
+     "name": "right jump",
+     "description": "jump while moving to the right"
+    },
+    {
+     "name": "right run",
+     "description": "run to the right at full speed"
+    },
+    {
+     "name": "right run jump",
+     "description": "run to the right at full speed and jump"
+    }
+   ],
+   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. noop: do nothing for a moment\nB. left: walk to the left\nC. right: walk to the right\nD. jump: jump up\nE. right jump: jump while moving to the right\nF. right run: run to the right at full speed\nG. right run jump: run to the right at full speed and jump\n\nAnswer with one letter: A, B, C, D, E, F, G.\nAnswer:",
+   "externals_removed": 1,
+   "modules": false
+  },
+  {
+   "id": "flappy",
+   "title": "Floppy Bird",
+   "upstream": "nebez/floppybird",
+   "license": "Apache-2.0",
+   "entry": "games/flappy/index.html",
+   "viewport": {
+    "width": 320,
+    "height": 525
+   },
+   "view": "#gamescreen",
+   "hide": "#footer{display:none!important}",
+   "step_frames": 5,
+   "step_ms": 83.33,
+   "max_steps": null,
+   "actions": [
+    {
+     "name": "flap",
+     "description": "flap the wings once to rise"
+    },
+    {
+     "name": "wait",
+     "description": "do nothing and let the bird fall"
+    }
+   ],
+   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. flap: flap the wings once to rise\nB. wait: do nothing and let the bird fall\n\nAnswer with one letter: A, B.\nAnswer:",
+   "externals_removed": 0,
+   "modules": false
+  },
+  {
+   "id": "breakout",
+   "title": "Breakout",
+   "upstream": "jakesgordon/javascript-breakout",
+   "license": "MIT",
+   "entry": "games/breakout/index.html",
+   "viewport": {
+    "width": 700,
+    "height": 540
+   },
+   "view": "#canvas",
+   "hide": "#levels,#controls,#instructions{display:none!important}",
+   "step_frames": 5,
+   "step_ms": 83.33,
+   "max_steps": null,
+   "actions": [
+    {
+     "name": "left",
+     "description": "move the paddle to the left"
+    },
+    {
+     "name": "right",
+     "description": "move the paddle to the right"
+    },
+    {
+     "name": "stay",
+     "description": "keep the paddle where it is"
+    }
+   ],
+   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. left: move the paddle to the left\nB. right: move the paddle to the right\nC. stay: keep the paddle where it is\n\nAnswer with one letter: A, B, C.\nAnswer:",
+   "externals_removed": 0,
+   "modules": false
+  },
+  {
+   "id": "2048",
+   "title": "2048",
+   "upstream": "gabrielecirulli/2048",
+   "license": "MIT",
+   "entry": "games/2048/index.html",
+   "viewport": {
+    "width": 700,
+    "height": 900
+   },
+   "view": ".game-container",
+   "hide": null,
+   "step_frames": 1,
+   "step_ms": 150.0,
+   "max_steps": 2500,
+   "actions": [
+    {
+     "name": "up",
+     "description": "slide every tile as far up as it can go and merge equal tiles that meet"
+    },
+    {
+     "name": "down",
+     "description": "slide every tile as far down as it can go and merge equal tiles that meet"
+    },
+    {
+     "name": "left",
+     "description": "slide every tile as far left as it can go and merge equal tiles that meet"
+    },
+    {
+     "name": "right",
+     "description": "slide every tile as far right as it can go and merge equal tiles that meet"
+    }
+   ],
+   "prompt": "Apply the question to the state. Choose exactly one of the listed options. Respond with only its uppercase letter, with no explanation or reasoning.\n\n<state>\n<|vision_start|><|image_pad|><|vision_end|>\n</state>\n\nQuestion: Which move should the player make next?\n\nOptions:\nA. up: slide every tile as far up as it can go and merge equal tiles that meet\nB. down: slide every tile as far down as it can go and merge equal tiles that meet\nC. left: slide every tile as far left as it can go and merge equal tiles that meet\nD. right: slide every tile as far right as it can go and merge equal tiles that meet\n\nAnswer with one letter: A, B, C, D.\nAnswer:",
+   "externals_removed": 0,
+   "modules": false
   }
  ]
 }

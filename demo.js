@@ -7,6 +7,7 @@
   if (!D) { document.body.insertAdjacentHTML('afterbegin', '<p>data.js is missing: run scripts/build_demo.py</p>'); return; }
   const qs = new URLSearchParams(location.search);
   const SERVER = normaliseServer(qs.get('server'));
+  const WANT = wantedGame(qs.get('game'));   // ?game=snake: the per-game link, opens the featured board on that game
   const INSTRUCTIONS = 'Which move should the player make next?';
   const BOOT_TIMEOUT_MS = 60000, LIVE_TIMEOUT_MS = 30000, END_PAUSE_MS = 1800;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -23,6 +24,53 @@
   const svgText = (parent, x, y, s, anchor) => { const t = svgEl(parent, 'text', { x, y }, 'txt'); if (anchor) t.setAttribute('text-anchor', anchor); t.textContent = s; return t; };
   const tip = (node, s) => { const t = document.createElementNS(NS, 'title'); t.textContent = s; node.appendChild(t); return node; };
 
+  // ---------------------------------------------------------------- language
+  // The page is written in English (index.html) and i18n.js carries the Chinese version. Switching reloads, which
+  // keeps one code path for everything drawn once, the SVG axes included. Move names and the prompt are never
+  // translated: they are the model's own input.
+  const I18N = window.PJ_I18N || { en: {}, zh: {}, games: {} };
+  const LANG = (function pickLang() {
+    const q = (qs.get('lang') || '').toLowerCase();
+    if (q.indexOf('zh') === 0) return 'zh';
+    if (q.indexOf('en') === 0) return 'en';
+    const saved = remembered('pj-lang');
+    if (saved === 'zh' || saved === 'en') return saved;
+    return /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+  })();
+  const T = (k, fb) => (I18N[LANG] && I18N[LANG][k]) || (I18N.en && I18N.en[k]) || fb || k;
+  const zhTitle = (id, fb) => (LANG === 'zh' && I18N.games && I18N.games[id]) || fb;
+  const gameTitle = (g) => zhTitle(g.id, g.title);
+  (function applyLanguage() {
+    document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+    if (LANG !== 'en') {
+      for (const node of document.querySelectorAll('[data-i18n]')) {
+        const v = I18N[LANG][node.dataset.i18n]; if (v) node.textContent = v;
+      }
+      for (const node of document.querySelectorAll('[data-i18n-html]')) {
+        const v = I18N[LANG][node.dataset.i18nHtml]; if (v) node.innerHTML = v;
+      }
+    }
+    const btn = document.getElementById('lang'); if (!btn) return;
+    btn.textContent = T('ui.lang'); btn.title = T('ui.langTitle');
+    btn.addEventListener('click', () => { remember('pj-lang', LANG === 'zh' ? 'en' : 'zh'); location.reload(); });
+  })();
+
+  // A game page that puts focus on itself scrolls this page down, which slides the top of the board under the
+  // sticky bar. Hold the page at the top until the reader moves it themselves.
+  (function keepTop() {
+    if (location.hash) return;
+    let free = false;
+    const release = () => { free = true; };
+    for (const ev of ['wheel', 'touchstart', 'keydown', 'mousedown', 'pointerdown']) {
+      window.addEventListener(ev, release, { passive: true, once: true });
+    }
+    const t0 = Date.now();
+    const iv = setInterval(() => {
+      if (free || Date.now() - t0 > 15000) { clearInterval(iv); return; }
+      if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'auto' });
+    }, 100);
+  })();
+
   function normaliseServer(s) {
     if (!s) return null;
     try {
@@ -32,13 +80,25 @@
     } catch (e) { console.warn('bad ?server= url', s); return null; }
   }
 
+  // ?game=<id> names one game for the featured board. The id is what the README links, and the title is accepted
+  // too, so ?game=floppy-bird and ?game=Floppy%20Bird land on the same board.
+  function wantedGame(s) {
+    if (!s) return null;
+    const key = (x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, '');
+    const k = key(s), list = D.games || [];
+    const g = list.find((x) => key(x.id) === k) || list.find((x) => key(x.title) === k) ||
+              (k.length >= 4 ? list.find((x) => key(x.title).includes(k)) : null);
+    if (!g) console.warn('unknown ?game=', s);
+    return g ? g.id : null;
+  }
+
   // ---------------------------------------------------------------- chrome
   (function theme() {
     const root = document.documentElement, btn = document.getElementById('theme');
     let stored = null; try { stored = localStorage.getItem('pj-theme'); } catch (e) {}
     if (stored === 'dark' || stored === 'light') root.dataset.theme = stored;
     const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    const label = () => { btn.textContent = isDark() ? 'light' : 'dark'; btn.title = isDark() ? 'switch to light' : 'switch to dark'; };
+    const label = () => { btn.textContent = isDark() ? T('ui.light') : T('ui.dark'); btn.title = isDark() ? T('ui.lightTitle') : T('ui.darkTitle'); };
     btn.addEventListener('click', () => { root.dataset.theme = isDark() ? 'light' : 'dark'; remember('pj-theme', root.dataset.theme); label(); });
     label();
   })();
@@ -126,24 +186,39 @@
       if (this.hero) root.classList.add('hero');
 
       const head = el('div', 'head');
-      head.appendChild(el('span', 'title', g.title));
-      const mark = el('span', 'mark'); mark.title = 'replayed score differs from the recording'; head.appendChild(mark);
-      this.scoreEl = el('span', 'score', 'score 0'); head.appendChild(this.scoreEl);
+      head.appendChild(el('span', 'title', gameTitle(g)));
+      const mark = el('span', 'mark'); mark.title = T('ui.mismatch'); head.appendChild(mark);
+      this.scoreEl = el('span', 'score', T('ui.score') + ' 0'); head.appendChild(this.scoreEl);
       root.appendChild(head);
 
+      // Play and speed sit in the readout, under the name and the score, on the boards that have a readout column.
+      // The grid's small tiles keep the same buttons on the board itself, out of the way until the pointer is there.
+      this.ppBtns = [];
+      const deck = this.deck = el('div', 'deck');
+      const deckPP = el('button', 'pp', T('ui.pause'));
+      deckPP.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
+      this.ppBtns.push(deckPP);
+      const deckSeg = el('span', 'seg speeds'); this.speedBtns = {};
+      for (const sp of [0.5, 1, 2, 4, 8]) {
+        const b = el('button', sp === 1 ? 'on' : '', sp + 'x');
+        b.addEventListener('click', () => this.setSpeed(sp));
+        deckSeg.appendChild(b); this.speedBtns[sp] = b;
+      }
+      deck.append(deckPP, el('span', 'decklabel', T('ui.speed')), deckSeg);
+      root.appendChild(deck);
+
       const board = this.board = el('div', 'board');
-      this.view = el('div', 'view'); this.overlay = el('div', 'overlay', 'loading');
+      this.view = el('div', 'view'); this.overlay = el('div', 'overlay', T('ui.loading'));
       this.view.appendChild(this.overlay); board.appendChild(this.view);
       const c = this.ctrl = el('div', 'controls');
-      this.ppBtn = el('button', 'pp', 'pause'); this.ppBtn.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
-      const seg = el('span', 'seg'); this.speedBtns = {};
-      for (const s of [1, 2, 4]) { const b = el('button', s === 1 ? 'on' : '', s + 'x'); b.addEventListener('click', () => this.setSpeed(s)); seg.appendChild(b); this.speedBtns[s] = b; }
-      const restart = el('button', '', 'restart'); restart.addEventListener('click', () => this.restart());
-      const next = el('button', '', 'next'); next.title = 'next recorded episode'; next.addEventListener('click', () => this.next());
-      c.append(this.ppBtn, seg, restart, next);
+      this.ppBtn = el('button', 'pp', T('ui.pause')); this.ppBtn.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
+      this.ppBtns.push(this.ppBtn);
+      const restart = el('button', '', T('ui.restart')); restart.addEventListener('click', () => this.restart());
+      const next = el('button', '', T('ui.next')); next.title = T('ui.nextTitle'); next.addEventListener('click', () => this.next());
+      c.append(this.ppBtn, restart, next);
       if (this.policies.length > 1) {
-        const sel = el('select'); sel.title = 'which recording to replay';
-        for (const p of this.policies) { const o = el('option', '', p === 'live' ? 'live server' : shortPolicy(p)); o.value = p; o.title = p; sel.appendChild(o); }
+        const sel = el('select'); sel.title = T('ui.whichrec');
+        for (const p of this.policies) { const o = el('option', '', p === 'live' ? T('ui.live') : shortPolicy(p)); o.value = p; o.title = p; sel.appendChild(o); }
         sel.value = this.policy; sel.addEventListener('change', () => this.selectPolicy(sel.value)); c.appendChild(sel); this.sel = sel;
       }
       board.appendChild(c); root.appendChild(board);
@@ -162,7 +237,7 @@
       // Every tile carries one, since any of the ten becomes the featured board in one-at-a-time mode.
       {
         const tr = this.trace = el('div', 'trace');
-        tr.appendChild(el('span', 'tlabel', 'confidence through the episode'));
+        tr.appendChild(el('span', 'tlabel', T('ui.trace')));
         const svg = this.traceSvg = document.createElementNS(NS, 'svg');
         svg.setAttribute('aria-hidden', 'true');
         tr.appendChild(svg); root.appendChild(tr);
@@ -170,7 +245,7 @@
       }
 
       const foot = el('div', 'foot');
-      this.stepEl = el('span', 'step', 'step 0'); this.recEl = el('span', 'rec', ''); this.warnEl = el('span', 'warn', '');
+      this.stepEl = el('span', 'step', T('ui.step') + ' 0'); this.recEl = el('span', 'rec', ''); this.warnEl = el('span', 'warn', '');
       foot.append(this.stepEl, this.recEl, this.warnEl); root.appendChild(foot);
 
       if (!this.entries.length && !SERVER) { restart.disabled = true; next.disabled = true; this.ppBtn.disabled = true; }
@@ -192,7 +267,7 @@
     }
     noteError(msg) {
       this.errors.push(msg); console.warn(`[${this.game.id}] page error: ${msg}`);
-      if (this.errors.length === 1) this.warnEl.textContent = 'page error, see console';
+      if (this.errors.length === 1) this.warnEl.textContent = T('ui.pageerror');
     }
     async boot() {
       // A fresh frame per episode, as the driver reloads the page before every pj.start.
@@ -201,7 +276,7 @@
       const f = this.iframe = document.createElement('iframe');
       f.width = this.game.viewport.width; f.height = this.game.viewport.height;
       f.style.width = this.game.viewport.width + 'px'; f.style.height = this.game.viewport.height + 'px';
-      f.setAttribute('scrolling', 'no'); f.setAttribute('tabindex', '-1'); f.title = this.game.title + ' (game frame)';
+      f.setAttribute('scrolling', 'no'); f.setAttribute('tabindex', '-1'); f.title = gameTitle(this.game) + ' (' + T('ui.gameframe') + ')';
       const ready = new Promise((res) => { this._ready = res; });
       f.src = this.game.entry;
       this.view.insertBefore(f, this.overlay);
@@ -225,6 +300,17 @@
       // Only the game area shows; the rest of the game page (menus, footers, score panels) is clipped away.
       this.iframe.style.clipPath = `inset(${r.y.toFixed(2)}px ${(V.width - r.x - r.w).toFixed(2)}px ${(V.height - r.y - r.h).toFixed(2)}px ${r.x.toFixed(2)}px)`;
       this.iframe.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${s.toFixed(5)})`;
+      // Where the game area actually landed against where it should sit. The frame is laid out at the board's
+      // top-left, but a browser can place it a pixel or ten off (a snake board came out half a cell high), and that
+      // shows as a cut-off row at the top and a black strip at the bottom. Measure the residual and take it out.
+      {
+        const vb = this.view.getBoundingClientRect(), ib = this.iframe.getBoundingClientRect();
+        const dx = (vb.left + (BW - r.w * s) / 2) - (ib.left + r.x * s);
+        const dy = (vb.top + (BH - r.h * s) / 2) - (ib.top + r.y * s);
+        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+          this.iframe.style.transform = `translate(${(tx + dx).toFixed(2)}px, ${(ty + dy).toFixed(2)}px) scale(${s.toFixed(5)})`;
+        }
+      }
       this.iframe.classList.add('shown');
       // The trace is sized by the room left in the readout, so a resize redraws it at the new size.
       if (this.traceSteps) {
@@ -308,14 +394,14 @@
     }
     renderRec() {
       const pol = this.policy;
-      if (!pol) { this.recEl.textContent = 'no recording yet'; this.recEl.classList.remove('random'); return; }
+      if (!pol) { this.recEl.textContent = T('ui.norec'); this.recEl.classList.remove('random'); return; }
       this.recEl.textContent = pol === 'live' ? 'live: ' + new URL(SERVER).host : shortPolicy(pol);
-      this.recEl.title = pol === 'live' ? SERVER : 'recording: ' + pol;
+      this.recEl.title = pol === 'live' ? SERVER : T('ui.recording') + ': ' + pol;
       this.recEl.classList.toggle('random', pol === 'random');
     }
     renderStatus(i, total, score, tail) {
-      this.stepEl.textContent = 'step ' + i + (total != null ? ' / ' + total : '') + (tail ? ' ' + tail : '');
-      this.scoreEl.textContent = 'score ' + fmtScore(score);
+      this.stepEl.textContent = T('ui.step') + ' ' + i + (total != null ? ' / ' + total : '') + (tail ? ' ' + tail : '');
+      this.scoreEl.textContent = T('ui.score') + ' ' + fmtScore(score);
     }
     // One-at-a-time mode promotes the running tile to the featured board: its own shape, the readout beside it.
     setFeatured(on) {
@@ -329,8 +415,8 @@
 
     // ---- controls
     setSpeed(s) { this.speed = s; for (const k in this.speedBtns) this.speedBtns[k].classList.toggle('on', Number(k) === s); }
-    pause() { this.playing = false; this.ppBtn.textContent = 'play'; }
-    play() { if (this.suspended) return; this.playing = true; this.ppBtn.textContent = 'pause'; if (this._resume) { const r = this._resume; this._resume = null; r(); } else if (!this.running) this.start(); }
+    pause() { this.playing = false; for (const b of this.ppBtns) b.textContent = T('ui.play'); }
+    play() { if (this.suspended) return; this.playing = true; for (const b of this.ppBtns) b.textContent = T('ui.pause'); if (this._resume) { const r = this._resume; this._resume = null; r(); } else if (!this.running) this.start(); }
     // Stop this tile and throw its game frame away. Ten live games is more than most machines can paint at once, so
     // the page can keep one running and hold the rest here; start() brings a tile back.
     suspend() {
@@ -338,7 +424,7 @@
       for (const p of this.pending.values()) p.reject(new Error('tile suspended')); this.pending.clear();
       if (this.iframe) { this.iframe.remove(); this.iframe = null; }
       this.running = false; this.rect = null; this._resume = null;
-      this.renderBars(null, -1); this.traceInit(null); this.setMismatch(''); this.showOverlay('paused');
+      this.renderBars(null, -1); this.traceInit(null); this.setMismatch(''); this.showOverlay(T('ui.paused'));
     }
     waitResume() { return new Promise((res) => { this._resume = res; }); }
     currentEntries() { return this.entries.filter((e) => e.policy === this.policy); }
@@ -374,7 +460,7 @@
 
     // Game loaded and started with seed 1 but nothing to replay yet.
     async idle(gen) {
-      this.showOverlay('loading'); await this.boot(); if (gen !== this.gen) return;
+      this.showOverlay(T('ui.loading')); await this.boot(); if (gen !== this.gen) return;
       const obs = await this.call('start', { seed: 1 }); await this.measure(); this.showOverlay(null);
       this.renderStatus(0, null, obs.score); this.renderBars(null, -1); this.traceInit(null); this.renderRec();
     }
@@ -384,7 +470,7 @@
       opts = opts || {};
       const g = this.game; const t0 = performance.now();
       this.latency = null; this.setMismatch(''); this.renderRec(); this.errors = [];
-      this.showOverlay('loading');
+      this.showOverlay(T('ui.loading'));
       const rec = await loadReplay(entry, g.id); if (gen !== this.gen) return null;
       await this.boot(); if (gen !== this.gen) return null;
       let obs = await this.call('start', { seed: rec.seed }); if (gen !== this.gen) return null;
@@ -472,7 +558,7 @@
     async verify(speed, policies) {
       // The featured board is a second copy of a game that the grid already verifies; it steps aside instead.
       if (this.hero) { this.gen++; this.pause(); return []; }
-      const out = []; const gen = ++this.gen; this.running = true; this.autoAdvance = false; this.playing = true; this.ppBtn.textContent = 'pause';
+      const out = []; const gen = ++this.gen; this.running = true; this.autoAdvance = false; this.playing = true; for (const b of this.ppBtns) b.textContent = T('ui.pause');
       try {
         for (let k = 0; k < this.entries.length; k++) {
           const e = this.entries[k]; if (policies && !policies.includes(e.policy)) continue;
@@ -507,10 +593,10 @@
       if (start) t.start();
     };
     for (const g of games) {
-      const b = el('button', '', g.title); b.type = 'button'; b.dataset.game = g.id;
+      const b = el('button', '', gameTitle(g)); b.type = 'button'; b.dataset.game = g.id;
       b.addEventListener('click', () => show(g, true)); picker.appendChild(b);
     }
-    const want = remembered('pj-hero');
+    const want = WANT || remembered('pj-hero');
     show(games.find((g) => g.id === want && nRec(g)) || games.find((g) => g.id === 'snake' && nRec(g)) || games.find(nRec) || games[0], false);
   }
 
@@ -556,8 +642,8 @@
       if (lead) t.root.classList.add('lead-board');
       tiles.push(t); host.appendChild(t.root); return t;
     };
-    const ta = mk(a, 'The model alone', false);
-    const tb = mk(b, 'With the teacher', true);
+    const ta = mk(a, T('ui.duelAlone'), false);
+    const tb = mk(b, T('ui.duelS2'), true);
     lazyWhileVisible([ta, tb], host);
     const note = document.getElementById('duel-note');
     if (note) note.textContent = `Both boards are ${g.title} from seed ${a.seed}, the same game with the same `
@@ -573,7 +659,7 @@
   // ---------------------------------------------------------------- page sections
   function buildGrid() {
     const grid = document.getElementById('grid');
-    const section = document.getElementById('games');
+    const section = document.getElementById('gallery');
     for (const g of D.games) { const t = new Tile(g, (D.replays && D.replays[g.id]) || []); tiles.push(t); grid.appendChild(t.root); }
     const all = document.getElementById('all');
     document.getElementById('all-pp').addEventListener('click', (ev) => {
@@ -619,7 +705,7 @@
       for (const b of modeBtns) b.classList.toggle('on', (b.dataset.mode === 'solo') === solo);
       const gt = gridTiles();
       if (solo) {
-        const want = remembered('pj-tile-game');
+        const want = WANT || remembered('pj-tile-game');
         const keep = (activeTile && gt.includes(activeTile) ? activeTile : null) || gt.find((o) => o.game.id === want) || gt[0];
         for (const o of gt) if (o !== keep) { mark(o, false); if (!o.suspended) o.suspend(); else o.suspended = true; }
         activeTile = null; if (keep) { if (initial) { mark(keep, true); activeTile = keep; remember('pj-tile-game', keep.game.id); } else activate(keep); }
@@ -641,19 +727,18 @@
     window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => tiles.forEach((t) => t.fit()), 60); });
     const notice = document.getElementById('notice');
     const nRec = Object.values(D.replays || {}).reduce((s, l) => s + l.length, 0);
-    if (SERVER) { notice.textContent = `Live mode: frames go to ${SERVER} and its probabilities pick every move.`; }
-    else if (!nRec) notice.textContent = 'No recordings have been built into this page yet; the games load and wait.';
-    else notice.textContent = `Nothing here is played live: the page carries ${nRec} recorded episodes and replays `
-      + 'them inside the real games, so what you see is the game itself and the model\'s own probabilities.';
+    if (SERVER) { notice.textContent = T('ui.liveMode').replace('{url}', SERVER); }
+    else if (!nRec) notice.textContent = T('ui.noRecs');
+    // Everything else the reader needs about the recordings is in the "How it works" section, so the lead stays short.
   }
 
   function buildResults() {
     const R = D.results; if (!R || !R.rows) return;
     const tb = document.getElementById('results-body');
-    const cell = (v, cls) => { const td = el('td', cls); if (v == null) { td.textContent = 'pending'; td.classList.add('pending'); } else td.textContent = v; return td; };
+    const cell = (v, cls) => { const td = el('td', cls); if (v == null) { td.textContent = T('ui.pending'); td.classList.add('pending'); } else td.textContent = v; return td; };
     for (const r of R.rows) {
       const tr = el('tr');
-      const name = el('td'); const a = el('a', '', r.title); a.href = 'https://github.com/' + (r.upstream || ''); a.target = '_blank'; a.rel = 'noopener'; name.appendChild(a);
+      const name = el('td'); const a = el('a', '', zhTitle(r.game, r.title)); a.href = 'https://github.com/' + (r.upstream || ''); a.target = '_blank'; a.rel = 'noopener'; name.appendChild(a);
       name.appendChild(el('span', 'sub', ` ${r.k} moves`)); tr.appendChild(name);
       tr.appendChild(cell(r.random ? fmtScore(r.random.score) : null, 'num'));
       tr.appendChild(cell(r.model ? fmtScore(r.model.score) : null, 'num'));
@@ -675,7 +760,7 @@
       scale.append(el('span'), ticks, el('span'));
       const rows = el('div', 'rows');
       for (const r of done.concat(rest)) {
-        rows.appendChild(el('div', 'name', r.title));
+        rows.appendChild(el('div', 'name', zhTitle(r.game, r.title)));
         const lane = el('div', 'lane');
         for (const v of [0, 1]) { const gl = el('i', 'grid-line'); gl.style.left = at(v); lane.appendChild(gl); }
         if (r.vs_teacher != null) {
@@ -691,7 +776,7 @@
     }
     const hasModel = R.rows.some((r) => r.model);
     const foot = document.getElementById('results-note');
-    foot.textContent = (R.note || 'Mean score per policy through the same harness, episodes capped at 1500 steps.') + ' '
+    if (foot) foot.textContent = (R.note || 'Mean score per policy through the same harness, episodes capped at 1500 steps.') + ' '
       + (hasModel ? `The model here is ${[...new Set(R.rows.filter((r) => r.model).map((r) => r.model.policy))].join(', ')}.` : 'The model columns fill in when its results land.');
   }
 
@@ -710,13 +795,13 @@
       svgEl(svg, 'line', { x1: P, y1: W - P, x2: W - P, y2: P }, 'diag');
       svgText(svg, P, W - 8, '0', 'middle'); svgText(svg, W - P, W - 8, '1', 'middle');
       svgText(svg, P - 5, W - P + 3, '0', 'end'); svgText(svg, P - 5, P + 3, '1', 'end');
-      svgText(svg, P + S / 2, W - 1, 'p of the move it chose', 'middle');
+      svgText(svg, P + S / 2, W - 1, T('ui.axP'), 'middle');
       const maxN = Math.max(1, ...r.calibration.bins.map((b) => b.n || 0));
       for (const b of r.calibration.bins) {
         const c = svgEl(svg, 'circle', { cx: (P + b.p * S).toFixed(1), cy: (W - P - b.acc * S).toFixed(1), r: (3 + 4.5 * Math.sqrt((b.n || 0) / maxN)).toFixed(1) }, 'pt');
         tip(c, `said ${b.p.toFixed(2)}, agreed with the teacher ${b.acc.toFixed(2)} of the time, ${b.n} decisions`);
       }
-      fig.appendChild(svg); fig.appendChild(el('figcaption', '', r.title)); box.appendChild(fig);
+      fig.appendChild(svg); fig.appendChild(el('figcaption', '', zhTitle(r.game, r.title))); box.appendChild(fig);
     }
     const pols = [...new Set(rows.map((r) => r.calibration.policy).filter(Boolean))];
     const note = document.getElementById('calib-note');
@@ -734,7 +819,7 @@
     const refs = {};
     for (const r of ((D.results && D.results.rows) || [])) {
       if (r.random && r.teacher && r.teacher.score != null && r.teacher.score !== r.random.score) {
-        refs[r.game] = { lo: r.random.score, hi: r.teacher.score, title: r.title };
+        refs[r.game] = { lo: r.random.score, hi: r.teacher.score, title: zhTitle(r.game, r.title) };
       }
     }
     const per = H.models[H.model];
@@ -761,14 +846,14 @@
       path(ctl, 'ctlline'); path(pts, 'line');
       for (const d of ctl) tip(svgEl(svg, 'circle', { cx: px(d.x).toFixed(1), cy: py(d.y).toFixed(1), r: 4 }, 'ctl'), `the same share handed over at random: ${(d.x * 100).toFixed(0)}% of steps, score ${fmtScore(d.score)}`);
       for (const d of pts) tip(svgEl(svg, 'circle', { cx: px(d.x).toFixed(1), cy: py(d.y).toFixed(1), r: 4 }, 'pt'), `below confidence ${d.tau}: the teacher takes ${(d.x * 100).toFixed(0)}% of steps, score ${fmtScore(d.score)}`);
-      svgText(svg, P, W - P + 12, 'model'); svgText(svg, W - P, W - P + 12, 'teacher', 'end');
-      svgText(svg, P - 4, py(1) + 3, 'teacher', 'end'); svgText(svg, P - 4, py(0) + 3, 'alone', 'end');
+      svgText(svg, P, W - P + 12, T('ui.axModel')); svgText(svg, W - P, W - P + 12, T('ui.axTeacher'), 'end');
+      svgText(svg, P - 4, py(1) + 3, T('ui.axTeacher'), 'end'); svgText(svg, P - 4, py(0) + 3, T('ui.axAlone'), 'end');
       fig.appendChild(svg); fig.appendChild(el('figcaption', '', ref.title)); box.appendChild(fig);
     }
     const legend = el('div', 'legend');
     const key = (cls, text) => { const s = el('span'); const i = el('i', cls); s.append(i, document.createTextNode(text)); legend.appendChild(s); };
-    key('', 'the teacher takes the steps the model is least sure about');
-    key('c', 'the teacher takes the same share of steps at random');
+    key('', T('ui.byConf'));
+    key('c', T('ui.atRandom'));
     box.parentNode.insertBefore(legend, box.nextSibling);
     const note = document.getElementById('handover-note');
     const withCtl = ids.filter((g) => per[g].random.length);
@@ -777,13 +862,13 @@
   }
 
   function buildTransfer() {
-    const T = D.results && D.results.transfer;
+    const TR = D.results && D.results.transfer;
     const sec = document.getElementById('transfer');
     if (!sec) return;
-    if (!T || !T.games || !T.games.length) { sec.remove(); return; }
+    if (!TR || !TR.games || !TR.games.length) { sec.remove(); return; }
     const tb = document.getElementById('transfer-body');
     const INIT = { base: 'the base model', hold8: 'eight other games', shuf: 'eight other games, labels shuffled' };
-    const titles = {}; for (const r of ((D.results && D.results.rows) || [])) titles[r.game] = r.title;
+    const titles = {}; for (const r of ((D.results && D.results.rows) || [])) titles[r.game] = zhTitle(r.game, r.title);
 
     // One panel per held-out game: how close each starting point gets to the teacher's moves as it sees more frames.
     // Only the default learning rate is drawn; every run, including the other learning rates, stays in the table.
@@ -793,7 +878,7 @@
     let drew = 0;
     if (box) {
       const W = 236, H = 198, PL = 36, PR = 12, PT = 12, PB = 34;
-      for (const g of T.games) {
+      for (const g of TR.games) {
         const series = KEY.map((k) => Object.assign({}, k, {
           pts: g.runs.filter((r) => r.init === k.init && !r.lr && r.agreement != null && r.frames > 0)
             .map((r) => ({ x: r.frames, y: r.agreement, score: r.score })).sort((a, b) => a.x - b.x),
@@ -810,7 +895,7 @@
         svgEl(svg, 'line', { x1: PL, y1: PT, x2: PL, y2: H - PB }, 'axis');
         svgText(svg, PL - 5, H - PB + 3, '0', 'end'); svgText(svg, PL - 5, PT + 3, '1', 'end');
         for (const x of xs) svgText(svg, px(x), H - PB + 14, kFrames(x), 'middle');
-        svgText(svg, PL + (W - PL - PR) / 2, H - 3, 'frames of this game', 'middle');
+        svgText(svg, PL + (W - PL - PR) / 2, H - 3, T('ui.axFrames'), 'middle');
         for (const k of series) {
           if (k.pts.length > 1) svgEl(svg, 'path', { d: k.pts.map((d, i) => `${i ? 'L' : 'M'}${px(d.x).toFixed(1)} ${py(d.y).toFixed(1)}`).join(' ') }, k.line);
           for (const d of k.pts) {
@@ -826,12 +911,12 @@
       else {
         const legend = el('div', 'legend');
         const key = (cls, text) => { const sp = el('span'); sp.append(el('i', cls), document.createTextNode(text)); legend.appendChild(sp); };
-        key('', 'fine-tuned from the eight-game model');
-        key('c', 'fine-tuned from the raw base model');
+        key('', T('ui.fromEight'));
+        key('c', T('ui.fromBase'));
         box.parentNode.insertBefore(legend, box.nextSibling);
       }
     }
-    for (const g of T.games) {
+    for (const g of TR.games) {
       let first = true;
       for (const r of g.runs) {
         const tr = el('tr'); if (first) tr.classList.add('sep');
@@ -839,22 +924,23 @@
         first = false;
         tr.appendChild(el('td', '', (INIT[r.init] || r.init) + (r.lr ? ` (lr ${r.lr})` : '')));
         tr.appendChild(el('td', 'num', r.frames.toLocaleString()));
-        const cell = (v, cls) => { const td = el('td', 'num ' + (cls || '')); if (v == null) { td.textContent = 'pending'; td.classList.add('pending'); } else td.textContent = v; return td; };
+        const cell = (v, cls) => { const td = el('td', 'num ' + (cls || '')); if (v == null) { td.textContent = T('ui.pending'); td.classList.add('pending'); } else td.textContent = v; return td; };
         tr.appendChild(cell(r.agreement != null ? r.agreement.toFixed(3) : null));
         tr.appendChild(cell(r.score != null ? fmtScore(r.score) : null));
         tr.appendChild(cell(r.vs_teacher != null ? r.vs_teacher.toFixed(2) : null, r.init === 'hold8' ? 'hi' : ''));
         tb.appendChild(tr);
       }
     }
-    const hasLr = T.games.some((g) => g.runs.some((r) => r.lr));
-    document.getElementById('transfer-note').textContent = (T.note || '') + ' '
-      + T.games.map((g) => `${titles[g.game] || g.game}: random ${fmtScore(g.random)}, teacher ${fmtScore(g.teacher)}.`).join(' ')
+    const hasLr = TR.games.some((g) => g.runs.some((r) => r.lr));
+    const tnote = document.getElementById('transfer-note');
+    if (tnote) tnote.textContent = (TR.note || '') + ' '
+      + TR.games.map((g) => `${titles[g.game] || g.game}: random ${fmtScore(g.random)}, teacher ${fmtScore(g.teacher)}.`).join(' ')
       + (drew && hasLr ? ' The panels show the default learning rate; the table has every run, including the other learning rates tried at 10,000 frames.' : '');
   }
 
   function buildPrompt() {
     const pre = document.getElementById('prompt'), sel = document.getElementById('prompt-game');
-    for (const g of D.games) { const o = el('option', '', g.title); o.value = g.id; sel.appendChild(o); }
+    for (const g of D.games) { const o = el('option', '', gameTitle(g)); o.value = g.id; sel.appendChild(o); }
     const render = () => {
       const g = D.games.find((x) => x.id === sel.value) || D.games[0];
       pre.textContent = ''; const parts = g.prompt.split('<|vision_start|><|image_pad|><|vision_end|>');
@@ -864,6 +950,14 @@
     };
     sel.value = D.games.some((g) => g.id === 'snake') ? 'snake' : D.games[0].id; sel.addEventListener('change', render); render();
     for (const a of document.querySelectorAll('a[data-link]')) if (D.links && D.links[a.dataset.link]) a.href = D.links[a.dataset.link];
+    // Weights and paper are announced before they are published: build_demo.py's LINKS carries an empty string until
+    // then, and the label turns into a real link the moment a URL lands there.
+    for (const node of document.querySelectorAll('[data-soon]')) {
+      const url = D.links && D.links[node.dataset.soon]; if (!url) continue;
+      const a = el('a'); a.href = url; a.innerHTML = node.innerHTML;
+      const tag = a.querySelector('em'); if (tag && node.dataset.soonLabel) tag.textContent = node.dataset.soonLabel;
+      node.replaceWith(a);
+    }
   }
 
   // ---------------------------------------------------------------- go
@@ -871,7 +965,7 @@
   // the handover section is two independent blocks; if the data for neither is here, the heading goes too
   const help = document.getElementById('help');
   if (help && !help.querySelector('.duel-block, .curves-block')) help.remove();
-  document.getElementById('generated').textContent = D.generated ? 'built ' + D.generated.replace('T', ' ') : '';
+  document.getElementById('generated').textContent = D.generated ? T('ui.built') + ' ' + D.generated.replace('T', ' ') : '';
   for (const t of tiles) if (!t.suspended && !t.running) t.start();
 
   window.pjDemo = {

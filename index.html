@@ -14,13 +14,17 @@
 
 <header class="top">
   <div class="wrap bar">
-    <a class="brand" href="#top">PlayJev</a>
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>PlayJev</a>
     <nav>
-      <a href="#games">the ten games</a>
-      <a href="#results">results</a>
-      <a href="#help">asking for help</a>
-      <a href="#how">how it works</a>
-      <a data-link="repo" href="https://github.com/OmniJev/PlayJev">code</a>
+      <a href="#gallery" data-i18n="nav.gallery">Gallery</a>
+      <a href="#results" data-i18n="nav.results">Results</a>
+      <a href="#help" data-i18n="nav.confidence">Confidence</a>
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <span class="navgap"></span>
+      <a class="icon" data-link="repo" href="https://github.com/OmniJev/PlayJev" title="GitHub" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button id="lang" type="button" title="切换到中文">中文</button>
       <button id="theme" type="button" title="switch theme">dark</button>
     </nav>
   </div>
@@ -30,139 +34,153 @@
 
   <section class="lead wrap">
     <div class="lead-copy">
-      <h1>An open 0.8B model plays ten browser games from raw pixels.</h1>
-      <p>PlayJev is Qwen3.5-0.8B-Base, fine-tuned until one forward pass turns a game frame into a probability over
-        the moves. It sees the picture, not the game's internal state, and it writes nothing: the answer is read
-        straight off the option letters, one decision every 43 ms on a single GPU.</p>
-      <p>One model plays all ten games, and the game's name never reaches it.</p>
-      <p class="quiet" id="notice"></p>
+      <h1 data-i18n="lead.h1">An open 0.8B model plays ten browser games from raw pixels.</h1>
+      <p class="lead-line" data-i18n="lead.p">One frame goes in, one forward pass runs, one move comes out, 43 ms on a
+        single GPU. The model sees the picture, never the game's state, and it is never told which game it is playing.</p>
+
+      <ul class="chips">
+        <li><b>0.8B</b> <span data-i18n="chip.params">parameters</span></li>
+        <li><b>10</b> <span data-i18n="chip.games">games</span></li>
+        <li><b>43 ms</b> <span data-i18n="chip.move">per move</span></li>
+        <li><b>863k</b> <span data-i18n="chip.frames">training frames</span></li>
+        <li><b>0.53</b> <span data-i18n="chip.teacher">of the teacher</span></li>
+      </ul>
+
+      <div class="links">
+        <a data-link="repo" href="https://github.com/OmniJev/PlayJev"><span data-i18n="link.code">Code</span> <em>GitHub</em></a>
+        <span class="soon" data-soon="hf" data-soon-label="Hugging Face"><span data-i18n="link.weights">Weights</span> <em data-i18n="link.soon">soon</em></span>
+        <a data-link="openjev" href="https://github.com/OmniJev/openJev"><span data-i18n="link.server">System One server</span> <em>OpenJev</em></a>
+        <a data-link="awesome" href="https://omnijev.github.io/awesome-jev/"><span data-i18n="link.reading">Reading list</span> <em>Awesome-JEV</em></a>
+        <span class="soon" data-soon="paper" data-soon-label="arXiv"><span data-i18n="link.paper">Paper</span> <em data-i18n="link.soon">soon</em></span>
+      </div>
+      <p id="notice" class="notice"></p>
     </div>
 
     <div class="lead-stage">
       <div id="picker" class="picker"></div>
       <div id="stage" class="stage"></div>
-      <p class="quiet stage-note">Every board here is a recorded episode replaying inside the real game. The bars are
-        the probabilities the model gave that frame, and the move it played is the one in blue.</p>
     </div>
   </section>
 
-  <section class="wrap" id="games">
-    <h2>All ten at once</h2>
-    <p>Ten games, one set of weights, ten different sets of moves to choose from. The label under each board says
-      which recording is playing.</p>
+  <section class="wrap" id="gallery">
+    <h2 data-i18n="gallery.h2">Gallery</h2>
+    <p data-i18n="gallery.p">Ten games, one set of weights, ten different sets of moves to choose from.</p>
 
     <div id="all" class="toolbar">
       <span class="seg" role="group" aria-label="who plays">
-        <button type="button" data-who="model" class="on">the model</button
-        ><button type="button" data-who="s2">with a teacher behind it</button
-        ><button type="button" data-who="random">random play</button>
-      </span>
-      <span class="seg" role="group" aria-label="speed">
-        <button type="button" data-speed="1" class="on">1x</button
-        ><button type="button" data-speed="2">2x</button
-        ><button type="button" data-speed="4">4x</button>
+        <button type="button" data-who="model" class="on" data-i18n="who.model">the model</button
+        ><button type="button" data-who="s2" data-i18n="who.s2">with a teacher behind it</button
+        ><button type="button" data-who="random" data-i18n="who.random">random play</button>
       </span>
       <span class="seg" role="group" aria-label="how many games run">
-        <button type="button" data-mode="all" class="on">ten at once</button
-        ><button type="button" data-mode="solo">one at a time</button>
+        <button type="button" data-mode="all" class="on" data-i18n="mode.all">ten at once</button
+        ><button type="button" data-mode="solo" data-i18n="mode.solo">one at a time</button>
       </span>
-      <button id="all-pp" type="button">pause all</button>
-      <span class="toolbar-note">1x is the game's own pace. Ten live games is heavy on a laptop; one at a time keeps a
-        single game running and leaves the others as names you can click.</span>
+      <button id="all-pp" type="button" data-i18n="btn.pauseall">pause all</button>
     </div>
 
     <div id="grid" class="grid"></div>
   </section>
 
   <section class="wrap" id="results">
-    <h2>Results</h2>
-    <p>Sixteen held-out episodes per game, the same seeds for every player, the most probable move taken with no
-      sampling. The bar is where the model lands between random play and the scripted teacher that labelled its
-      training data.</p>
+    <h2 data-i18n="results.h2">Results</h2>
+    <p data-i18n="results.p">Sixteen held-out episodes per game, the same seeds for every player, the most probable move
+      taken with no sampling. The bar is where the model lands between random play and the scripted teacher that
+      labelled its training data.</p>
     <div id="score-chart" class="chart"></div>
     <details class="table-view">
-      <summary>the same numbers as a table</summary>
+      <summary data-i18n="results.table">the same numbers as a table</summary>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>game</th><th class="num">random</th><th class="num">the model</th><th class="num">teacher</th><th class="num">vs teacher</th></tr></thead>
+          <thead><tr><th data-i18n="th.game">game</th><th class="num" data-i18n="th.random">random</th><th class="num" data-i18n="th.model">the model</th><th class="num" data-i18n="th.teacher">teacher</th><th class="num" data-i18n="th.vs">vs teacher</th></tr></thead>
           <tbody id="results-body"></tbody>
         </table>
       </div>
     </details>
-    <p id="results-note" class="quiet"></p>
   </section>
 
   <section class="wrap" id="calibration">
-    <h2>Does it know when it is right?</h2>
-    <p>Each dot takes the steps where the model gave its chosen move about the same probability, and asks how often
-      that move was the teacher's. On the diagonal, the number it reports is the rate it achieves. Dot size is how
-      many decisions fell in that bin.</p>
+    <h2 data-i18n="calib.h2">Does it know when it is right?</h2>
+    <p data-i18n="calib.p">Each dot takes the steps where the model gave its chosen move about the same probability, and
+      asks how often that move was the teacher's. On the diagonal, the number it reports is the rate it achieves.</p>
     <div class="panels calib"></div>
-    <p id="calib-note" class="quiet"></p>
   </section>
 
   <section class="wrap" id="help">
-    <h2>Asking for help</h2>
+    <h2 data-i18n="help.h2">Knowing when to ask for help</h2>
     <div class="duel-block">
-      <p>The model plays every step it is sure about and hands the rest to the teacher. Two boards of the same game
-        from the same seed: one where the model plays every step itself, one where it keeps the steps it is confident
-        about and the teacher takes the others. The steps the teacher decided show in coral.</p>
+      <p data-i18n="help.p">The model plays every step it is sure about and hands the rest to the teacher. Two boards of
+        the same game from the same seed: on the left the model plays alone, on the right it keeps the steps it is
+        confident about and the teacher takes the others, shown in coral.</p>
       <div class="duel-row">
         <div id="duel" class="duel"></div>
-        <p id="duel-note" class="quiet"></p>
       </div>
     </div>
 
     <div class="curves-block">
-      <h3>What the confidence is worth</h3>
-      <p>The horizontal axis is the share of steps the teacher actually took, so the left end is the model alone and
-        the right end is the teacher alone. <b class="k-blue">Picking those steps by confidence</b> is the line that
-        has to beat <b class="k-coral">handing over the same share at random</b>, or the confidence means nothing.</p>
+      <h3 data-i18n="help.h3">What the confidence is worth</h3>
+      <p data-i18n="help.p2">The horizontal axis is the share of steps the teacher actually took, so the left end is the
+        model alone and the right end is the teacher alone. <b class="k-blue">Picking those steps by confidence</b> is
+        the line that has to beat <b class="k-coral">handing over the same share at random</b>, or the confidence means
+        nothing.</p>
       <div class="panels curves"></div>
-      <p id="handover-note" class="quiet"></p>
     </div>
   </section>
 
   <section class="wrap" id="transfer">
-    <h2>Learning a new game</h2>
-    <p>Two games were held out of an eight-game model. Fine-tuning that model on a few thousand frames of a held-out
-      game is compared against fine-tuning the raw base model on the same frames. The line is how often the fine-tuned
-      model picks the teacher's move on 2000 frames of that game it never trained on.</p>
+    <h2 data-i18n="transfer.h2">Learning a new game</h2>
+    <p data-i18n="transfer.p">Two games were held out of an eight-game model. Fine-tuning that model on a few thousand
+      frames of a held-out game is compared against fine-tuning the raw base model on the same frames. The line is how
+      often the fine-tuned model picks the teacher's move on 2000 frames of that game it never trained on.</p>
     <div class="panels transfer"></div>
     <details class="table-view">
-      <summary>every run as a table, with the scores</summary>
+      <summary data-i18n="transfer.table">every run as a table, with the scores</summary>
       <div class="tablewrap">
         <table id="transfer-table">
-          <thead><tr><th>game</th><th>starts from</th><th class="num">frames</th><th class="num">agreement</th><th class="num">score</th><th class="num">vs teacher</th></tr></thead>
+          <thead><tr><th data-i18n="th.game">game</th><th data-i18n="th.from">starts from</th><th class="num" data-i18n="th.frames">frames</th><th class="num" data-i18n="th.agree">agreement</th><th class="num" data-i18n="th.score">score</th><th class="num" data-i18n="th.vs">vs teacher</th></tr></thead>
           <tbody id="transfer-body"></tbody>
         </table>
       </div>
     </details>
-    <p id="transfer-note" class="quiet"></p>
   </section>
 
   <section class="wrap" id="how">
-    <h2>How it works</h2>
+    <h2 data-i18n="how.h2">How it works</h2>
     <div class="how">
       <div class="how-copy">
-        <p>The model sees the frame and the option list, rendered with the frozen OpenJev prompt, and its answer is
-          the next token after "Answer:". The probability over moves is the softmax over the option letters at that
-          position: one forward pass, no sampling, nothing generated. Confidence is
-          (p<sub>max</sub> &minus; 1/K) / (1 &minus; 1/K), so 0 is a uniform guess and 1 is certainty.</p>
-        <p>The most probable move is played, with one exception: a move that leaves the picture unchanged, such as a
-          blocked direction in 2048 or Sokoban, is not repeated on that same picture, and the next most probable move
-          goes instead.</p>
-        <p>Each board is the vendored game running with the shim and hook used in training, a virtual clock, a seeded
-          random source and synthetic key events, so the recorded action sequence reproduces the episode step for
-          step. The page checks the replayed score against the recording at the end of every episode and marks the
-          board in coral if the two ever differ.</p>
+        <p data-i18n-html="how.p1">The model sees the frame and the option list, rendered with the frozen OpenJev prompt,
+          and its answer is the next token after "Answer:". The probability over moves is the softmax over the option
+          letters at that position: one forward pass, no sampling, nothing generated.</p>
+        <p data-i18n="how.p2">The most probable move is played, with one exception: a move that leaves the picture
+          unchanged, such as a blocked direction in 2048 or Sokoban, is not repeated on that same picture, and the next
+          most probable move goes instead.</p>
+        <p data-i18n="how.p3">Each board here is the vendored game running with the shim and hook used in training, a
+          virtual clock, a seeded random source and synthetic key events, so the recorded action sequence reproduces the
+          episode step for step.</p>
       </div>
       <div class="how-prompt">
-        <div class="promptrow"><label for="prompt-game">option list for</label><select id="prompt-game"></select></div>
+        <div class="promptrow"><label for="prompt-game" data-i18n="how.optionlist">option list for</label><select id="prompt-game"></select></div>
         <pre id="prompt"></pre>
-        <p class="quiet">The highlighted placeholder is where the frame goes: one visual token per merged 32x32 pixel
-          block, 182 of them for a 448x416 frame.</p>
       </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="credits">
+    <h2 data-i18n="credits.h2">The games</h2>
+    <p data-i18n="credits.p">Ten open-source browser games, vendored with their own licence and every change we made
+      recorded next to them. The art in Infinite Mario, Floppy Bird and the Racer belongs to its original owners, and
+      the licence below covers the code each author wrote.</p>
+    <div class="credit-grid">
+      <a href="https://github.com/jakesgordon/javascript-tetris"><b>Tetris</b> <em>jakesgordon/javascript-tetris</em> <i>MIT</i></a>
+      <a href="https://github.com/patorjk/JavaScript-Snake"><b>Snake</b> <em>patorjk/JavaScript-Snake</em> <i>MIT</i></a>
+      <a href="https://github.com/daleharvey/pacman"><b>Pacman</b> <em>daleharvey/pacman</em> <i>WTFPL</i></a>
+      <a href="https://github.com/jakesgordon/javascript-racer"><b>Javascript Racer</b> <em>jakesgordon/javascript-racer</em> <i>MIT</i></a>
+      <a href="https://github.com/StrykerKKD/SpaceInvaders"><b>Space Invaders</b> <em>StrykerKKD/SpaceInvaders</em> <i>MIT</i></a>
+      <a href="https://github.com/taniarascia/sokoban"><b>Sokoban</b> <em>taniarascia/sokoban</em> <i>MIT</i></a>
+      <a href="https://github.com/robertkleffner/mariohtml5"><b>Infinite Mario</b> <em>robertkleffner/mariohtml5</em> <i>Unlicense</i></a>
+      <a href="https://github.com/nebez/floppybird"><b>Floppy Bird</b> <em>nebez/floppybird</em> <i>Apache-2.0</i></a>
+      <a href="https://github.com/jakesgordon/javascript-breakout"><b>Breakout</b> <em>jakesgordon/javascript-breakout</em> <i>MIT</i></a>
+      <a href="https://github.com/gabrielecirulli/2048"><b>2048</b> <em>gabrielecirulli/2048</em> <i>MIT</i></a>
     </div>
   </section>
 
@@ -170,11 +188,12 @@
 
 <footer class="wrap">
   <span><a data-link="repo" href="https://github.com/OmniJev/PlayJev">PlayJev on GitHub</a> ·
-    <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev server</a> ·
+    <a data-link="openjev" href="https://github.com/OmniJev/openJev">OpenJev</a> ·
     <a data-link="awesome" href="https://omnijev.github.io/awesome-jev/">Awesome-JEV</a></span>
   <span id="generated"></span>
 </footer>
 
+<script src="i18n.js"></script>
 <script src="data.js"></script>
 <script src="demo.js"></script>
 </body>
