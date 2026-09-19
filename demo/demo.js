@@ -159,6 +159,11 @@
     for (const t of tiles) if (t.iframe && ev.source === t.iframe.contentWindow) { t.onMessage(m); return; }
   });
 
+  // A grid tile is square and no game is: the picture fills it and the long side runs off the edge, instead of
+  // parking the game between two black bars. This is which part stays when it does, 0 the top, 1 the bottom.
+  // The featured board is the game's own shape, so it always shows the whole picture.
+  const FILL_Y = { tetris: 1, flappy: .2, pacman: .54, '2048': .62 };
+
   class Tile {
     constructor(game, entries, opts) {
       opts = opts || {};
@@ -293,8 +298,10 @@
       const r = this.rect || { x: 0, y: 0, w: this.game.viewport.width, h: this.game.viewport.height };
       if (this.free) this.root.style.setProperty('--ar', (r.w / r.h).toFixed(4));
       const BW = this.view.clientWidth || 200, BH = this.view.clientHeight || BW;
-      const s = Math.min(BW / r.w, BH / r.h);
-      const tx = (BW - r.w * s) / 2 - r.x * s, ty = (BH - r.h * s) / 2 - r.y * s;
+      const fill = !this.free;
+      const s = fill ? Math.max(BW / r.w, BH / r.h) : Math.min(BW / r.w, BH / r.h);
+      const ay = fill && FILL_Y[this.game.id] != null ? FILL_Y[this.game.id] : 0.5;
+      const tx = (BW - r.w * s) / 2 - r.x * s, ty = (BH - r.h * s) * ay - r.y * s;
       const V = this.game.viewport;
       // Only the game area shows; the rest of the game page (menus, footers, score panels) is clipped away.
       this.iframe.style.clipPath = `inset(${r.y.toFixed(2)}px ${(V.width - r.x - r.w).toFixed(2)}px ${(V.height - r.y - r.h).toFixed(2)}px ${r.x.toFixed(2)}px)`;
@@ -305,7 +312,7 @@
       {
         const vb = this.view.getBoundingClientRect(), ib = this.iframe.getBoundingClientRect();
         const dx = (vb.left + (BW - r.w * s) / 2) - (ib.left + r.x * s);
-        const dy = (vb.top + (BH - r.h * s) / 2) - (ib.top + r.y * s);
+        const dy = (vb.top + (BH - r.h * s) * ay) - (ib.top + r.y * s);
         if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
           this.iframe.style.transform = `translate(${(tx + dx).toFixed(2)}px, ${(ty + dy).toFixed(2)}px) scale(${s.toFixed(5)})`;
         }
