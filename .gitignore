@@ -26,3 +26,5 @@ docs/assets/board.gif
 docs/assets/board.png
 docs/assets/social.png
 demo/shots/
+logs/
+ckpt/

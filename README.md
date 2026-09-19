@@ -81,7 +81,9 @@ The model plays a game, one command:
 python -m playjev.play snake --policy local --ckpt OmniJev/PlayJev-0.8B --episodes 1
 ```
 
-It pulls the weights from Hugging Face, opens Snake in headless Chromium and plays it. Setup once (Python 3.12,
+It pulls the weights from Hugging Face, opens Snake in headless Chromium and plays it. There is no dataset to
+download: the ten games are in this repository and `scripts/reproduce.sh` regenerates every training frame here,
+from the teachers through both DAgger rounds to the closed-loop score. Setup once (Python 3.12,
 a CUDA GPU, about 3 GB for inference and 17 GB for training at batch 64):
 
 ```bash
@@ -96,6 +98,7 @@ pip install -r requirements.txt && playwright install chromium
 | `playjev.collect <game> --steps 4000 --shard s0` | (frame, teacher target) pairs under `data/<game>/s0` |
 | `playjev.train_sft --games <game> --model Qwen/Qwen3.5-0.8B-Base --out ckpt/x` | fine-tune, one epoch |
 | `playjev.serve --ckpt <ckpt> --port 18732` | the checkpoint at `/v1/systemone` in the OpenJev request shape; the demo switches every tile to it with `?server=http://127.0.0.1:18732` |
+| `bash scripts/reproduce.sh` | the whole model from nothing: the teachers collect, the base model clones them, two DAgger rounds, the closed loop |
 | `python scripts/build_demo.py` | rebuild `demo/` from the games and the recorded runs, then serve it and open `index.html` |
 
 ## 📊 Results
@@ -166,7 +169,7 @@ The rest of what we measured, one line each.
 |---|---|
 | **Teachers** | One search program per game on the game's internal state: BFS (Snake), expectimax (2048), Dellacherie (Tetris), A* with deadlock pruning (Sokoban), exact physics (Floppy Bird), ghost occupancy (Pacman), ball flight (Breakout), dodge-and-aim DP (Invaders), lookahead steering (Racer), physics rollouts (Mario). Soft target: 0.9 on the best move, 0.1 over acceptable ones, 0 on losing ones. |
 | **Collection** | 100k frames per game, 448 px JPEGs, teachers playing with 2 to 30 percent random moves so the data covers recoveries. |
-| **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5, bf16 autocast on fp32 master weights, 3 to 4 h per round on one H200. |
+| **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5 for the cloning epoch and 1e-5 for each round, bf16 autocast on fp32 master weights, 3 to 4 h per round on one H200. |
 | **Closed loop** | 16 held-out episodes per game, the same seeds as random play and the teacher. Validation also reports agreement, calibration error and per-position bias. |
 
 Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELINES.md).
