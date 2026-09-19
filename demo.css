@@ -162,26 +162,27 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 
 /* ---------------------------------------------------------------- lead */
 /* the project-page header: title, the link buttons, then the board itself */
-.lead { padding-top: 34px; }
+.lead { padding-top: 48px; }
 .pagetitle {
-  text-align: center; max-width: 30ch; margin: 0 auto 26px;
-  font-size: clamp(31px, 4.1vw, 52px); line-height: 1.1;
+  text-align: center; margin: 0 auto 36px; text-wrap: initial;
+  font-size: clamp(30px, 4vw, 50px); line-height: 1.14;
 }
-.hero-buttons { display: flex; justify-content: center; gap: 13px; flex-wrap: wrap; margin: 0 0 30px; }
+.hero-buttons { display: flex; justify-content: center; gap: 11px; flex-wrap: wrap; margin: 0 0 34px; }
 .hero-buttons .btn {
-  display: inline-flex; align-items: center; gap: 9px; padding: 11px 23px; border-radius: 10px;
-  font-weight: 600; font-size: 15.5px; color: #fff; border: 0; letter-spacing: -0.01em;
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 17px; border-radius: 9px;
+  font-weight: 600; font-size: 14.5px; color: #fff; border: 0; letter-spacing: -0.01em;
   transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
 }
-.hero-buttons a.btn:hover { text-decoration: none; transform: translateY(-2px); filter: saturate(1.06); box-shadow: 0 8px 20px rgba(16, 26, 48, .22); }
-.hero-buttons .btn svg { flex: none; }
-.hero-buttons .tagx { font-style: normal; font-size: 11.5px; font-weight: 600; opacity: .78; letter-spacing: .01em; }
-.hero-buttons .soon { background: var(--muted); opacity: .62; cursor: default; }
-.btn-paper { background: #e0424f; }
-.btn-code { background: #2b3446; }
-.btn-model { background: #d68910; }
-.btn-jev { background: var(--accent); }
-.btn-list { background: #6d5ce7; }
+.hero-buttons a.btn:hover { text-decoration: none; transform: translateY(-2px); filter: saturate(1.08); box-shadow: 0 8px 20px rgba(16, 26, 48, .22); }
+.hero-buttons .btn svg { flex: none; width: 15px; height: 15px; }
+.hero-buttons .tagx { font-style: normal; font-size: 11px; font-weight: 600; opacity: .72; letter-spacing: .01em; }
+/* not published yet: the button keeps its colour so the row is not a grey wall, and says so */
+.hero-buttons .soon { opacity: .46; cursor: default; }
+.btn-paper { background: #d93a4a; }
+.btn-code { background: #1e2735; }
+.btn-model { background: #ffd21e; color: #1d2333; }
+.btn-jev { background: #1f6fe5; }
+.btn-list { background: #7c5cf0; }
 .lead-stage { max-width: 1080px; margin: 0 auto; }
 .stage-note { margin-top: 12px; max-width: 70ch; }
 
@@ -222,12 +223,18 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .tile .view .overlay[hidden] { display: none; }
 
 /* play controls sit on the board and only come out on hover or keyboard focus */
-.tile .controls {
+.tile .board > .controls {
   position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; gap: 5px; align-items: center;
   opacity: 0; transition: opacity 120ms ease; z-index: 2;
 }
-.tile:hover .controls, .tile .controls:focus-within { opacity: 1; }
-@media (hover: none) { .tile .controls { opacity: 1; } }
+.tile:hover .board > .controls, .tile .board > .controls:focus-within { opacity: 1; }
+@media (hover: none) { .tile .board > .controls { opacity: 1; } }
+/* in the readout they are ordinary buttons on the card, not a strip floating over the game */
+.tile .deck > .controls { display: flex; align-items: center; gap: 5px; }
+.tile .deck > .controls button, .tile .deck > .controls select {
+  background: var(--btn); color: var(--fg-2); border: 1px solid var(--line); backdrop-filter: none; max-width: none;
+}
+.tile .deck > .controls button:hover, .tile .deck > .controls select:hover { background: var(--btn-hover); color: var(--fg); }
 .tile .controls button, .tile .controls select {
   font-size: 12px; padding: 3px 8px; background: rgba(12, 14, 17, .74); color: #e9eaec; border-color: rgba(255, 255, 255, .16);
   backdrop-filter: blur(6px);

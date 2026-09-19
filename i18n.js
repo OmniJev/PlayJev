@@ -51,7 +51,7 @@ window.PJ_I18N = {
 
     'nav.gallery': '游戏墙', 'nav.results': '结果', 'nav.confidence': '置信度', 'nav.how': '原理',
 
-    'lead.h1': 'PlayJev：会玩小游戏的多模态 JEV 模型',
+    'lead.h1': 'PlayJev：会玩十款小游戏的<br>多模态 JEV 模型',
     'btn.paper': '论文', 'btn.code': '代码', 'btn.model': '模型', 'link.soon': '即将发布',
 
     'gallery.h2': '游戏墙',

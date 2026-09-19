@@ -195,16 +195,13 @@
       // The grid's small tiles keep the same buttons on the board itself, out of the way until the pointer is there.
       this.ppBtns = [];
       const deck = this.deck = el('div', 'deck');
-      const deckPP = el('button', 'pp', T('ui.pause'));
-      deckPP.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
-      this.ppBtns.push(deckPP);
       const deckSeg = el('span', 'seg speeds'); this.speedBtns = {};
       for (const sp of [0.5, 1, 2, 4, 8]) {
         const b = el('button', sp === 1 ? 'on' : '', sp + 'x');
         b.addEventListener('click', () => this.setSpeed(sp));
         deckSeg.appendChild(b); this.speedBtns[sp] = b;
       }
-      deck.append(deckPP, el('span', 'decklabel', T('ui.speed')), deckSeg);
+      deck.append(el('span', 'decklabel', T('ui.speed')), deckSeg);
       root.appendChild(deck);
 
       const board = this.board = el('div', 'board');
@@ -221,7 +218,9 @@
         for (const p of this.policies) { const o = el('option', '', p === 'live' ? T('ui.live') : shortPolicy(p)); o.value = p; o.title = p; sel.appendChild(o); }
         sel.value = this.policy; sel.addEventListener('change', () => this.selectPolicy(sel.value)); c.appendChild(sel); this.sel = sel;
       }
-      board.appendChild(c); root.appendChild(board);
+      // on a board with a readout column they go in the readout, next to the speed; a small grid tile has
+      // nowhere else to put them, so there they stay on the picture until the pointer leaves
+      this.placeControls(); root.appendChild(board);
 
       this.bars = el('div', 'bars'); this.rows = [];
       for (const a of g.actions) {
@@ -403,11 +402,16 @@
       this.stepEl.textContent = T('ui.step') + ' ' + i + (total != null ? ' / ' + total : '') + (tail ? ' ' + tail : '');
       this.scoreEl.textContent = T('ui.score') + ' ' + fmtScore(score);
     }
+    // The controls belong to the readout column when there is one, and to the board when there is not.
+    placeControls() {
+      if (this.free) this.deck.prepend(this.ctrl); else this.board.appendChild(this.ctrl);
+    }
     // One-at-a-time mode promotes the running tile to the featured board: its own shape, the readout beside it.
     setFeatured(on) {
       on = !!on; if (this.featured === on) return;
       this.featured = on; this.free = on || this.hero;
       this.root.classList.toggle('hero', this.free);
+      this.placeControls();
       if (!this.free) this.root.style.removeProperty('--ar');
       this.fit();
     }
@@ -701,7 +705,7 @@
       activeTile = t; mark(t, true); remember('pj-tile-game', t.game.id); t.start();
     }
     applyMode = (next, initial) => {
-      solo = !!next; grid.classList.toggle('solo', solo); remember('pj-tile-mode', solo ? 'solo' : 'all');
+      solo = !!next; grid.classList.toggle('solo', solo);
       for (const b of modeBtns) b.classList.toggle('on', (b.dataset.mode === 'solo') === solo);
       const gt = gridTiles();
       if (solo) {
@@ -719,7 +723,7 @@
       if (!solo || ev.target.closest('.controls')) return;   // the tile's own buttons keep working
       activate(t);
     });
-    applyMode(remembered('pj-tile-mode') === 'solo', true);
+    applyMode(false, true);   // the gallery always opens with the ten of them running
     // The ten only run while the section is on screen: the featured board above it is what loads first.
     lazyWhileVisible(gridTiles(), section, (t) => !solo || t.root.classList.contains('active'));
 
