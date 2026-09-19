@@ -26,7 +26,7 @@ GAMES = [
     ("2048",     "2048",           "7204",   (0.12, 0.06, 0.13)),
 ]
 # fractional crop, to keep page furniture (theme pickers, how-to-play copy) out of the board
-CROP = {"snake": (0, .06, 1, 1), "2048": (0, 0, 1, .80)}
+CROP = {"snake": (0, .105, 1, 1), "2048": (0, 0, 1, .80)}
 BOARD_ORDER = ["mario", "snake", "tetris", "2048", "flappy", "pacman", "breakout", "invaders", "racer", "sokoban"]
 
 
