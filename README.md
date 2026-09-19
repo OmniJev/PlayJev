@@ -65,6 +65,33 @@ shuffled in every training sample, so position carries no information. One frame
 matters the vision tower also takes the previous frame, at no extra token cost. The prompt itself is in
 [docs/MODEL_NOTES.md](docs/MODEL_NOTES.md).
 
+## ▶️ Run It
+
+The model plays a game, one command:
+
+```bash
+python -m playjev.play snake --policy local --ckpt OmniJev/PlayJev-0.8B --episodes 1
+```
+
+It pulls the weights from Hugging Face, opens Snake in headless Chromium and plays it. Setup once (Python 3.12,
+a CUDA GPU, about 3 GB for inference and 17 GB for training at batch 64):
+
+```bash
+git clone https://github.com/OmniJev/PlayJev && cd PlayJev
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt && playwright install chromium
+```
+
+| Command | What it does |
+|---|---|
+| `playjev.play <game> --policy teacher` (or `random`) | the two reference rows; `--delay 1` decides one step late |
+| `playjev.collect <game> --steps 4000 --shard s0` | (frame, teacher target) pairs under `data/<game>/s0` |
+| `playjev.train_sft --games <game> --model Qwen/Qwen3.5-0.8B-Base --out ckpt/x` | fine-tune, one epoch |
+| `playjev.serve --ckpt <ckpt> --port 18732` | the checkpoint at `/v1/systemone` in the OpenJev request shape; the demo switches every tile to it with `?server=http://127.0.0.1:18732` |
+| `python scripts/build_demo.py` | rebuild `demo/` from the games and the recorded runs, then serve it and open `index.html` |
+
+The PBS job scripts we used are under `hpc/`.
+
 ## 📊 Results
 
 One model for all ten games, playing 16 held-out episodes per game, argmax move, episodes capped at 1500
@@ -233,44 +260,13 @@ deadlocked, and no later decision repairs them.
 
 | Stage | What it is |
 |---|---|
-| **Teachers** | One program per game, playing on the game's internal state: BFS for Snake, expectimax for 2048, Dellacherie placement search for Tetris, A* with deadlock pruning for Sokoban, exact physics search for Floppy Bird, ghost-occupancy propagation for Pacman, ball-flight simulation for Breakout, a dodge-and-aim DP for Space Invaders, lookahead steering for the Racer, physics rollouts for Mario. Each returns a soft target: 0.9 on the best move, split on ties, 0.1 over acceptable moves, 0 on moves that lose. |
-| **Collection** | Teachers play with 2 to 30 percent random moves so the data covers recoveries, and the label is always the teacher's own judgement of the frame. 100k frames per game, 448 px JPEGs, three shards per game collected in parallel on the CPU cores next to the GPU. |
-| **Fine-tuning** | Full fine-tuning of the 0.8B model against the teacher distribution, one epoch over the ten games mixed, batch 64, learning rate 2e-5, fp32 master weights with bf16 autocast. |
-| **Closed loop** | 16 held-out episodes per game through the same harness, against random play and the teacher on the same seeds. Validation also reports agreement, calibration error and per-position bias. |
+| **Teachers** | One search program per game on the game's internal state: BFS (Snake), expectimax (2048), Dellacherie (Tetris), A* with deadlock pruning (Sokoban), exact physics (Floppy Bird), ghost occupancy (Pacman), ball flight (Breakout), dodge-and-aim DP (Invaders), lookahead steering (Racer), physics rollouts (Mario). Soft target: 0.9 on the best move, 0.1 over acceptable ones, 0 on losing ones. |
+| **Collection** | 100k frames per game, 448 px JPEGs, teachers playing with 2 to 30 percent random moves so the data covers recoveries. |
+| **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5, bf16 autocast on fp32 master weights. |
+| **Closed loop** | 16 held-out episodes per game, the same seeds as random play and the teacher. Validation also reports agreement, calibration error and per-position bias. |
 
 Curves and every number: [docs/TRAIN_NOTES.md](docs/TRAIN_NOTES.md), [docs/MODEL_NOTES.md](docs/MODEL_NOTES.md),
 [docs/BASELINES.md](docs/BASELINES.md).
-
-<details>
-<summary>💻 &nbsp;Run it yourself</summary>
-
-Python 3.12, Playwright's Chromium for the games, and a CUDA GPU (about 3 GB for inference, 17 GB for
-training at batch 64).
-
-```bash
-git clone https://github.com/OmniJev/PlayJev && cd PlayJev
-python -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt && playwright install chromium
-
-python -m playjev.bench snake --pages 8 --steps 200        # the harness: random play, env-steps per second
-python -m playjev.teacher_eval snake --episodes 16         # the teacher's score on held-out seeds
-python -m playjev.collect snake --steps 4000 --shard s0    # (frame, teacher target) pairs under data/snake/s0
-python -m playjev.train_sft --games snake --model Qwen/Qwen3.5-0.8B-Base --out ckpt/snake1
-python -m playjev.play snake --policy local --ckpt ckpt/snake1/final --record runs/replays
-python -m playjev.play snake --policy local --ckpt OmniJev/PlayJev-0.8B          # the released weights
-```
-
-`--policy teacher` and `--policy random` give the two reference rows, `--delay 1` applies each decision one
-step late. The PBS job scripts we used are under `hpc/`.
-
-Serving: `python -m playjev.serve --ckpt ckpt/snake1/final --port 18732` exposes the checkpoint at
-`/v1/systemone` in the OpenJev request shape with frames as the state.
-`playjev.play --policy server --url http://127.0.0.1:18732/v1/systemone` plays through it, and the demo page
-switches every tile to that server with `?server=http://127.0.0.1:18732`.
-
-The demo itself is in `demo/`, built by `scripts/build_demo.py` from the games and the recorded runs. Serve
-that directory and open `index.html` to run it locally.
-</details>
 
 ## 📈 More Charts
 
