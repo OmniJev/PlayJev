@@ -93,7 +93,9 @@ h1 {
 h2 { font-size: 25px; font-weight: 620; letter-spacing: -0.015em; line-height: 1.25; margin: 0 0 12px; }
 h3 { font-size: 18px; font-weight: 620; letter-spacing: -0.01em; margin: 34px 0 8px; }
 p { margin: 0 0 12px; max-width: 74ch; color: var(--fg-2); }
-.quiet { font-size: 14.5px; color: var(--muted); }
+.quiet { font-size: 15px; color: var(--muted); }
+/* these two carry the point of their section, so they keep the body colour */
+#notice, #duel-note { color: var(--fg-2); }
 main section { padding: 54px 0 0; }
 main section + section { padding-top: 60px; }
 .k-blue { color: var(--accent); }
@@ -101,7 +103,7 @@ main section + section { padding-top: 60px; }
 
 /* ---------------------------------------------------------------- top bar */
 .top {
-  position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--bg) 93%, transparent);
   backdrop-filter: saturate(1.4) blur(8px); border-bottom: 1px solid transparent;
 }
 .top.stuck { border-bottom-color: var(--line); }
@@ -145,7 +147,7 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 }
 .tile .head { display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 600; line-height: 1.2; }
 .tile .head .title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tile .head .score { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--fg); font-weight: 600; }
+.tile .head .score { margin-left: auto; flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--fg); font-weight: 600; }
 .tile .head .mark { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); flex: none; }
 .tile.mismatch .head .mark { display: inline-block; }
 
@@ -215,21 +217,40 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 @media (min-width: 720px) {
   .tile.hero {
     display: grid; grid-template-columns: minmax(0, 1fr) 244px;
-    grid-template-areas: "board head" "board bars" "board conf" "board foot";
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas: "board head" "board bars" "board conf" "board trace" "board foot";
+    /* the trace sits on the bottom of the slack row, so the readout column is anchored at both ends */
+    grid-template-rows: auto auto auto 1fr auto;
   }
   .tile.hero .head { grid-area: head; font-size: 17px; }
   .tile.hero .board { grid-area: board; }
   .tile.hero .bars { grid-area: bars; }
   .tile.hero .conf { grid-area: conf; }
+  .tile.hero .trace { grid-area: trace; align-self: end; width: 100%; }
   .tile.hero .foot { grid-area: foot; align-content: start; margin-top: 0; }
 }
-.tile.hero .view { aspect-ratio: auto; height: clamp(290px, 45vh, 440px); }
+/* --ar is the game's own width / height, set in fit(); a free board is exactly that shape, never letterboxed */
+.tile.hero { --cap-h: clamp(290px, 45vh, 440px); }
+.tile.hero .board, .duel .board { width: min(100%, calc(var(--cap-h) * var(--ar, 1))); margin-inline: auto; }
+.tile.hero .view, .duel .view { width: 100%; height: auto; aspect-ratio: var(--ar, 1); }
 .tile.hero .bars { font-size: 13.5px; row-gap: 6px; }
+.tile.hero .trace { margin-top: 6px; }
 .tile.hero .bars .row .bar { height: 10px; }
 .tile.hero .bars .row .val { width: 34px; }
 .tile.hero .conf { font-size: 13.5px; }
 .tile.hero .foot { font-size: 13px; }
+
+/* the episode's confidence as a line: played part blue, the rest faint, teacher steps as coral ticks */
+.tile .trace { display: none; margin-top: 2px; }
+.tile.hero .trace { display: block; }
+.tile .trace .tlabel { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 1px; }
+.tile .trace svg { display: block; width: 100%; height: auto; }
+.trace .tbase { stroke: var(--line); stroke-width: 1; }
+.trace .tfull { fill: none; stroke: var(--line); stroke-width: 1.4; stroke-linejoin: round; }
+.trace .tplayed { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.trace .ttick { stroke: var(--coral); stroke-width: 1.4; }
+.trace .tnow { stroke: var(--line); stroke-width: 1; }
+.trace .tdot { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+.trace .tdot.h { fill: var(--coral); }
 
 /* ---------------------------------------------------------------- the ten */
 .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 18px 0 16px; }
@@ -237,12 +258,27 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .grid { display: grid; gap: 16px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 @media (max-width: 1180px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 900px)  { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 640px)  { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .wrap { padding: 0 16px; } }
+@media (max-width: 640px)  {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .wrap { padding: 0 16px; }
+  .toolbar-note { flex-basis: 100%; }   /* the note gets its own line instead of sitting in a hole beside a button */
+}
+
+/* Every tile in the grid shares one set of rows, so the boards, the bar block, the confidence line and the step
+   line sit at the same height across the row however many moves a game has. Tiles keep their own 8px row gap. */
+@supports (grid-template-rows: subgrid) {
+  .grid:not(.solo) > .tile { display: grid; grid-template-rows: subgrid; grid-row: span 5; row-gap: 8px; }
+  .grid:not(.solo) > .tile .bars { align-content: start; }
+  .grid:not(.solo) > .tile .foot { margin-top: 0; }
+}
 
 /* one at a time: the running game keeps a full tile, the rest collapse to a clickable name */
 .grid.solo { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
 .grid.solo .tile { flex: 0 0 auto; }
-.grid.solo .tile.active { flex: 0 0 min(560px, 100%); order: 1; }
+/* the one running game is the main event: a taller board, and the card hugs it instead of padding it out */
+.grid.solo .tile.active { flex: 0 1 auto; max-width: min(1060px, 100%); order: 1; --cap-h: clamp(300px, 56vh, 600px); }
+@media (min-width: 720px) {
+  .grid.solo .tile.active { grid-template-columns: minmax(0, calc(var(--cap-h) * var(--ar, 1))) 244px; }
+}
 .grid.solo::after { content: ''; order: 0; flex-basis: 100%; height: 0; }
 .grid.solo .tile:not(.active) {
   cursor: pointer; padding: 5px 13px; align-self: flex-start; border-radius: 999px; box-shadow: none;
@@ -257,7 +293,7 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .grid.solo .tile:not(.active):hover .head .title { color: var(--accent); }
 
 /* ---------------------------------------------------------------- score chart */
-.chart { margin: 22px 0 8px; max-width: 900px; }
+.chart { margin: 22px 0 8px; }
 .chart .scale { display: grid; grid-template-columns: var(--namew, 148px) minmax(0, 1fr) 52px; gap: 0 14px; align-items: end; }
 .chart .scale .ticks { position: relative; height: 18px; font-size: 12.5px; color: var(--muted); }
 .chart .scale .ticks span { position: absolute; bottom: 0; transform: translateX(-50%); white-space: nowrap; }
@@ -294,9 +330,11 @@ td.pending { color: var(--muted); }
 
 /* ---------------------------------------------------------------- small multiples */
 .panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 18px 20px; margin: 22px 0 10px; }
-.panels figure { margin: 0; }
+.panels.transfer { grid-template-columns: repeat(auto-fill, minmax(280px, 400px)); }
+.panels figure { margin: 0; display: flex; flex-direction: column; }
 .panels svg { display: block; width: 100%; height: auto; }
-.panels figcaption { font-size: 13.5px; color: var(--fg-2); margin-top: 2px; }
+/* the caption is the panel's title, so it reads first, above the plot */
+.panels figcaption { order: -1; font-size: 13.5px; color: var(--fg-2); margin: 0 0 4px; }
 .panels .axis { stroke: var(--line); stroke-width: 1; }
 .panels .diag { stroke: var(--line); stroke-width: 1; }
 .panels .txt { fill: var(--muted); font-size: 10px; }
@@ -310,7 +348,11 @@ td.pending { color: var(--muted); }
 .legend i.c { background: var(--coral); }
 
 /* ---------------------------------------------------------------- duel */
-.duel { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin: 20px 0 8px; max-width: 980px; }
+.duel-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 14px 32px; margin: 20px 0 8px; }
+/* min-width: 0 lets the pair drop to one column on a phone instead of running off the side */
+.duel { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; flex: 0 1 auto; min-width: 0; max-width: 980px; }
+#duel-note { flex: 1 1 250px; max-width: 44ch; }
+.duel .tile { --cap-h: min(360px, 42vh); }
 .duel .tile .head .title { font-variant-numeric: tabular-nums; }
 .duel .tile.lead-board { border-color: var(--accent); }
 
@@ -328,8 +370,8 @@ pre .ph { color: var(--accent); }
 footer {
   margin-top: 64px; padding-top: 18px; padding-bottom: 40px; font-size: 13.5px; color: var(--muted);
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 20px;
+  border-top: 1px solid var(--line-soft);
 }
-footer::before { content: ''; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

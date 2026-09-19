@@ -105,10 +105,12 @@
     <h2>Asking for help</h2>
     <div class="duel-block">
       <p>The model plays every step it is sure about and hands the rest to the teacher. Two boards of the same game
-        from the same seed: on the left the model plays alone, on the right it keeps the confident steps and the
-        teacher takes the others. The steps the teacher decided show in coral.</p>
-      <div id="duel" class="duel"></div>
-      <p id="duel-note" class="quiet"></p>
+        from the same seed: one where the model plays every step itself, one where it keeps the steps it is confident
+        about and the teacher takes the others. The steps the teacher decided show in coral.</p>
+      <div class="duel-row">
+        <div id="duel" class="duel"></div>
+        <p id="duel-note" class="quiet"></p>
+      </div>
     </div>
 
     <div class="curves-block">
@@ -124,13 +126,18 @@
   <section class="wrap" id="transfer">
     <h2>Learning a new game</h2>
     <p>Two games were held out of an eight-game model. Fine-tuning that model on a few thousand frames of a held-out
-      game is compared against fine-tuning the raw base model on the same frames.</p>
-    <div class="tablewrap">
-      <table id="transfer-table">
-        <thead><tr><th>game</th><th>starts from</th><th class="num">frames</th><th class="num">agreement</th><th class="num">score</th><th class="num">vs teacher</th></tr></thead>
-        <tbody id="transfer-body"></tbody>
-      </table>
-    </div>
+      game is compared against fine-tuning the raw base model on the same frames. The line is how often the fine-tuned
+      model picks the teacher's move on 2000 frames of that game it never trained on.</p>
+    <div class="panels transfer"></div>
+    <details class="table-view">
+      <summary>every run as a table, with the scores</summary>
+      <div class="tablewrap">
+        <table id="transfer-table">
+          <thead><tr><th>game</th><th>starts from</th><th class="num">frames</th><th class="num">agreement</th><th class="num">score</th><th class="num">vs teacher</th></tr></thead>
+          <tbody id="transfer-body"></tbody>
+        </table>
+      </div>
+    </details>
     <p id="transfer-note" class="quiet"></p>
   </section>
 
