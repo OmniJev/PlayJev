@@ -13,8 +13,9 @@ frame (JPEG, 448 px) ─┐
 option list ──────────┘
 ```
 
-Demo: <https://omnijev.github.io/PlayJev/>. Every tile is the real game replaying a recorded episode of the
-trained model step by step, with the model's probabilities drawn beside the picture.
+The demo is in `demo/`, built by `scripts/build_demo.py` from the games and the recorded runs: every tile is the
+real game replaying an episode of the trained model step by step, with the model's probabilities drawn beside the
+picture. Serve the directory and open `index.html`.
 
 ## Why pixels
 
@@ -27,45 +28,63 @@ the frame alone, in real time, with a probability the game loop can trust.
 
 ## Results
 
-Two models so far, both Qwen3.5-0.8B-Base and both one model for all ten games. `sft_all1` is one epoch of
-behaviour cloning on 863k teacher-labelled frames (about 100k per game, 4 h 11 min on one H200). `dagger1` is one
-DAgger round on top of it: `sft_all1` played 40k frames per game, the teachers labelled every frame it visited, and
-the model trained one more epoch (lr 1e-5) on those plus one teacher-driven shard per game (3 h 10 min). Closed loop
-on 16 held-out episodes per game (seeds 5000 to 5015), argmax move, episodes capped at 1500 steps; random and
-teacher play the same seeds through the same harness. "vs teacher" is (model - random) / (teacher - random): 0 is
-random play, 1 is the teacher.
+Three models, all Qwen3.5-0.8B-Base and each one model for all ten games. `sft_all1` is one epoch of behaviour
+cloning on 863k teacher-labelled frames (about 100k per game, 4 h 11 min on one H200). `dagger1` and `dagger2` are
+two DAgger rounds on top of it: the current model plays 40k frames per game, the teachers label every frame it
+visited, and the model trains one more epoch (lr 1e-5) on those plus the earlier shards (3 h 10 min and 4 h 20 min).
+Closed loop on 16 held-out episodes per game, argmax move, episodes capped at 1500 steps; random and teacher play
+the same seeds through the same harness. "vs teacher" is (model - random) / (teacher - random): 0 is random play,
+1 is the teacher.
 
-| game | random | sft_all1 | dagger1 | teacher | vs teacher, sft_all1 | vs teacher, dagger1 |
-|---|---:|---:|---:|---:|---:|---:|
-| Space Invaders | 215 | 400 | **400** | 400 | 1.00 | **1.00** |
-| Racer | 238 | 6211 | **6704** | 6712 | 0.92 | **1.00** |
-| Sokoban | 6.6 | 57.9 | **102.3** | 102.2 | 0.54 | **1.00** |
-| Snake | 1.0 | 77.8 | **107.9** | 114 | 0.68 | **0.95** |
-| Pacman | 113 | 1036 | **3209** | 7026 | 0.13 | **0.45** |
-| Infinite Mario | 613 | 1156 | 1170 | 4229 | 0.15 | 0.15 |
-| Floppy Bird | 0.0 | 8.9 | 9.3 | 84.0 | 0.11 | 0.11 |
-| Tetris | 162 | 1034 | 1561 | 15288 | 0.06 | 0.09 |
-| Breakout | 496 | 611 | 1552 | 16547 | 0.01 | 0.07 |
-| 2048 | 1021 | 3174 | 2170 | 19593 | 0.12 | 0.06 |
-| mean | | | | | 0.37 | 0.49 |
+| game | random | sft_all1 | dagger1 | dagger2 | teacher | vs teacher, sft_all1 | dagger1 | dagger2 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Space Invaders | 215 | 400 | 400 | 400 | 400 | 1.00 | 1.00 | **1.00** |
+| Racer | 238 | 6211 | 6704 | 6707 | 6712 | 0.92 | 1.00 | **1.00** |
+| Sokoban | 6.6 | 57.9 | 102.3 | 102.1 | 102.2 | 0.54 | 1.00 | **1.00** |
+| Snake | 1.0 | 77.8 | **107.9** | 89.5 | 114 | 0.68 | **0.95** | 0.79 |
+| Pacman | 113 | 1036 | 3209 | 3702 | 7026 | 0.13 | 0.45 | **0.52** |
+| Infinite Mario | 613 | 1156 | 1170 | 1764 | 4229 | 0.15 | 0.15 | **0.32** |
+| Tetris | 162 | 1034 | 1561 | 4718 | 15288 | 0.06 | 0.09 | **0.30** |
+| Floppy Bird | 0.0 | 8.9 | 9.3 | 13.8 | 84.0 | 0.11 | 0.11 | **0.16** |
+| Breakout | 496 | 611 | 1552 | 2712 | 16547 | 0.01 | 0.07 | **0.14** |
+| 2048 | 1021 | 3174 | 2170 | 3386 | 19593 | 0.12 | 0.06 | **0.13** |
+| mean | | | | | | 0.37 | 0.49 | **0.53** |
 
 Zero-shot, the base model puts 0.7 on option A whatever the frame. After one epoch every game is above random.
-The DAgger round separates the games by what was wrong:
+The DAgger rounds separate the games by what was wrong:
 
 - Sokoban, Racer, Snake and Pacman were covariate shift: the cloned policy reproduced the teacher on the teacher's
   own frames (0.95, 0.84, 0.99 and 0.87 agreement) and lost it on its own (0.91, 0.56, 0.93, 0.92 on its own play,
   with the errors concentrated where they cost most). One round of labels on the model's own states brings three of
-  them to the teacher's level and triples Pacman.
+  them to the teacher's level and triples Pacman; the three saturated ones hold through round 2.
+- Snake goes the other way in round 2, 107.9 to 89.5, the only column in the table that does. It is a real
+  regression and not 16-episode noise: on the 14 held-out seeds the two rounds share, round 2 is lower on 12, the
+  paired difference is -17.4 with sd 22.5, and a sign-flip permutation test over 200,000 permutations puts it at
+  p = 0.0073. Mean episode length falls with the score, 455 steps to 348, which is what a snake regression looks
+  like: the model dies earlier, so it eats less. Both agreement instruments miss it. Validation agreement is flat
+  (.780 to .775) and on-policy agreement, measured by replaying the recorded episodes through the real game with
+  the teacher watching, *rises* more for snake than for any other game (.722 to .824). The reason is that agreement
+  is averaged over the frames the model visits and those frames changed: total steps over the same 16 episodes fell
+  7275 to 5568, so the average shifts toward the easy early game, where a three-segment snake on an empty board has
+  almost no way to be wrong. In a fatal-on-mistake game, agreement can move against the score. Only the closed loop
+  sees it.
 - Breakout and Mario need motion. On the teacher's frames the paddle is already under the ball's landing point, so
   the cloned policy learned to read the paddle instead of the ball (16 percent agreement on its own play); DAgger
-  raises that to 47 percent and the score 2.5x, but a single frame does not show the ball's direction, nor Mario's
-  velocity and jump phase. A two-frame input (previous and current frame merged into the vision tower's temporal
-  patch) did not add the motion read; two separate images is the next ablation.
+  raises that to 47 percent and the score 2.5x, and round 2 doubles both again (Breakout 0.07 to 0.14, Mario 0.15
+  to 0.32). A single frame still does not show the ball's direction, nor Mario's velocity and jump phase, and how
+  the second frame is delivered decides who benefits. Merged into the vision tower's temporal patch it adds nothing
+  outside Breakout. Passed as two separate images the model can compare by attention, Breakout gains validation
+  agreement at every eval point (+.096 on average, the largest effect in the ablation) while Mario and Racer lose at
+  every point. Those two are the only games in the roster whose camera translates: the frame difference is dominated
+  by the global shift of the scene, which the model has to discount before any local motion means anything. For a
+  fixed camera the frame difference *is* the object that moved. Stacking through the patch convolution mixes the
+  translation into every patch embedding, which is why the merged version looked flat overall.
 - Floppy Bird and Tetris are precision. Flappy reproduces the teacher on 99.8 percent of frames and dies at 9 pipes
   on the one missed correction (a second consecutive flap); Tetris drops pieces one move early. Forty thousand
-  on-policy frames contain a few hundred of those moments, so the round barely moves them.
+  on-policy frames contain a few hundred of those moments, so round 1 barely moves them. Round 2 triples Tetris
+  (0.09 to 0.30) and lifts Flappy to 0.16.
 - 2048 is a reading problem (tile digits at 448 px): 0.48 agreement either way, and the model knows it, its
-  confidence there is 0.25.
+  confidence there is 0.25. Two rounds take it from 0.06 to 0.13, still the bottom of the table.
 
 **Execution rule.** A move that leaves the observation unchanged (a blocked direction in 2048 or Sokoban is a legal
 no-op) is not repeated on that observation; the next most probable move is taken. Without it, a deterministic
@@ -74,8 +93,13 @@ games whose frames change every step; their numbers are identical with and witho
 
 **Latency.** The same model applied one step late (the decision from frame k acts at step k+1, the real-time
 setting at 83 to 100 ms per step) collapses in the reflex games: Snake 11, Tetris 248, Breakout 394, Flappy 0.2,
-Pacman 502; Invaders 400 and Racer 5885 barely move. A model trained on labels shifted by one step
-(`--label-delay 1`) is the answer to that; results follow.
+Pacman 502; Invaders 400 and Racer 5885 barely move. Training on shifted labels (`--label-delay 1`, frame k
+labelled with the teacher's decision at k+1) helps exactly the games whose next decision follows from the current
+frame: Snake 11 to 20, Tetris 248 to 306, Breakout 394 to 636, Flappy 0.2 to 2.3, 2048 2191 to 3195. It hurts the
+ones whose next decision depends on what the current move does to the board: Mario 820 to 242 (standing still to
+the cap in half the episodes), Pacman 502 to 236, Racer 5885 to 5116, Sokoban at random level either way. So the
+shift has to be per game, and even where it helps, the real-time score stays a fraction of the undelayed one:
+latency has to be attacked in the model too, which is what the second frame is for.
 
 ### Does it read the option text?
 
@@ -147,12 +171,20 @@ Each game exposes the same tiny hook (`window.pj`: `start(seed)`, `step(action)`
 | Snake | patorjk/JavaScript-Snake | MIT | up, down, left, right |
 | Tetris | jakesgordon/javascript-tetris | MIT | left, right, rotate, drop, none |
 | 2048 | gabrielecirulli/2048 | MIT | up, down, left, right |
-| Floppy Bird | nebez/floppybird | Apache-2.0 | flap, wait |
-| Pacman | daleharvey/pacman | WTFPL | up, down, left, right |
+| Floppy Bird | nebez/floppybird | Apache-2.0 (code) | flap, wait |
+| Pacman | daleharvey/pacman | WTFPL (code) | up, down, left, right |
 | Breakout | jakesgordon/javascript-breakout | MIT | left, right, stay |
 | Space Invaders | StrykerKKD/SpaceInvaders | MIT | left, right, noop |
-| Javascript Racer | jakesgordon/javascript-racer | MIT | left, right, faster, slower, left faster, right faster |
+| Javascript Racer | jakesgordon/javascript-racer | MIT (code) | left, right, faster, slower, left faster, right faster |
 | Sokoban | taniarascia/sokoban, Microban levels by David Skinner | MIT | up, down, left, right |
+
+Three of the upstream projects say in their own READMEs that their art is not theirs to license. Infinite Mario's
+sprites are Nintendo's, Floppy Bird's are extracted from the original Android game and are Dong Nguyen's and
+.GEARS', and the Racer's are placeholder art borrowed from the Mega Drive version of OutRun. The licence in the
+table covers the code each author wrote. No audio ships here at all: every sound and music file was removed from
+the roster, which costs nothing, because the driver already aborted every audio request (`playjev/env.py`), the
+shim forces media elements muted and Chromium runs with `--mute-audio`. Not one frame in this repository, training
+or demo, was ever produced with sound.
 
 ## How a decision is made
 
@@ -249,4 +281,5 @@ hpc/               PBS job scripts for collection, training and closed-loop play
 
 ## Licence
 
-Code and trained weights: Apache-2.0. The games keep their own licences (see each `games/<id>/LICENSE`).
+Code and trained weights: Apache-2.0. The games keep their own licences, one file per game under `games/<id>/`,
+and the note under the roster says which of them cover the code only.
