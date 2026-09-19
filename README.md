@@ -6,6 +6,7 @@
 
 <p align="center">
   <a href="https://omnijev.github.io/PlayJev/"><img alt="live demo" src="https://img.shields.io/badge/live%20demo-show%20it-eda100?style=flat-square&labelColor=16181c"></a>
+  <a href="https://huggingface.co/spaces/OmniJev/PlayJev"><img alt="live demo on Hugging Face" src="https://img.shields.io/badge/HF%20Space-try%20it-ffd21e?style=flat-square&logo=huggingface&logoColor=ffd21e&labelColor=16181c"></a>
   <a href="https://huggingface.co/OmniJev/PlayJev-0.8B"><img alt="weights on Hugging Face" src="https://img.shields.io/badge/weights-PlayJev--0.8B-ffd21e?style=flat-square&logo=huggingface&logoColor=ffd21e&labelColor=16181c"></a>
   <a href="#-how-a-decision-is-made"><img alt="43 ms per move" src="https://img.shields.io/badge/per%20move-43%20ms-eb6834?style=flat-square&labelColor=16181c"></a>
   <a href="#-results"><img alt="0.53 vs teacher" src="https://img.shields.io/badge/vs%20teacher-0.53-2a78d6?style=flat-square&labelColor=16181c"></a>
