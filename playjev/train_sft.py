@@ -1,4 +1,4 @@
-"""Supervised fine-tuning of a Qwen3.5 VLM on teacher-labelled frames (stage B of docs/DESIGN.md).
+"""Supervised fine-tuning of a Qwen3.5 VLM on teacher-labelled frames.
 
 Loss: cross-entropy between the teacher's soft distribution over the options and the model's softmax over the
 option-letter logits at the answer position (a KL to soft targets), optionally plus a Brier term on the same two

@@ -62,8 +62,8 @@ of them.
 The demo's single game view is the whole model in one picture: the frame on the left is the only input, the
 bars are what the forward pass returns, the line below them is how sure it was at every step so far. Moves are
 shuffled in every training sample, so position carries no information. One frame per decision; where velocity
-matters the vision tower also takes the previous frame, at no extra token cost. The prompt itself is in
-[docs/MODEL_NOTES.md](docs/MODEL_NOTES.md).
+matters the vision tower also takes the previous frame, at no extra token cost. The prompt is built in
+[playjev/model.py](playjev/model.py), and the demo prints the exact one for every game.
 
 ## ▶️ Run It
 
@@ -263,8 +263,7 @@ deadlocked, and no later decision repairs them.
 | **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5, bf16 autocast on fp32 master weights. |
 | **Closed loop** | 16 held-out episodes per game, the same seeds as random play and the teacher. Validation also reports agreement, calibration error and per-position bias. |
 
-Curves and every number: [docs/TRAIN_NOTES.md](docs/TRAIN_NOTES.md), [docs/MODEL_NOTES.md](docs/MODEL_NOTES.md),
-[docs/BASELINES.md](docs/BASELINES.md).
+Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELINES.md).
 
 ## 📈 More Charts
 
@@ -307,7 +306,7 @@ games/<id>/        vendored game, pj.json manifest, pj_hook.js, NOTES.md, TEACHE
 games/_shared/     pj_shim.js: virtual clock, seeded Math.random, synthetic keys, frame grab
 playjev/           env.py (Playwright driver), collect.py, teachers/, model.py, train_sft.py, play.py, serve.py
 demo/              the GitHub Pages site; scripts/build_demo.py assembles it from games/ and runs/replays/
-docs/              HARNESS.md (the hook contract), DESIGN.md, BASELINES.md, MODEL_NOTES.md, TRAIN_NOTES.md
+docs/              HARNESS.md (the hook contract), BASELINES.md (the reference scores), DEMO.md
 ```
 
 ## 🔗 Related

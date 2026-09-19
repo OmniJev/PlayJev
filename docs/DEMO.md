@@ -63,7 +63,7 @@ in the lead and anywhere else marked `data-soon`.
 ## Live mode
 
 If a server URL is given (`?server=http://host:port`), the page sends the current canvas frame (JPEG data URL) with
-the option list in the OpenJev request shape (`docs/DESIGN.md` 3.1) and uses the returned probabilities instead of
+the option list in the OpenJev request shape and uses the returned probabilities instead of
 the recording. Latency is shown next to the confidence.
 
 ## Build

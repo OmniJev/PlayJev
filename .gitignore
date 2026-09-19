@@ -13,3 +13,10 @@ docs/HANDOVER.md
 docs/AGENT_BRIEF.md
 docs/TEACHER_BRIEF.md
 docs/agent_tasks/
+# lab notebooks: they name the cluster, the queue and every job id
+docs/TRAIN_NOTES.md
+docs/MODEL_NOTES.md
+docs/DESIGN.md
+
+# dead: the figures are built from docs/assets/games/
+shots/

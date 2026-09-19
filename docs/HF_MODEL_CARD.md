@@ -119,8 +119,9 @@ d = model.decide([frame], options)[0]       # one forward pass, a probability pe
 d.choice, d.probs, d.confidence             # the move it takes, the distribution, how sure it is
 ```
 
-The prompt, the readout and the option format are in
-[docs/MODEL_NOTES.md](https://github.com/OmniJev/PlayJev/blob/main/docs/MODEL_NOTES.md).
+The prompt, the readout and the option format are built in
+[playjev/model.py](https://github.com/OmniJev/PlayJev/blob/main/playjev/model.py), and the demo prints the exact
+prompt for every game.
 
 ## 🏋️ Training
 
@@ -136,7 +137,7 @@ One program per game (BFS, expectimax, placement search, A* with deadlock prunin
 the game's internal state and labels frames with a soft target. The model trains on 863k such frames, then on
 two DAgger rounds where it plays 40k frames per game and the teachers relabel what it visited. Full
 fine-tuning, one epoch per round, batch 64, learning rate 2e-5, fp32 master weights with bf16 autocast.
-Details in [docs/TRAIN_NOTES.md](https://github.com/OmniJev/PlayJev/blob/main/docs/TRAIN_NOTES.md).
+The trainer is [playjev/train_sft.py](https://github.com/OmniJev/PlayJev/blob/main/playjev/train_sft.py).
 
 ## ⚠️ Limits
 
