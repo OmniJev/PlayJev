@@ -1,14 +1,14 @@
 <p align="center">
-  <img src="docs/assets/board.png" alt="Ten browser games, each one being played by PlayJev, with the score it had reached">
+  <img src="docs/assets/board.gif" alt="Ten browser games, each one being played by PlayJev, with the score it had reached">
 </p>
 
 <h1 align="center">PlayJev: An Open-Source JEV-Like Model That Plays Small Games</h1>
 
 <p align="center">
-  <a href="https://omnijev.github.io/PlayJev/"><img alt="live demo" src="https://img.shields.io/badge/live_demo-play_it-eda100?style=for-the-badge&labelColor=16181c"></a>
-  <a href="https://huggingface.co/Qwen/Qwen3.5-0.8B-Base"><img alt="model" src="https://img.shields.io/badge/model-Qwen3.5--0.8B-2a78d6?style=for-the-badge&logo=huggingface&logoColor=white&labelColor=16181c"></a>
-  <a href="#-the-ten-games"><img alt="ten games" src="https://img.shields.io/badge/games-10-1baf7a?style=for-the-badge&labelColor=16181c"></a>
-  <a href="#-how-a-decision-is-made"><img alt="43 ms per move" src="https://img.shields.io/badge/per_move-43_ms-eb6834?style=for-the-badge&labelColor=16181c"></a>
+  <a href="https://omnijev.github.io/PlayJev/"><img alt="live demo" src="https://img.shields.io/badge/live%20demo-show%20it-eda100?style=flat-square&labelColor=16181c"></a>
+  <a href="https://huggingface.co/Qwen/Qwen3.5-0.8B-Base"><img alt="model" src="https://img.shields.io/badge/model-Qwen3.5--0.8B-2a78d6?style=flat-square&logo=huggingface&logoColor=white&labelColor=16181c"></a>
+  <a href="#-the-ten-games"><img alt="ten games" src="https://img.shields.io/badge/games-10-1baf7a?style=flat-square&labelColor=16181c"></a>
+  <a href="#-how-a-decision-is-made"><img alt="43 ms per move" src="https://img.shields.io/badge/per%20move-43%20ms-eb6834?style=flat-square&labelColor=16181c"></a>
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
   <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square"></a>
 </p>
 
-<h3 align="center">🎮 &nbsp;<a href="https://omnijev.github.io/PlayJev/">Play the live demo</a>&nbsp; 🎮</h3>
+<h2 align="center">🎮 &nbsp;<a href="https://omnijev.github.io/PlayJev/">Show the live demo</a>&nbsp; 🎮</h2>
 
 PlayJev is Qwen3.5-0.8B-Base fine-tuned to play ten classic browser games from raw pixels. One frame goes in,
 one forward pass runs, one move comes out, 43 ms on an H200. Every picture above is the trained model playing,
@@ -27,45 +27,29 @@ each a frame from a recorded held-out episode with the score it had reached by t
 
 ## 🎮 The Ten Games
 
-Plain HTML5/JS, vendored under `games/<id>/`. Each game exposes the same small hook (`window.pj`:
-`start(seed)`, `step(action)`, `frame()`, `score()`, `done()`, `actions`), and the same page serves as both
-training environment and demo tile.
+Plain HTML5/JS, one hook each (`window.pj`: `start(seed)`, `step(action)`, `frame()`, `score()`, `done()`,
+`actions`), and the same page is both training environment and demo tile. Every name below opens that game's
+board on the demo, with the model playing and the bars showing what it gave each move.
 
-|   | Game | Upstream | Licence | Moves |
-|---|---|---|---|---:|
-| <img src="docs/assets/thumbs/mario.png" width="140"> | Infinite Mario | [robertkleffner/mariohtml5](https://github.com/robertkleffner/mariohtml5) | Unlicense | 7 |
-| <img src="docs/assets/thumbs/snake.png" width="140"> | Snake | [patorjk/JavaScript-Snake](https://github.com/patorjk/JavaScript-Snake) | MIT | 4 |
-| <img src="docs/assets/thumbs/tetris.png" width="140"> | Tetris | [jakesgordon/javascript-tetris](https://github.com/jakesgordon/javascript-tetris) | MIT | 5 |
-| <img src="docs/assets/thumbs/2048.png" width="140"> | 2048 | [gabrielecirulli/2048](https://github.com/gabrielecirulli/2048) | MIT | 4 |
-| <img src="docs/assets/thumbs/flappy.png" width="140"> | Floppy Bird | [nebez/floppybird](https://github.com/nebez/floppybird) | Apache-2.0 | 2 |
-| <img src="docs/assets/thumbs/pacman.png" width="140"> | Pacman | [daleharvey/pacman](https://github.com/daleharvey/pacman) | WTFPL | 4 |
-| <img src="docs/assets/thumbs/breakout.png" width="140"> | Breakout | [jakesgordon/javascript-breakout](https://github.com/jakesgordon/javascript-breakout) | MIT | 3 |
-| <img src="docs/assets/thumbs/invaders.png" width="140"> | Space Invaders | [StrykerKKD/SpaceInvaders](https://github.com/StrykerKKD/SpaceInvaders) | MIT | 3 |
-| <img src="docs/assets/thumbs/racer.png" width="140"> | Javascript Racer | [jakesgordon/javascript-racer](https://github.com/jakesgordon/javascript-racer) | MIT | 6 |
-| <img src="docs/assets/thumbs/sokoban.png" width="140"> | Sokoban | [taniarascia/sokoban](https://github.com/taniarascia/sokoban) | MIT | 4 |
-
-<details>
-<summary>Art, licences and the silence</summary>
-
-Three of the upstream projects say in their own READMEs that their art is not theirs to license. Infinite
-Mario's sprites are Nintendo's, Floppy Bird's are extracted from the original Android game and belong to Dong
-Nguyen and .GEARS, and the Racer's are placeholder art borrowed from the Mega Drive version of OutRun. The
-licence in the table covers the code each author wrote. Sokoban's Microban levels are by David Skinner. Every
-file we changed is recorded in that game's `vendor.patch`, next to its `NOTES.md` and `TEACHER.md`.
-
-The roster ships silent. Every sound and music file was deleted, which costs nothing, because the driver
-already aborted every audio request (`playjev/env.py`), the shim forces media elements muted, and Chromium
-runs with `--mute-audio`. Every frame in this repository, training or demo, was produced in silence.
-</details>
+|   | Game | Moves |
+|---|---|---:|
+| [<img src="docs/assets/thumbs/tetris.png" width="140">][tetris] | [Tetris][tetris] | 5 |
+| [<img src="docs/assets/thumbs/snake.png" width="140">][snake] | [Snake][snake] | 4 |
+| [<img src="docs/assets/thumbs/pacman.png" width="140">][pacman] | [Pacman][pacman] | 4 |
+| [<img src="docs/assets/thumbs/racer.png" width="140">][racer] | [Javascript Racer][racer] | 6 |
+| [<img src="docs/assets/thumbs/invaders.png" width="140">][invaders] | [Space Invaders][invaders] | 3 |
+| [<img src="docs/assets/thumbs/sokoban.png" width="140">][sokoban] | [Sokoban][sokoban] | 4 |
+| [<img src="docs/assets/thumbs/mario.png" width="140">][mario] | [Infinite Mario][mario] | 7 |
+| [<img src="docs/assets/thumbs/flappy.png" width="140">][flappy] | [Floppy Bird][flappy] | 2 |
+| [<img src="docs/assets/thumbs/breakout.png" width="140">][breakout] | [Breakout][breakout] | 3 |
+| [<img src="docs/assets/thumbs/2048.png" width="140">][2048] | [2048][2048] | 4 |
 
 ## 🔍 Why Pixels
 
-Every Jev-shaped game demo before this one feeds the model text. TypeSafe's Mario demo parses the emulator's
-RAM into JSON and states that the model does not receive screenshots. The open-jev Doom demo describes each
-frame in one line of text. The zero-shot pixel attempts play one game without training, and VideoGameBench
-and lmgame-Bench run frontier models with reasoning loops at seconds per move. PlayJev trains a small
-vision-language model under the Jev contract and plays ten games from the frame alone, in real time, with a
-probability the game loop can act on.
+Every Jev-shaped game demo before this one feeds the model text. TypeSafe's Mario parses emulator RAM into
+JSON and says the model gets no screenshots, the open-jev Doom demo writes one line of text per frame, and
+VideoGameBench and lmgame-Bench run frontier models with reasoning loops at seconds per move. PlayJev plays
+ten games from the frame alone, in real time, and returns a probability the game loop can act on.
 
 ## 🧠 How a Decision Is Made
 
@@ -79,11 +63,10 @@ of them.
 
 ![The demo showing one Mario frame, the probability the model puts on each of the seven moves, and its confidence through the episode](docs/assets/decision.png)
 
-That is the demo's single game view and the whole model in one picture: the frame on the left is the only
-input, the bars on the right are the numbers that come out of the forward pass, and the line below them is
-how sure the model was at every step of the episode so far. Moves are shuffled for every training sample, so
-position carries no information. One frame per decision by default; for games where velocity matters the
-vision tower also takes the previous frame, at no extra token cost. The exact prompt the model is given is in
+The demo's single game view is the whole model in one picture: the frame on the left is the only input, the
+bars are what the forward pass returns, the line below them is how sure it was at every step so far. Moves are
+shuffled in every training sample, so position carries no information. One frame per decision; where velocity
+matters the vision tower also takes the previous frame, at no extra token cost. The prompt itself is in
 [docs/MODEL_NOTES.md](docs/MODEL_NOTES.md).
 
 ## 📊 Results
@@ -144,48 +127,33 @@ Training cost: 4 h 11 min, 3 h 10 min and 4 h 20 min on one H200.
 <details>
 <summary>🔬 &nbsp;What each round fixed, and the Snake regression</summary>
 
-**Covariate shift.** Sokoban, Racer, Snake and Pacman reproduced the teacher on the teacher's own frames
-(0.95, 0.84, 0.99 and 0.87 agreement) and lost it on their own (0.91, 0.56, 0.93, 0.92), with the errors
-concentrated where they cost most. One round of labels on the model's own states brings three of them to the
-teacher's level and triples Pacman; the three saturated ones hold through round 2.
+| What was wrong | Games | How we know | What the rounds did |
+|---|---|---|---|
+| Covariate shift | Sokoban, Racer, Snake, Pacman | agreement on the teacher's frames 0.95 / 0.84 / 0.99 / 0.87, on their own 0.91 / 0.56 / 0.93 / 0.92, errors where they cost most | round 1 brings three of them to the teacher and triples Pacman, round 2 holds |
+| One frame shows no motion | Breakout, Mario | 16 percent agreement on its own play: cloning learned to read the paddle, which sits under the ball on every teacher frame | DAgger 47 percent and 2.5x the score, round 2 doubles both again |
+| Single-step precision | Floppy Bird, Tetris | Flappy matches the teacher on 99.8 percent of frames and dies at 9 pipes on the one it misses, Tetris drops a move early | a few hundred such moments in 40k frames, so round 1 barely moves them, round 2 triples Tetris and lifts Flappy to 0.16 |
+| Reading tile digits at 448 px | 2048 | 0.48 agreement either way, and the model knows it: confidence 0.25 | still open |
 
-**Snake goes the other way in round 2**, 107.9 to 89.5. It is a real regression and not 16-episode noise: on
-the 14 held-out seeds the two rounds share, round 2 is lower on 12, the paired difference is -17.4 with sd
-22.5, and a sign-flip permutation test over 200,000 permutations puts it at p = 0.0073. Mean episode length
-falls with the score, 455 steps to 348, which is what a snake regression looks like: the model dies earlier,
-so it eats less. Both agreement instruments miss it. Validation agreement is flat (.780 to .775) and
-on-policy agreement, measured by replaying the recorded episodes through the real game with the teacher
-watching, *rises* more for Snake than for any other game (.722 to .824). The reason is that agreement is
-averaged over the frames the model visits and those frames changed: total steps over the same 16 episodes
-fell 7275 to 5568, so the average shifts toward the easy early game, where a three-segment snake on an empty
-board has almost no way to be wrong. In a fatal-on-mistake game, agreement can move against the score.
+**Snake goes backwards in round 2**, 107.9 to 89.5, and it is real: lower on 12 of the 14 held-out seeds the two
+rounds share, paired difference -17.4 (sd 22.5), sign-flip permutation p = 0.0073. Episodes shorten with the
+score, 455 steps to 348, which is what a snake regression looks like. Both agreement instruments miss it:
+validation is flat (.780 to .775) and on-policy agreement, the recorded episodes replayed through the real game
+with the teacher watching, *rises* more than for any other game (.722 to .824). Agreement averages over the
+frames the model visits and those frames changed, 7275 steps to 5568 over the same 16 episodes, so the mean
+shifts to the easy early game where a three-segment snake can hardly be wrong. In a fatal-on-mistake game,
+agreement can move against the score.
 
-**Breakout and Mario need motion.** On the teacher's frames the paddle is already under the ball's landing
-point, so the cloned policy learned to read the paddle instead of the ball (16 percent agreement on its own
-play). DAgger raises that to 47 percent and the score 2.5x, and round 2 doubles both again. A single frame
-still does not show the ball's direction, nor Mario's velocity and jump phase, and how the second frame is
-delivered decides who benefits. Merged into the vision tower's temporal patch it adds nothing outside
-Breakout. Passed as two separate images the model can compare by attention, Breakout gains validation
-agreement at every eval point (+.096 on average, the largest effect in the ablation) while Mario and Racer
-lose at every point. Those two are the only games in the roster whose camera translates: the frame difference
-is dominated by the global shift of the scene, which the model has to discount before any local motion means
-anything. For a fixed camera the frame difference *is* the object that moved. Stacking through the patch
-convolution mixes the translation into every patch embedding, which is why the merged version looked flat.
+**The second frame has to stay a second image.** Merged into the vision tower's temporal patch it adds nothing
+outside Breakout. Passed as its own image, which the model can compare by attention, Breakout gains validation
+agreement at every eval point (+.096, the largest effect in the ablation) while Mario and Racer lose at every
+point. Those two are the only games whose camera translates: their frame difference is the global shift of the
+scene, which has to be discounted before any local motion means anything, and the patch convolution mixes that
+shift into every embedding. For a fixed camera the frame difference *is* the object that moved.
 
-**Floppy Bird and Tetris are precision.** Flappy reproduces the teacher on 99.8 percent of frames and dies at
-9 pipes on the one missed correction (a second consecutive flap); Tetris drops pieces one move early. Forty
-thousand on-policy frames contain a few hundred of those moments, so round 1 barely moves them. Round 2
-triples Tetris and lifts Flappy to 0.16.
-
-**2048 is a reading problem** (tile digits at 448 px): 0.48 agreement either way, and the model knows it, its
-confidence there is 0.25.
-
-**Anchor game.** An eight-game mix with Snake and Racer held out reproduced a failure mode with two seeds:
-five games never left the letter prior and the other three converged to "the most common move for this option
-list", with the image pathway unused. With Snake back in the mix (Racer and Pacman held out instead) every
-game reads the frame by step 1500, as in the ten-game run. Snake's labels are the ones with no text shortcut
-(a BFS arrow, uniform over the four moves, decided by the board alone), and one such game in the mix is what
-forces the frame to be read.
+**One game in the mix must have no text shortcut.** An eight-game mix with Snake and Racer held out failed on
+two seeds: five games never left the letter prior, three converged to the most common move for their option
+list, and the image pathway went unused. With Snake back (Racer and Pacman held out instead) every game reads
+the frame by step 1500. Snake's label is a BFS arrow, uniform over the four moves, decided by the board alone.
 </details>
 
 <details>
@@ -215,30 +183,29 @@ give the move away.
 <summary>⚙️ &nbsp;The execution rule and the real-time setting</summary>
 
 **Execution rule.** A move that leaves the observation unchanged (a blocked direction in 2048 or Sokoban is a
-legal no-op) is not repeated on that observation; the next most probable move is taken. Without it, a
-deterministic policy that picks a blocked direction loops to the step cap, and 2048 scores 54. The rule never
-fires in the games whose frames change every step; their numbers are identical with and without it.
+legal no-op) is not repeated on that observation; the next most probable move goes instead. Without it a
+deterministic policy loops to the step cap and 2048 scores 54. It never fires where the frame changes every
+step, and those numbers are identical with and without it.
 
-**Latency.** Applying the same model one step late (the decision from frame k acts at step k+1, which is the
-real-time setting at 83 to 100 ms per step) collapses the reflex games: Snake 11, Tetris 248, Breakout 394,
-Flappy 0.2, Pacman 502, while Invaders 400 and Racer 5885 barely move. Training on shifted labels
-(`--label-delay 1`) helps exactly the games whose next decision follows from the current frame: Snake 11 to
-20, Tetris 248 to 306, Breakout 394 to 636, Flappy 0.2 to 2.3, 2048 2191 to 3195. It hurts the ones whose
-next decision depends on what the current move does to the board: Mario 820 to 242 (standing still to the cap
-in half the episodes), Pacman 502 to 236, Racer 5885 to 5116, Sokoban at random level either way. So the
-shift has to be per game, and even where it helps the real-time score stays a fraction of the undelayed one.
-Latency has to be attacked in the model too, which is what the second frame is for.
+**Latency.** One step late (frame k decides step k+1, which is real time at 83 to 100 ms per step) collapses the
+reflex games: Snake 78 to 11, Tetris 1034 to 248, Breakout 611 to 394, Flappy 8.9 to 0.2, Pacman 1036 to 502,
+Sokoban 58 to 6.6, while Invaders and Racer barely move. Training on shifted labels (`--label-delay 1`) buys
+part of it back where the next decision follows from the current frame (Snake to 20, Tetris to 306, Breakout to
+636, Flappy to 2.3, 2048 2191 to 3195) and costs where it depends on what the current move does to the board
+(Mario 820 to 242, standing still to the cap in half the episodes; Pacman 502 to 236; Racer 5885 to 5116;
+Sokoban at random level either way). So the shift has to be per game, and even where it helps the real-time
+score stays a fraction of the undelayed one. Latency has to be attacked in the model too, which is what the
+second frame is for.
 </details>
 
 <details>
 <summary>🎚️ &nbsp;Is the confidence worth anything?</summary>
 
-Low-confidence steps are where the errors are. On the model's own play, Tetris agrees with the teacher on 36
-percent of the steps below confidence 0.5 and 61 percent overall; Invaders 41 percent against 97 above 0.9;
-Racer 34 against 97; Sokoban 3 against 94. The operational test is a System Two behind the model: whenever
-confidence falls below a threshold the decision is handed to the teacher (`playjev.play --handover`), and the
-control hands the same share of steps over at random (`--handover-random`). Cloning model, 16 episodes per
-setting:
+Low-confidence steps are where the errors are: on its own play Tetris agrees with the teacher on 36 percent of
+the steps below confidence 0.5 against 61 overall, Invaders 41 against 97 above 0.9, Racer 34 against 97,
+Sokoban 3 against 94. The operational test is a System Two behind the model: below a confidence threshold the
+decision goes to the teacher (`playjev.play --handover`), and the control hands the same share over at random
+(`--handover-random`). Cloning model, 16 episodes per setting:
 
 | Game | Alone | Handed over | By confidence | At random | Teacher |
 |---|---:|---:|---:|---:|---:|
@@ -362,7 +329,40 @@ hpc/               PBS job scripts for collection, training and closed-loop play
 [OpenJev](https://github.com/OmniJev/openJev), the text-state System One server this model plugs into, and
 [Awesome-JEV](https://github.com/OmniJev/awesome-jev), the reading list behind System One models.
 
-## ⚖️ Licence
+## ⚖️ Licence and Credits
 
-Code and trained weights: Apache-2.0. The games keep their own licences, one file per game under
-`games/<id>/`, and the note under the roster says which of them cover the code only.
+Code and trained weights: Apache-2.0.
+
+The ten games are other people's work, vendored under `games/<id>/` with the author's own licence file and a
+`vendor.patch` of every line we changed.
+
+- Tetris, [github.com/jakesgordon/javascript-tetris](https://github.com/jakesgordon/javascript-tetris), MIT
+- Snake, [github.com/patorjk/JavaScript-Snake](https://github.com/patorjk/JavaScript-Snake), MIT
+- Pacman, [github.com/daleharvey/pacman](https://github.com/daleharvey/pacman), WTFPL
+- Javascript Racer, [github.com/jakesgordon/javascript-racer](https://github.com/jakesgordon/javascript-racer), MIT
+- Space Invaders, [github.com/StrykerKKD/SpaceInvaders](https://github.com/StrykerKKD/SpaceInvaders), MIT
+- Sokoban, [github.com/taniarascia/sokoban](https://github.com/taniarascia/sokoban), MIT
+- Infinite Mario, [github.com/robertkleffner/mariohtml5](https://github.com/robertkleffner/mariohtml5), Unlicense
+- Floppy Bird, [github.com/nebez/floppybird](https://github.com/nebez/floppybird), Apache-2.0
+- Breakout, [github.com/jakesgordon/javascript-breakout](https://github.com/jakesgordon/javascript-breakout), MIT
+- 2048, [github.com/gabrielecirulli/2048](https://github.com/gabrielecirulli/2048), MIT
+
+Three of those READMEs say the art is not the author's to license: Mario's sprites are Nintendo's, Floppy
+Bird's come from the original Android game and belong to Dong Nguyen and .GEARS, the Racer's are placeholder
+art from the Mega Drive OutRun. The licence above covers the code each author wrote. Sokoban's Microban levels
+are by David Skinner.
+
+The roster ships silent. Every sound and music file was deleted, which costs nothing: the driver already
+aborted every audio request (`playjev/env.py`), the shim forces media elements muted, and Chromium runs with
+`--mute-audio`. Every frame in this repository, training or demo, was produced in silence.
+
+[mario]: https://omnijev.github.io/PlayJev/?game=mario
+[snake]: https://omnijev.github.io/PlayJev/?game=snake
+[tetris]: https://omnijev.github.io/PlayJev/?game=tetris
+[2048]: https://omnijev.github.io/PlayJev/?game=2048
+[flappy]: https://omnijev.github.io/PlayJev/?game=flappy
+[pacman]: https://omnijev.github.io/PlayJev/?game=pacman
+[breakout]: https://omnijev.github.io/PlayJev/?game=breakout
+[invaders]: https://omnijev.github.io/PlayJev/?game=invaders
+[racer]: https://omnijev.github.io/PlayJev/?game=racer
+[sokoban]: https://omnijev.github.io/PlayJev/?game=sokoban

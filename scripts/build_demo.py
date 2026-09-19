@@ -40,14 +40,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GAMES_DIR = ROOT / "games"
 DEMO = ROOT / "demo"
-ORDER = ["mario", "snake", "tetris", "2048", "flappy", "pacman", "breakout", "invaders", "racer", "sokoban"]  # GAMES.md order
+# Display order on the page and in the README roster: the games the model plays best and the ones people
+# recognise first, the four still-open ones last.
+ORDER = ["tetris", "snake", "pacman", "racer", "invaders", "sokoban", "mario", "flappy", "breakout", "2048"]
 
 # Per game: the element whose box the tile shows (the game area as the model saw it), cosmetic overlays to hide
 # inside the iframe (DOM only, never game state), and assets the reference walk cannot see (built by string
 # concatenation in the game's code).
 VIEW = {
     "mario": dict(view="#canvas"),
-    "snake": dict(view=".snake-playing-field", hide=".snake-toolbar,.snake-gamepad{display:none!important}"),
+    # The head is painted white in the training frame (games/snake/pj_hook.js canvas()), but the DOM theme draws it
+    # like any other body block, so the demo would show less than the model saw. This puts the head back.
+    "snake": dict(view=".snake-playing-field", hide=".snake-toolbar,.snake-gamepad{display:none!important}"
+                                                    "#snake-snakehead-alive{background-image:none!important;"
+                                                    "background-color:#ffffff!important;border-radius:3px!important}"),
     "tetris": dict(view="#canvas"),
     "2048": dict(view=".game-container"),
     "flappy": dict(view="#gamescreen", hide="#footer{display:none!important}", extra=["assets/*.png"]),
@@ -74,8 +80,10 @@ SYSTEM_PROMPT = ("Apply the question to the state. Choose exactly one of the lis
 INSTRUCTIONS = "Which move should the player make next?"
 FRAME_PLACEHOLDER = "<|vision_start|><|image_pad|><|vision_end|>"
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# The page reads these. An empty string means "not published yet": the lead shows the name with "soon" next to it
+# and nothing links anywhere, and the moment a URL is filled in here the placeholder becomes a live link.
 LINKS = {"repo": "https://github.com/OmniJev/PlayJev", "openjev": "https://github.com/OmniJev/openJev",
-         "awesome": "https://omnijev.github.io/awesome-jev/"}
+         "awesome": "https://omnijev.github.io/awesome-jev/", "hf": "", "paper": ""}
 
 
 def log(msg: str) -> None:

@@ -27,7 +27,7 @@ GAMES = [
 ]
 # fractional crop, to keep page furniture (theme pickers, how-to-play copy) out of the board
 CROP = {"snake": (0, .105, 1, 1), "2048": (0, 0, 1, .80)}
-BOARD_ORDER = ["mario", "snake", "tetris", "2048", "flappy", "pacman", "breakout", "invaders", "racer", "sokoban"]
+BOARD_ORDER = ["tetris", "snake", "pacman", "racer", "invaders", "sokoban", "mario", "flappy", "breakout", "2048"]
 
 
 def font(size, bold=False):

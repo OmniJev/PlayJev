@@ -39,6 +39,27 @@ The page reloads the game with `pj.start(seed)` and replays `steps[i].a` through
 real game. Determinism of the hooks (checked per game) is what makes this possible; the recorder verifies the
 replayed score matches before writing a file.
 
+## Per-game links
+
+`?game=<id>` (id or title, so `?game=flappy` and `?game=Floppy%20Bird` both work) opens the featured board on
+that game instead of the remembered one, and picks it in the grid's one-at-a-time mode. That is the link the
+README's roster table hands out, one per game. An unknown name falls back to the default and warns on the
+console.
+
+## Language
+
+English is the page's source (`index.html`); `demo/i18n.js` carries the Chinese version and the strings demo.js
+writes at runtime. Every translatable node is marked `data-i18n="key"` (or `data-i18n-html` where the copy has
+markup). The button in the bar remembers the choice and reloads, which keeps one code path for everything that is
+drawn once, the SVG axis labels included; `?lang=zh` and `?lang=en` force it, and a Chinese browser gets Chinese by
+default. The move names and the prompt are never translated: they are the model's own input.
+
+## Links that are not published yet
+
+`build_demo.py`'s `LINKS` carries an empty string for anything unreleased (the weights, the paper). The lead shows
+those as a plain label with "soon" next to it, and filling the URL in turns them into live links on the next build,
+in the lead and anywhere else marked `data-soon`.
+
 ## Live mode
 
 If a server URL is given (`?server=http://host:port`), the page sends the current canvas frame (JPEG data URL) with
