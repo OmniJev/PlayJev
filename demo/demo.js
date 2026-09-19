@@ -106,6 +106,8 @@
       this.speed = 1; this.playing = true; this.gen = 0; this.pending = new Map(); this.seq = 0;
       this.iframe = null; this.rect = null; this.errors = []; this.result = null; this.autoAdvance = true; this.suspended = false;
       this.hero = !!opts.hero; this.fixed = !!opts.fixed; this.tag = opts.tag || null;
+      // a free board is sized to the game's own shape instead of the grid's square cell
+      this.free = !!(opts.hero || opts.free); this.onFit = opts.onFit || null;
       // the table's trained-model policy for this game plays by default; other recordings stay selectable
       const row = ((D.results && D.results.rows) || []).find((r) => r.game === this.game.id);
       const preferred = row && row.model ? row.model.policy : null;
@@ -156,6 +158,17 @@
       root.appendChild(this.bars);
       this.conf = el('div', 'conf'); root.appendChild(this.conf);
 
+      // The featured board shows the whole episode's confidence under the bars, with the current step marked.
+      // Every tile carries one, since any of the ten becomes the featured board in one-at-a-time mode.
+      {
+        const tr = this.trace = el('div', 'trace');
+        tr.appendChild(el('span', 'tlabel', 'confidence through the episode'));
+        const svg = this.traceSvg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 240 96'); svg.setAttribute('aria-hidden', 'true');
+        tr.appendChild(svg); root.appendChild(tr);
+        this.traceInit(null);
+      }
+
       const foot = el('div', 'foot');
       this.stepEl = el('span', 'step', 'step 0'); this.recEl = el('span', 'rec', ''); this.warnEl = el('span', 'warn', '');
       foot.append(this.stepEl, this.recEl, this.warnEl); root.appendChild(foot);
@@ -203,8 +216,9 @@
     }
     fit() {
       if (!this.iframe) return;
-      const BW = this.view.clientWidth || 200, BH = this.view.clientHeight || BW;
       const r = this.rect || { x: 0, y: 0, w: this.game.viewport.width, h: this.game.viewport.height };
+      if (this.free) this.root.style.setProperty('--ar', (r.w / r.h).toFixed(4));
+      const BW = this.view.clientWidth || 200, BH = this.view.clientHeight || BW;
       const s = Math.min(BW / r.w, BH / r.h);
       const tx = (BW - r.w * s) / 2 - r.x * s, ty = (BH - r.h * s) / 2 - r.y * s;
       const V = this.game.viewport;
@@ -212,6 +226,7 @@
       this.iframe.style.clipPath = `inset(${r.y.toFixed(2)}px ${(V.width - r.x - r.w).toFixed(2)}px ${(V.height - r.y - r.h).toFixed(2)}px ${r.x.toFixed(2)}px)`;
       this.iframe.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${s.toFixed(5)})`;
       this.iframe.classList.add('shown');
+      if (this.onFit) this.onFit(r);
     }
     showOverlay(text, err) { if (text == null) { this.overlay.hidden = true; return; } this.overlay.hidden = false; this.overlay.textContent = text; this.overlay.classList.toggle('err', !!err); }
 
@@ -227,6 +242,42 @@
       this.conf.innerHTML = p ? `confidence <b>${confidence(p).toFixed(2)}</b>` + (s2 ? ' <span class="s2tag">the teacher decided this one</span>' : '')
                               + (this.latency != null ? ` <span>latency ${Math.round(this.latency)} ms</span>` : '') : ' ';
     }
+    // Draw one episode's confidence: the whole line faint, the part already played in blue, coral ticks on the
+    // steps the teacher decided. traceAt() then only moves the clip and the dot, once per step.
+    traceInit(steps) {
+      if (!this.trace) return;
+      const svg = this.traceSvg; while (svg.firstChild) svg.removeChild(svg.firstChild);
+      this.traceRect = null;
+      const W = 240, H = 96, TOP = 4, BASE = 72;
+      svgEl(svg, 'line', { x1: 0, y1: BASE, x2: W, y2: BASE }, 'tbase');
+      if (!steps || steps.length < 2) return;
+      const N = steps.length;
+      const X = (i) => (i / (N - 1)) * W, Y = (c) => TOP + (1 - Math.max(0, Math.min(1, c))) * (BASE - TOP);
+      const stride = Math.max(1, Math.ceil(N / 300));
+      let d = '';
+      for (let i = 0; i < N; i += stride) d += (d ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(confidence(steps[i].p)).toFixed(1);
+      d += 'L' + X(N - 1).toFixed(1) + ' ' + Y(confidence(steps[N - 1].p)).toFixed(1);
+      svgEl(svg, 'path', { d }, 'tfull');
+      this.traceUid = (this.traceUid || 0) + 1;
+      const cid = 'tc-' + this.game.id + '-' + this.traceUid;
+      const clip = document.createElementNS(NS, 'clipPath'); clip.setAttribute('id', cid); svg.appendChild(clip);
+      this.traceRect = svgEl(clip, 'rect', { x: -4, y: 0, width: 0, height: H });
+      svgEl(svg, 'path', { d, 'clip-path': 'url(#' + cid + ')' }, 'tplayed');
+      let ticks = '';
+      for (let i = 0; i < N; i++) if (steps[i].h) ticks += 'M' + X(i).toFixed(1) + ' ' + (BASE + 5) + 'v7';
+      if (ticks) svgEl(svg, 'path', { d: ticks }, 'ttick');
+      this.traceNow = svgEl(svg, 'line', { x1: -9, y1: TOP, x2: -9, y2: BASE }, 'tnow');
+      this.traceDot = svgEl(svg, 'circle', { cx: -9, cy: -9, r: 3.2 }, 'tdot');
+      this.traceX = X; this.traceY = Y;
+    }
+    traceAt(i, c, h) {
+      if (!this.traceRect) return;
+      const x = this.traceX(i), y = this.traceY(c);
+      this.traceRect.setAttribute('width', (x + 4).toFixed(1));
+      this.traceNow.setAttribute('x1', x.toFixed(1)); this.traceNow.setAttribute('x2', x.toFixed(1));
+      this.traceDot.setAttribute('cx', x.toFixed(1)); this.traceDot.setAttribute('cy', y.toFixed(1));
+      this.traceDot.classList.toggle('h', !!h);
+    }
     renderRec() {
       const pol = this.policy;
       if (!pol) { this.recEl.textContent = 'no recording yet'; this.recEl.classList.remove('random'); return; }
@@ -237,6 +288,14 @@
     renderStatus(i, total, score, tail) {
       this.stepEl.textContent = 'step ' + i + (total != null ? ' / ' + total : '') + (tail ? ' ' + tail : '');
       this.scoreEl.textContent = 'score ' + fmtScore(score);
+    }
+    // One-at-a-time mode promotes the running tile to the featured board: its own shape, the readout beside it.
+    setFeatured(on) {
+      on = !!on; if (this.featured === on) return;
+      this.featured = on; this.free = on || this.hero;
+      this.root.classList.toggle('hero', this.free);
+      if (!this.free) this.root.style.removeProperty('--ar');
+      this.fit();
     }
     setMismatch(text) { this.root.classList.toggle('mismatch', !!text); this.warnEl.textContent = text || ''; }
 
@@ -251,7 +310,7 @@
       for (const p of this.pending.values()) p.reject(new Error('tile suspended')); this.pending.clear();
       if (this.iframe) { this.iframe.remove(); this.iframe = null; }
       this.running = false; this.rect = null; this._resume = null;
-      this.renderBars(null, -1); this.setMismatch(''); this.showOverlay('paused');
+      this.renderBars(null, -1); this.traceInit(null); this.setMismatch(''); this.showOverlay('paused');
     }
     waitResume() { return new Promise((res) => { this._resume = res; }); }
     currentEntries() { return this.entries.filter((e) => e.policy === this.policy); }
@@ -289,7 +348,7 @@
     async idle(gen) {
       this.showOverlay('loading'); await this.boot(); if (gen !== this.gen) return;
       const obs = await this.call('start', { seed: 1 }); await this.measure(); this.showOverlay(null);
-      this.renderStatus(0, null, obs.score); this.renderBars(null, -1); this.renderRec();
+      this.renderStatus(0, null, obs.score); this.renderBars(null, -1); this.traceInit(null); this.renderRec();
     }
 
     // Replay one recording; resolves with the verification record when the episode is over.
@@ -303,6 +362,7 @@
       let obs = await this.call('start', { seed: rec.seed }); if (gen !== this.gen) return null;
       await this.measure(); this.showOverlay(null);
       const steps = rec.steps, N = steps.length; let i = 0, divergedAt = null, handed = 0;
+      this.traceInit(steps);
       this.renderStatus(0, N, obs.score); this.renderBars(null, -1);
       const stepMs = g.step_ms || 150;
       while (i < N) {
@@ -313,6 +373,7 @@
         // it first, hold for the step's duration, then apply the move (otherwise the model looks one beat late).
         if (st.h) handed++;
         this.renderBars(st.p, st.a, !!st.h); this.renderStatus(i, N, obs.score, handed ? `(teacher took ${handed} of ${i + 1})` : '');
+        this.traceAt(i, confidence(st.p), !!st.h);
         const speed0 = opts.speed || this.speed;
         const hold = stepMs / speed0 - (performance.now() - tick); if (hold > 0) await sleep(hold);
         if (gen !== this.gen) return null;
@@ -456,14 +517,19 @@
     const { g, a, b } = seeds[Math.floor(seeds.length / 2)];
     const nSeeds = seeds.length;
     const sameAsTable = table.includes(useBase);
+    const capH = () => Math.min(360, 0.42 * window.innerHeight);
+    const sizeHost = (r) => {
+      const panel = Math.max(272, Math.min(520, Math.round(capH() * (r.w / r.h)) + 30));
+      host.style.maxWidth = (panel * 2 + 18) + 'px';
+    };
     const mk = (entry, title, lead) => {
-      const t = new Tile(g, [entry], { fixed: true, tag: 'duelGame' }); t.autoAdvance = true;
+      const t = new Tile(g, [entry], { fixed: true, free: true, onFit: sizeHost, tag: 'duelGame' }); t.autoAdvance = true;
       t.root.querySelector('.head .title').textContent = title;
       if (lead) t.root.classList.add('lead-board');
       tiles.push(t); host.appendChild(t.root); return t;
     };
-    const ta = mk(a, g.title + ', the model alone', false);
-    const tb = mk(b, g.title + ', with the teacher behind it', true);
+    const ta = mk(a, 'The model alone', false);
+    const tb = mk(b, 'With the teacher', true);
     lazyWhileVisible([ta, tb], host);
     const note = document.getElementById('duel-note');
     if (note) note.textContent = `Both boards are ${g.title} from seed ${a.seed}, the same game with the same `
@@ -514,10 +580,11 @@
     const gridTiles = () => tiles.filter((t) => t.root.parentElement === grid);
     const modeBtns = [...all.querySelectorAll('[data-mode]')];
     let solo = false, activeTile = null;
+    const mark = (t, on) => { t.root.classList.toggle('active', on); t.setFeatured(on); };
     function activate(t) {
       if (!solo || !t || t === activeTile) return;
-      for (const o of gridTiles()) if (o !== t) { o.root.classList.remove('active'); if (!o.suspended) o.suspend(); }
-      activeTile = t; t.root.classList.add('active'); remember('pj-tile-game', t.game.id); t.start();
+      for (const o of gridTiles()) if (o !== t) { mark(o, false); if (!o.suspended) o.suspend(); }
+      activeTile = t; mark(t, true); remember('pj-tile-game', t.game.id); t.start();
     }
     applyMode = (next, initial) => {
       solo = !!next; grid.classList.toggle('solo', solo); remember('pj-tile-mode', solo ? 'solo' : 'all');
@@ -526,11 +593,11 @@
       if (solo) {
         const want = remembered('pj-tile-game');
         const keep = (activeTile && gt.includes(activeTile) ? activeTile : null) || gt.find((o) => o.game.id === want) || gt[0];
-        for (const o of gt) if (o !== keep) { o.root.classList.remove('active'); if (!o.suspended) o.suspend(); else o.suspended = true; }
-        activeTile = null; if (keep) { if (initial) { keep.root.classList.add('active'); activeTile = keep; remember('pj-tile-game', keep.game.id); } else activate(keep); }
+        for (const o of gt) if (o !== keep) { mark(o, false); if (!o.suspended) o.suspend(); else o.suspended = true; }
+        activeTile = null; if (keep) { if (initial) { mark(keep, true); activeTile = keep; remember('pj-tile-game', keep.game.id); } else activate(keep); }
       } else {
         activeTile = null;
-        for (const o of gt) { o.root.classList.remove('active'); if (o.suspended && !initial) o.start(); }
+        for (const o of gt) { mark(o, false); if (o.suspended && !initial) o.start(); }
       }
     };
     for (const b of modeBtns) b.addEventListener('click', () => applyMode(b.dataset.mode === 'solo', false));
@@ -689,6 +756,53 @@
     const tb = document.getElementById('transfer-body');
     const INIT = { base: 'the base model', hold8: 'eight other games', shuf: 'eight other games, labels shuffled' };
     const titles = {}; for (const r of ((D.results && D.results.rows) || [])) titles[r.game] = r.title;
+
+    // One panel per held-out game: how close each starting point gets to the teacher's moves as it sees more frames.
+    // Only the default learning rate is drawn; every run, including the other learning rates, stays in the table.
+    const box = sec.querySelector('.panels.transfer');
+    const KEY = [{ init: 'hold8', line: 'line', dot: 'pt' }, { init: 'base', line: 'ctlline', dot: 'ctl' }];
+    const kFrames = (n) => (n >= 1000 ? n / 1000 + 'k' : String(n));
+    let drew = 0;
+    if (box) {
+      const W = 236, H = 198, PL = 36, PR = 12, PT = 12, PB = 34;
+      for (const g of T.games) {
+        const series = KEY.map((k) => Object.assign({}, k, {
+          pts: g.runs.filter((r) => r.init === k.init && !r.lr && r.agreement != null && r.frames > 0)
+            .map((r) => ({ x: r.frames, y: r.agreement, score: r.score })).sort((a, b) => a.x - b.x),
+        })).filter((k) => k.pts.length);
+        const xs = [...new Set(series.flatMap((k) => k.pts.map((d) => d.x)))].sort((a, b) => a - b);
+        if (series.length < 2 || xs.length < 2) continue;
+        const px = (x) => PL + (xs.indexOf(x) / (xs.length - 1)) * (W - PL - PR);
+        const py = (y) => H - PB - y * (H - PT - PB);
+        const fig = el('figure');
+        const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', `${titles[g.game] || g.game}: how often the fine-tuned model picks the teacher's move, against the number of frames it trained on`);
+        svgEl(svg, 'line', { x1: PL, y1: H - PB, x2: W - PR, y2: H - PB }, 'axis');
+        svgEl(svg, 'line', { x1: PL, y1: PT, x2: PL, y2: H - PB }, 'axis');
+        svgText(svg, PL - 5, H - PB + 3, '0', 'end'); svgText(svg, PL - 5, PT + 3, '1', 'end');
+        for (const x of xs) svgText(svg, px(x), H - PB + 14, kFrames(x), 'middle');
+        svgText(svg, PL + (W - PL - PR) / 2, H - 3, 'frames of this game', 'middle');
+        for (const k of series) {
+          if (k.pts.length > 1) svgEl(svg, 'path', { d: k.pts.map((d, i) => `${i ? 'L' : 'M'}${px(d.x).toFixed(1)} ${py(d.y).toFixed(1)}`).join(' ') }, k.line);
+          for (const d of k.pts) {
+            tip(svgEl(svg, 'circle', { cx: px(d.x).toFixed(1), cy: py(d.y).toFixed(1), r: 4 }, k.dot),
+              `${INIT[k.init] || k.init}, ${d.x.toLocaleString()} frames: picks the teacher's move ${(d.y * 100).toFixed(0)}% of the time`
+              + (d.score != null ? `, score ${fmtScore(d.score)}` : ''));
+          }
+        }
+        fig.appendChild(svg); fig.appendChild(el('figcaption', '', titles[g.game] || g.game)); box.appendChild(fig);
+        drew++;
+      }
+      if (!drew) box.remove();
+      else {
+        const legend = el('div', 'legend');
+        const key = (cls, text) => { const sp = el('span'); sp.append(el('i', cls), document.createTextNode(text)); legend.appendChild(sp); };
+        key('', 'fine-tuned from the eight-game model');
+        key('c', 'fine-tuned from the raw base model');
+        box.parentNode.insertBefore(legend, box.nextSibling);
+      }
+    }
     for (const g of T.games) {
       let first = true;
       for (const r of g.runs) {
@@ -704,8 +818,10 @@
         tb.appendChild(tr);
       }
     }
+    const hasLr = T.games.some((g) => g.runs.some((r) => r.lr));
     document.getElementById('transfer-note').textContent = (T.note || '') + ' '
-      + T.games.map((g) => `${titles[g.game] || g.game}: random ${fmtScore(g.random)}, teacher ${fmtScore(g.teacher)}.`).join(' ');
+      + T.games.map((g) => `${titles[g.game] || g.game}: random ${fmtScore(g.random)}, teacher ${fmtScore(g.teacher)}.`).join(' ')
+      + (drew && hasLr ? ' The panels show the default learning rate; the table has every run, including the other learning rates tried at 10,000 frames.' : '');
   }
 
   function buildPrompt() {
