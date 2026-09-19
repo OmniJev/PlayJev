@@ -6,18 +6,20 @@
 [![decision](https://img.shields.io/badge/decision-43_ms-6d747e?style=flat-square)](#how-a-decision-is-made)
 [![licence](https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square)](LICENSE)
 
+An open System One model that plays ten classic browser games from raw pixels. PlayJev is
+Qwen3.5-0.8B-Base fine-tuned so that one forward pass turns a game frame into a calibrated
+probability over the game's moves.
+
 ![Ten browser games with the model playing each one](docs/assets/board.png)
 
-Every picture above is the trained model playing. Each is a frame from a recorded held-out episode
+Every picture above is the trained model playing. Each one is a frame from a recorded held-out episode
 with the score it had reached by then, and the [live demo](https://omnijev.github.io/PlayJev/) replays
 those same episodes in the real game, step by step, with the probabilities drawn beside the picture.
 
-An open System One model that plays ten classic browser games from raw pixels. PlayJev is
-Qwen3.5-0.8B-Base fine-tuned so that one forward pass turns a game frame into a calibrated
-probability over the game's moves. Nothing is generated and nothing is parsed: the answer is read
-from the option-letter logits, the same contract as Jev's Choice primitive and the same confidence
-formula. A decision takes 43 ms on one H200 at batch 1, about twice as fast as the games' own step, and
-the same GPU serves about 140 decisions per second when several games run at once.
+Nothing is generated and nothing is parsed: the answer is read from the option-letter logits, the same
+contract as Jev's Choice primitive and the same confidence formula. A decision takes 43 ms on one H200
+at batch 1, about twice as fast as the games' own step, and the same GPU serves about 140 decisions per
+second when several games run at once.
 
 ```
 frame (JPEG, 448 px) ─┐
