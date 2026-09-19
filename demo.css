@@ -218,14 +218,14 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
   .tile.hero {
     display: grid; grid-template-columns: minmax(0, 1fr) 244px;
     grid-template-areas: "board head" "board bars" "board conf" "board trace" "board foot";
-    /* the trace sits on the bottom of the slack row, so the readout column is anchored at both ends */
+    /* the trace takes whatever room the readout has left, so the column has no hole in it */
     grid-template-rows: auto auto auto 1fr auto;
   }
   .tile.hero .head { grid-area: head; font-size: 17px; }
   .tile.hero .board { grid-area: board; }
   .tile.hero .bars { grid-area: bars; }
   .tile.hero .conf { grid-area: conf; }
-  .tile.hero .trace { grid-area: trace; align-self: end; width: 100%; }
+  .tile.hero .trace { grid-area: trace; align-self: stretch; width: 100%; }
   .tile.hero .foot { grid-area: foot; align-content: start; margin-top: 0; }
 }
 /* --ar is the game's own width / height, set in fit(); a free board is exactly that shape, never letterboxed */
@@ -241,11 +241,14 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 
 /* the episode's confidence as a line: played part blue, the rest faint, teacher steps as coral ticks */
 .tile .trace { display: none; margin-top: 2px; }
-.tile.hero .trace { display: block; }
+.tile.hero .trace { display: flex; flex-direction: column; min-height: 0; }
+.tile.hero .trace svg { flex: 1 1 auto; min-height: 56px; }
 .tile .trace .tlabel { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 1px; }
-.tile .trace svg { display: block; width: 100%; height: auto; }
+.tile .trace svg { display: block; width: 100%; height: auto; overflow: visible; }
 .trace .tbase { stroke: var(--line); stroke-width: 1; }
 .trace .tfull { fill: none; stroke: var(--line); stroke-width: 1.4; stroke-linejoin: round; }
+.trace .tafull { fill: var(--line-soft); stroke: none; }
+.trace .taplayed { fill: var(--accent-soft); stroke: none; }
 .trace .tplayed { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .trace .ttick { stroke: var(--coral); stroke-width: 1.4; }
 .trace .tnow { stroke: var(--line); stroke-width: 1; }
