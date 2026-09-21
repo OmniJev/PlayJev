@@ -75,22 +75,29 @@ the darkest bar is this release, version 3.
 
 ## 🧭 General Ability
 
-Two held-out sets the training never touched, 200 questions each, asked under the game contract: the picture
-or the passage is the state, the question is the instruction, the answers are the options. Each question is
-asked twice, with the options in both orders. Version 2, the previous release, trained on games alone and
-answered both sets near chance. This release keeps a fifth of every epoch on general image questions and a
-fifth on text, and comes out above the base model on MMBench and level with it on MMLU.
+Two held-out sets the training never saw, 200 questions each, asked under the game contract (picture or passage
+as the state, question as the instruction, answers as the options). This release spends a fifth of every epoch
+on general image questions and a fifth on text; it beats the base model on MMBench and matches it on MMLU.
 
 <p align="center">
-  <img src="assets/general.png" alt="Accuracy on MMBench dev and the MMLU test slice for version 2, version 3 and the base model" width="100%">
+  <img src="assets/general.png" alt="Accuracy on MMBench dev and the MMLU test slice for the base model, version 2 and version 3" width="100%">
 </p>
 
-| Model | MMBench dev | MMLU test |
-|---|---:|---:|
-| Qwen3.5-0.8B-Base | 0.66 | 0.33 |
-| Version 2 | 0.37 | 0.22 |
-| **Version 3 (this release)** | **0.74** | **0.32** |
-| chance | 0.40 | 0.25 |
+How much replay it takes: four runs of 1500 steps from the base model, same budget, a growing share of the
+batches drawn from general image and text questions. Game agreement is validation agreement with the teachers.
+
+| Replay share | Game agreement | MMBench dev | MMLU test |
+|---|---:|---:|---:|
+| base model, no training | | 0.66 | 0.33 |
+| games only | 0.430 | 0.48 | 0.29 |
+| 10 percent | 0.431 | 0.65 | 0.42 |
+| **20 percent** (the release mix) | **0.586** | 0.78 | 0.44 |
+| 30 percent | 0.547 | **0.83** | **0.47** |
+| chance | | 0.40 | 0.25 |
+
+<p align="center">
+  <img src="assets/replay.png" alt="Game agreement, MMBench and MMLU accuracy against the share of general batches in training" width="100%">
+</p>
 
 ## 🧠 How It Decides
 

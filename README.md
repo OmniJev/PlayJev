@@ -105,14 +105,9 @@ pip install -r requirements.txt && playwright install chromium
 
 ## 📊 Results
 
-One model for all ten games, 16 held-out episodes each, argmax move. Random play and the teacher run the same
-seeds through the same harness; a teacher is the per-game search program that plays on the game's internal
-state, which the model never sees. **vs teacher** is (model - random) / (teacher - random), so 0 is random play
-and 1.00 is the teacher. `cloning` is one epoch over 863k teacher-labelled frames, `version 1` and `version 2`
-two DAgger rounds on top: the model plays 40k frames per game, the teachers label every frame it visited, one
-more epoch. `version 3` starts over from the base model on every frame the first two rounds produced, with a
-fifth of each epoch spent on general image questions and a fifth on text so the model keeps what it knew, then
-plays one more round. Bold is the released model.
+Ten games, one model, 16 held-out episodes per game, argmax move. Random play and the teacher run the same seeds
+through the same harness; **vs teacher** is (model - random) / (teacher - random). Each version is one more
+DAgger round: the model plays, the teachers label what it visited. Bold is the released model.
 
 | Game | Random | Cloning | Version 1 | Version 2 | Version 3 | Teacher | vs teacher |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -128,111 +123,76 @@ plays one more round. Bold is the released model.
 | Breakout | 496 | 611 | 1552 | 2712 | **2785** | 16547 | 0.14 |
 | **mean vs teacher** | | 0.37 | 0.49 | 0.53 | **0.57** | | |
 
-Zero-shot the base model puts 0.7 on option A whatever the frame. Three games end up at their teacher and the
-mean at 0.57. What separates the other seven from their teachers is one of four things, and the rounds
-close or halve three of them.
-
-| Problem | Games | How we know | What the rounds did |
-|---|---|---|---|
-| Covariate shift | Sokoban, Racer, Snake, Pacman | agreement on the teacher's frames 0.95 / 0.84 / 0.99 / 0.87, on their own 0.91 / 0.56 / 0.93 / 0.92 | round 1 brings three of them to the teacher and triples Pacman |
-| One frame shows no motion | Breakout, Mario | 16 percent agreement on its own play: cloning learned to read the paddle, which sits under the ball on every teacher frame | 47 percent after round 1, and round 2 doubles the score again |
-| Single-step precision | Floppy Bird, Tetris | Flappy matches the teacher on 99.8 percent of frames and dies at 9 pipes on the one it misses | a few hundred such moments in 40k frames, so it takes both rounds |
-| Reading tile digits at 448 px | 2048 | 0.48 agreement either way, and the model knows it: confidence 0.25 | relabelling cannot help where the digits are unreadable, resolution can |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/chart-dark.png">
+  <img alt="Score against the teacher for each game after cloning and after each of the three rounds" src="docs/assets/chart.png">
+</picture>
 
 ### 🧭 General Ability
 
-Two held-out sets the training never touched, 200 questions each, asked under the game contract: the picture
-or the passage is the state, the question is the instruction, the answers are the options, one forward pass.
-Each question is asked twice, with the options in both orders. Two game-only rounds spent the base model's
-general ability on game score, and version 2 answers both sets near chance. Version 3 keeps a fifth of every
-epoch on general image questions and a fifth on text; it comes out above the base model on MMBench, level with
-it on MMLU, and plays every game as well or better.
+Two held-out sets the training never saw, 200 questions each, asked under the game contract (picture or passage
+as the state, question as the instruction, answers as the options). Version 3 spends a fifth of every epoch on
+general image questions and a fifth on text; it beats the base model on MMBench and matches it on MMLU.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/general-dark.png">
-  <img alt="Accuracy on MMBench dev and the MMLU test slice for version 2, version 3 and the base model" src="docs/assets/general.png">
+  <img alt="Accuracy on MMBench dev and the MMLU test slice for the base model, version 2 and version 3" src="docs/assets/general.png">
 </picture>
 
-| Model | MMBench dev | MMLU test |
-|---|---:|---:|
-| Qwen3.5-0.8B-Base | 0.66 | 0.33 |
-| Version 2 | 0.37 | 0.22 |
-| **Version 3** | **0.74** | **0.32** |
-| chance | 0.40 | 0.25 |
+How much replay it takes: four runs of 1500 steps from the base model, same budget, a growing share of the batches
+drawn from general image and text questions. Game agreement is validation agreement with the teachers.
 
-The rest of what we measured, one line each.
+| Replay share | Game agreement | MMBench dev | MMLU test |
+|---|---:|---:|---:|
+| base model, no training | | 0.66 | 0.33 |
+| games only | 0.430 | 0.48 | 0.29 |
+| 10 percent | 0.431 | 0.65 | 0.42 |
+| **20 percent** (the release mix) | **0.586** | 0.78 | 0.44 |
+| 30 percent | 0.547 | **0.83** | **0.47** |
+| chance | | 0.40 | 0.25 |
 
-- **Agreement can move against the score.** Snake scores 89.5 in round 2 against 107.9 in round 1, lower on 12 of
-  the 14 held-out seeds the two rounds share (sign-flip permutation p = 0.0073), while its on-policy agreement
-  rises more than any other game's. Agreement averages over the frames the model visits and those frames changed,
-  455 steps per episode down to 348, so the mean shifts to the easy early game. The closed loop is the instrument
-  that sees it.
-- **The second frame has to be its own image.** Merged into the vision tower's temporal patch it does nothing; as
-  a separate image Breakout gains .096 validation agreement, the largest effect in the ablation, while Mario and
-  Racer, the two games whose camera translates, lose at every point.
-- **Snake has to be in the training mix.** Hold it and Racer out and two seeds of eight never use the image at
-  all: five games stay on the letter prior, three take the most common move for their option list. Snake's label
-  is a BFS arrow, uniform over the four moves and decided by the board alone, so no option list predicts it. Put
-  it back and every game reads the frame by step 1500.
-- **Both halves of an option are read** (`scripts/probe_options.py`, 400 validation frames per game). Neutral
-  move names cost 0 to 13 points; rotating the descriptions while the names stay moves the decision in Flappy
-  (84 percent), Sokoban (67) and Racer (47). The model that never learned to look follows the name every time.
-- **One step late is what real time costs.** Deciding step k+1 from frame k takes the reflex games apart: Snake
-  77.8 to 11.4, Tetris 1034 to 248, Flappy 8.9 to 0.2, while Invaders and Racer barely move. Training on labels
-  shifted one step (`--label-delay 1`) buys part of it back where the next decision follows from the current
-  frame and costs where it depends on what the current move does, so the shift has to be per game.
-- **The confidence is worth something.** Below a threshold the decision goes to the teacher
-  (`playjev.play --handover`): a third of Breakout's steps handed over by confidence reaches the teacher's score,
-  the same share picked at random gets a third of the way.
-- **One execution rule.** A move that leaves the observation unchanged (a blocked direction in 2048 or Sokoban is
-  a legal no-op) is not repeated on that observation, and the next most probable move goes instead. Without it a
-  deterministic policy loops to the step cap and 2048 scores 54. It never fires where the frame changes every step.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/replay-dark.png">
+  <img alt="Game agreement, MMBench and MMLU accuracy against the share of general batches in training" src="docs/assets/replay.png">
+</picture>
 
 ## 🏋️ Training Recipe
 
-| Stage | What it is |
+| Stage | Setting |
 |---|---|
-| **Teachers** | One search program per game on the game's internal state: BFS (Snake), expectimax (2048), Dellacherie (Tetris), A* with deadlock pruning (Sokoban), exact physics (Floppy Bird), ghost occupancy (Pacman), ball flight (Breakout), dodge-and-aim DP (Invaders), lookahead steering (Racer), physics rollouts (Mario). Soft target: 0.9 on the best move, 0.1 over acceptable ones, 0 on losing ones. |
-| **Collection** | 100k frames per game, 448 px JPEGs, teachers playing with 2 to 30 percent random moves so the data covers recoveries. |
-| **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5 for the cloning epoch and 1e-5 for each round, bf16 autocast on fp32 master weights, 3 to 4 h per round on one H200. Version 3 restarts from the base model over all 1.8M frames the first two rounds left behind (12 h), then plays one more round (7 h). |
-| **Replay** | From version 3 on, 60 percent of the batches are game frames, 20 percent are general image questions (A-OKVQA, ScienceQA) and 20 percent text questions (MMLU auxiliary train, SciQ, ARC), all rendered through the same prompt. 30 percent of the game samples get one of four option rewrites: a distractor move from another game, a pruned option, a paraphrased question or a renamed move. |
-| **Closed loop** | 16 held-out episodes per game, the same seeds as random play and the teacher. Validation also reports agreement, calibration error and per-position bias. |
+| **Teachers** | One search program per game on the internal state: BFS (Snake), expectimax (2048), Dellacherie (Tetris), A* (Sokoban), exact physics (Floppy Bird), ghost occupancy (Pacman), ball flight (Breakout), dodge-and-aim DP (Invaders), lookahead steering (Racer), physics rollouts (Mario). Soft target 0.9 / 0.1 / 0. |
+| **Collection** | 100k frames per game, 448 px JPEGs, 2 to 30 percent random moves. |
+| **Cloning** | One epoch, batch 64, lr 2e-5, full fine-tuning, bf16 autocast on fp32 master weights. |
+| **DAgger round** | The model plays 40k frames per game, the teachers label them, one epoch at lr 1e-5. |
+| **Replay** (version 3) | 60 percent game batches, 20 percent general image questions (A-OKVQA, ScienceQA), 20 percent text (MMLU auxiliary train, SciQ, ARC); 30 percent of game samples get an option rewrite. Restarts from the base model on all 1.8M frames (12 h on one H200), then one more round (7 h). |
+| **Closed loop** | 16 held-out episodes per game, the same seeds as random play and the teacher. |
 
 Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELINES.md).
 
 ## 📈 More Charts
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/chart-dark.png">
-  <img alt="Score against the teacher for each game after cloning and after each of the three rounds" src="docs/assets/chart.png">
-</picture>
-
-Every game and every version against its teacher. Three games are finished after one round, and the rest
-split by what was wrong with them; version 3 moves five of them again.
-
-<picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/handover-dark.png">
   <img alt="Score against the share of steps handed to the teacher, picked by confidence and picked at random" src="docs/assets/handover.png">
 </picture>
 
-Hand the hardest steps to a System Two and the score climbs to the teacher's. Hand over the same number of
-steps at random and it does not, which is the whole claim about the confidence in one picture.
+Hand the least confident steps to a System Two (`playjev.play --handover`) and the score climbs to the teacher's;
+the same number of steps picked at random does not.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/calibration-dark.png">
   <img alt="How often the model matched the teacher against the probability it gave the move it took, for all ten games" src="docs/assets/calibration.png">
 </picture>
 
-The probability means something in every game. Most of these curves sit above the diagonal, so the model is
-usually more right than it claims; 2048, the game it is least sure about, sits on it.
+The probability means something in every game: how often the move matched the teacher against how sure the
+model was.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/realtime-dark.png">
   <img alt="Teacher-normalised score with the decision on time and one step late, for all ten games" src="docs/assets/realtime.png">
 </picture>
 
-One step of latency, which is what real time costs, takes the reflex games apart and leaves the slow ones
-alone. Both bars are the cloning model, which is why they sit below the table above.
+One step of latency takes the reflex games apart and leaves the slow ones alone (cloning model, both bars).
 
 ## 📁 Repository
 
