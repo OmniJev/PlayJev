@@ -20,8 +20,10 @@ KK = K
 
 
 class MotionPolicy(play.LocalPolicy):
-    def __init__(self, ckpt, actions, n, device="cuda:0", template="plain", two_frame=False, stack="temporal"):
-        super().__init__(ckpt, actions, n, device=device, template=template, two_frame=False, stack=stack)
+    def __init__(self, ckpt, actions, n, device="cuda:0", template="plain", two_frame=False, stack="temporal",
+                 history=0):
+        super().__init__(ckpt, actions, n, device=device, template=template, two_frame=False, stack=stack,
+                         history=history)
         self.hist = [deque(maxlen=KK) for _ in range(n)]
 
     def reset(self, i):
@@ -32,7 +34,8 @@ class MotionPolicy(play.LocalPolicy):
         for i, f in enumerate(frames):
             self.hist[i].append(Image.open(io.BytesIO(f)).convert("RGB"))
             imgs.append(compose(list(self.hist[i]), MODE))
-        return [d.probs for d in self.m.decide(imgs, self.options, batch_size=len(frames))]
+        return [d.probs for d in self.m.decide(imgs, self.options, batch_size=len(frames),
+                                               state_text=self._state_text(len(frames)))]
 
 
 if __name__ == "__main__":
@@ -44,11 +47,12 @@ if __name__ == "__main__":
     p.add_argument("--out", default=None); p.add_argument("--record", default=None)
     p.add_argument("--policy-name", dest="policy_name", default=None)
     p.add_argument("--delay", type=int, default=0, choices=[0, 1]); p.add_argument("--sample", action="store_true")
+    p.add_argument("--history", type=int, default=0, metavar="K", help="also put the K moves this page has played into the state (match the checkpoint's training --history)")
     p.add_argument("--no-skip-noop", dest="skip_noop", action="store_false"); p.set_defaults(skip_noop=True)
     a = p.parse_args()
     MODE, KK = a.motion, a.k
     play.LocalPolicy = MotionPolicy
     a.policy = "local"; a.two_frame = False; a.stack = "temporal"; a.url = None
     a.handover = None; a.handover_random = None; a.handover_invert = False
-    a.policy_name = a.policy_name or f"local_{a.motion}"
+    a.policy_name = a.policy_name or f"local_{a.motion}" + (f"_h{a.history}" if a.history else "")
     asyncio.run(play.main(a))

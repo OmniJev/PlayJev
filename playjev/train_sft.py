@@ -28,7 +28,8 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from .data import Collate, GameBalancedSampler, SFTDataset, load_records, split_records
+from .data import Collate, GameAug, GameBalancedSampler, SFTDataset, load_records, render_history, split_records
+from .mixdata import AuxDataset, MixedDataset, TypeBatchSampler, load_aux, split_aux
 from .model import LETTERS, DEFAULT_INSTRUCTIONS, choice_confidence
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +55,8 @@ def slot_ids_for(tokenizer, k: int) -> list[int]:
 def slot_logits(model, batch: dict, slot_ids: torch.Tensor, device) -> torch.Tensor:
     """Forward the inner model under bf16 autocast, read the last position, and project it onto the letter rows of
     the (tied) output embedding in fp32. Returns (B, Kmax) fp32 logits; positions >= n_opts are masked to -inf."""
-    inputs = {k: batch[k].to(device, non_blocking=True) for k in ("input_ids", "attention_mask", "pixel_values", "image_grid_thw", "mm_token_type_ids")}
+    keys = ("input_ids", "attention_mask", "pixel_values", "image_grid_thw", "mm_token_type_ids")
+    inputs = {k: batch[k].to(device, non_blocking=True) for k in keys if k in batch}  # a text state has no image keys
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=device.type == "cuda"):
         out = model.model(**inputs, use_cache=False, return_dict=True)
     h = out.last_hidden_state[:, -1, :].float()  # left padding: the last position is the answer slot for every row
@@ -92,6 +94,13 @@ def ece(conf: list[float], correct: list[bool], bins: int = 15) -> float:
     return total
 
 
+def overall_agreement(ev: dict) -> float:
+    """Sample-weighted agreement over every group an evaluate() call reports."""
+    rows = [v for k, v in ev.items() if k != "all"]
+    n = sum(r["n"] for r in rows)
+    return sum(r["agreement"] * r["n"] for r in rows) / max(n, 1)
+
+
 @torch.no_grad()
 def evaluate(model, loader, slot_ids, device, brier: float, max_batches: int | None = None) -> dict:
     """Validation loss, teacher agreement, calibration (ECE 15 bins and Brier of p_max against agreement),
@@ -116,8 +125,9 @@ def evaluate(model, loader, slot_ids, device, brier: float, max_batches: int | N
             s["ce"].append(float(ce[row])); s["correct"].append(bool(pred[row] == teacher_pos[row]))
             s["top"].append(bool(targets[row, pred[row]] >= tmax[row] - 1e-6))  # argmax inside the teacher's top set (ties)
             s["pmax"].append(float(pmax[row])); s["conf"].append(choice_confidence(p))
-            if s["pos_prob"] is None:
-                s["pos_prob"], s["pos_argmax"] = [0.0] * k, [0] * k
+            if s["pos_prob"] is None or len(s["pos_prob"]) < k:  # option counts differ within a source
+                s["pos_prob"] = (s["pos_prob"] or []) + [0.0] * (k - len(s["pos_prob"] or []))
+                s["pos_argmax"] = (s["pos_argmax"] or []) + [0] * (k - len(s["pos_argmax"] or []))
             for j in range(k):
                 s["pos_prob"][j] += p[j]
             s["pos_argmax"][int(pred[row])] += 1
@@ -212,7 +222,11 @@ def main(a: argparse.Namespace) -> None:
     # ---- data
     records = load_records(a.games, Path(a.data_root), shards=a.shards or None, label_delay=a.label_delay,
                            no_delay_games=a.no_delay_games, boost_last=tuple(a.boost_last) if a.boost_last else None,
-                           boost_games=a.boost_games)
+                           boost_games=a.boost_games, history=a.history)
+    if a.history:
+        shown = [r for r in records[:2000] if any(m != "-" for m in r.history)]
+        print(f"[train] history {a.history}: the state carries the moves already made, e.g. "
+              f"{render_history(shown[0].history) if shown else '(none in the first 2000 records)'}")
     if a.boost_last:
         print(f"[train] boost: the last {a.boost_last[0]} records of every episode shorter than 500 steps appear {a.boost_last[1]} times"
               + (f" (only for {' '.join(a.boost_games)})" if a.boost_games else ""))
@@ -246,12 +260,37 @@ def main(a: argparse.Namespace) -> None:
     processor = AutoProcessor.from_pretrained(a.model, local_files_only=Path(a.model).exists())
     processor.tokenizer.padding_side = "left"
     collate = Collate(processor, two_frame=a.two_frame, stack=a.stack)
-    train_ds = SFTDataset(train_recs, two_frame=a.two_frame, long_side=a.long_side, train=True, seed=a.seed)
+    aug = GameAug(*a.aug) if any(a.aug) else None
+    train_ds = SFTDataset(train_recs, two_frame=a.two_frame, long_side=a.long_side, train=True, seed=a.seed, aug=aug)
     val_ds = SFTDataset(val_recs, two_frame=a.two_frame, long_side=a.long_side, train=False, seed=a.seed)
     sampler = GameBalancedSampler([r.game for r in train_recs], seed=a.seed)
     loader_kw = dict(num_workers=a.workers, collate_fn=collate, pin_memory=device.type == "cuda",
                      persistent_workers=a.workers > 0, prefetch_factor=4 if a.workers > 0 else None)
-    train_loader = DataLoader(train_ds, batch_size=a.micro_batch, sampler=sampler, drop_last=True, **loader_kw)
+    aux_recs, aux_val_loaders, k_aux = [], {}, 0
+    if a.aux:
+        aux_recs = load_aux(a.aux)
+        aux_train, aux_val = split_aux(aux_recs)
+        k_aux = max(len(r.options) for r in aux_recs)
+        mix = dict(zip(("game", "image", "text"), a.mix)) if a.mix else None
+        if mix is None:
+            raise SystemExit("--aux needs --mix GAME IMAGE TEXT")
+        mixed = MixedDataset([train_ds, AuxDataset(aux_train, long_side=a.long_side, train=True, seed=a.seed,
+                                                   soft=a.aux_soft)])
+        batch_sampler = TypeBatchSampler(mixed.kinds, mixed.groups, a.micro_batch, mix, seed=a.seed)
+        train_loader = DataLoader(mixed, batch_sampler=batch_sampler, **loader_kw)
+        sampler = batch_sampler
+        print(f"[train] mixture: {batch_sampler.report()}")
+        # one validation loader per non-game kind: mixing kinds inside a batch is what the type sampler exists
+        # to prevent, and the two kinds are read separately anyway
+        for kind in ("image", "text"):
+            part = [r for r in aux_val if r.kind == kind][: a.eval_samples]
+            if part:
+                ds = AuxDataset(part, long_side=a.long_side, train=False, seed=a.seed, soft=a.aux_soft)
+                aux_val_loaders[kind] = DataLoader(ds, batch_size=a.micro_batch, shuffle=False, **loader_kw)
+        print(f"[train] aux: {len(aux_train)} train, {len(aux_val)} val "
+              f"{ {k: sum(r.kind == k for r in aux_recs) for k in ('image', 'text')} }")
+    else:
+        train_loader = DataLoader(train_ds, batch_size=a.micro_batch, sampler=sampler, drop_last=True, **loader_kw)
     # validation: a fixed, game-balanced subset so every eval sees the same samples
     val_idx = list(GameBalancedSampler([r.game for r in val_recs], seed=a.seed, num_samples=min(len(val_recs), a.eval_samples)))
     val_loader = DataLoader(torch.utils.data.Subset(val_ds, val_idx), batch_size=a.micro_batch, shuffle=False, **loader_kw)
@@ -277,7 +316,7 @@ def main(a: argparse.Namespace) -> None:
         for p in model.model.visual.parameters():
             p.requires_grad_(False)
     model.train()
-    kmax = max(len(r.names) for r in records)
+    kmax = max([len(r.names) for r in records] + [k_aux]) + (aug.extra_slots if aug else 0)
     slot_ids = torch.tensor(slot_ids_for(processor.tokenizer, kmax), device=device)
     n_train = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"[train] loaded in {time.perf_counter() - t0:.1f}s; trainable params {n_train / 1e6:.1f}M; slots {slot_ids.tolist()}")
@@ -328,8 +367,10 @@ def main(a: argparse.Namespace) -> None:
                 print(f"[step {step}/{total_steps}] loss {rec['loss']:.4f} lr {rec['lr']:.2e} gnorm {rec['grad_norm']:.2f} "
                       f"{rec['samples_per_s']:.1f} samples/s mem {rec['mem_gb']:.1f} GB elapsed {el / 60:.1f} min")
                 log_line(log_path, rec)
-            if step % a.eval_every == 0 and step < total_steps:
+            if a.eval_every and step % a.eval_every == 0 and step < total_steps:
                 ev = evaluate(model, val_loader, slot_ids, device, a.brier)
+                for kind, loader in aux_val_loaders.items():
+                    ev[f"aux_{kind}"] = overall_agreement(evaluate(model, loader, slot_ids, device, a.brier))
                 print(f"[eval step {step}] {json.dumps(ev)}")
                 log_line(log_path, {"step": step, "eval": ev})
             if a.save_every and step % a.save_every == 0 and step < total_steps:
@@ -342,6 +383,8 @@ def main(a: argparse.Namespace) -> None:
             break
 
     ev = evaluate(model, val_loader, slot_ids, device, a.brier)
+    for kind, loader in aux_val_loaders.items():
+        ev[f"aux_{kind}"] = overall_agreement(evaluate(model, loader, slot_ids, device, a.brier))
     print(f"[eval final] {json.dumps(ev)}")
     log_line(log_path, {"step": step, "eval": ev, "final": True})
     p = save_ckpt(model, processor, out_dir, a.keep, "final", {**meta, "step": step, "eval": ev})
@@ -357,6 +400,7 @@ if __name__ == "__main__":
     p.add_argument("--label-delay", type=int, default=0, help="label frame k with the teacher's decision at step k+delay (real-time latency)")
     p.add_argument("--no-delay-games", nargs="*", default=[], help="games whose labels stay unshifted under --label-delay (turn-based: 2048 sokoban)")
     p.add_argument("--boost-last", type=int, nargs=2, default=None, metavar=("K", "TIMES"), help="repeat the last K records of every short (< 500 steps) episode TIMES times (DAgger: oversample the steps before a death)")
+    p.add_argument("--history", type=int, default=0, metavar="K", help="put the K moves already made in this episode into the state, oldest first (names, from taken_action)")
     p.add_argument("--boost-games", nargs="*", default=[], help="apply --boost-last to these games only (default: every game in --games)")
     p.add_argument("--model", required=True, help="HF id or local snapshot path")
     p.add_argument("--out", required=True, help="checkpoint directory")
@@ -383,6 +427,13 @@ if __name__ == "__main__":
     p.add_argument("--log-every", type=int, default=20)
     p.add_argument("--limit", type=int, default=0, help="use only this many training records (smoke tests)")
     p.add_argument("--subsample", type=int, default=0, help="random subset of this many training records per game (transfer / data-efficiency runs)")
+    p.add_argument("--aux", nargs="*", default=[], help="jsonl manifests of non-game samples (playjev.mixdata)")
+    p.add_argument("--mix", nargs=3, type=float, default=None, metavar=("GAME", "IMAGE", "TEXT"),
+                   help="share of batches per kind, e.g. 0.6 0.2 0.2; one epoch stays one pass over the game frames")
+    p.add_argument("--aux-soft", type=float, default=0.9, help="mass the answer keeps in a non-game target")
+    p.add_argument("--aug", nargs=4, type=float, default=[0.0, 0.0, 0.0, 0.0],
+                   metavar=("DISTRACTOR", "PRUNE", "PARAPHRASE", "RENAME"),
+                   help="per-sample probability of each option rewrite on game frames (playjev.data.GameAug)")
     p.add_argument("--shuffle-labels", action="store_true", help="control: permute the training targets within each game so the frame carries no information about the answer")
     p.add_argument("--seed", type=int, default=0)
     main(p.parse_args())

@@ -48,13 +48,30 @@ def ghost(frames, alphas=GHOST_ALPHAS, thresh=GHOST_THRESH):
         fs.insert(0, fs[0])
     cur = fs[-1]
     fs = [f if f.size == cur.size else f.resize(cur.size) for f in fs]
-    olds, out = fs[:-1], cur.copy()
+    olds = fs[:-1]
     hot = lambda a, b: ImageChops.difference(a, b).convert("L").point(lambda v, t=thresh: 255 if v > t else 0)
-    for f, a in zip(olds, alphas):
-        out = Image.composite(Image.blend(out, f, a), out, hot(f, cur))
-    agree = ImageChops.invert(hot(olds[0], olds[-1])) if len(olds) > 1 else Image.new("L", cur.size, 255)
-    arrived = ImageChops.multiply(agree, hot(olds[-1], cur))
-    return Image.composite(cur, out, arrived)
+    # Everything below is confined to the union box of the movement masks. Outside it every mask is zero,
+    # so `out` would stay equal to `cur` and `arrived` would be zero: the result is `cur` there by
+    # construction. This is the identical picture, computed over the few percent of pixels that can change.
+    hots = [hot(f, cur) for f in olds]
+    box = None
+    for h in hots:
+        b = h.getbbox()
+        if b:
+            box = b if box is None else (min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3]))
+    if box is None:
+        return cur.copy()
+    crops = [f.crop(box) for f in olds]
+    hcrops = [h.crop(box) for h in hots]
+    base = cur.crop(box)
+    out = base.copy()
+    for f, a, h in zip(crops, alphas, hcrops):
+        out = Image.composite(Image.blend(out, f, a), out, h)
+    agree = ImageChops.invert(hot(crops[0], crops[-1])) if len(olds) > 1 else Image.new("L", base.size, 255)
+    arrived = ImageChops.multiply(agree, hcrops[-1])
+    res = cur.copy()
+    res.paste(Image.composite(base, out, arrived), box)
+    return res
 
 
 def rgbtime(frames):

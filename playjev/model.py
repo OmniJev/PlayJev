@@ -56,12 +56,21 @@ def render_suffix(options: Sequence[dict], instructions: str = DEFAULT_INSTRUCTI
     return f"Question: {instructions}\n\nOptions:\n{options_block(options)}\n\nAnswer with one letter: {letters}."
 
 
-def render_state(n_placeholders: int) -> str:
-    return "<state>\n" + "\n".join([FRAME_PLACEHOLDER] * n_placeholders) + "\n</state>"
+def render_state(n_placeholders: int, text: str | None = None) -> str:
+    """The state block: frame placeholders first, then a text body if the state has one. A state may be
+    frames (a game), text (a document, a question stem), or both; it may not be empty."""
+    parts = [FRAME_PLACEHOLDER] * n_placeholders
+    if text and text.strip():
+        parts.append(text.strip())
+    if not parts:
+        raise ValueError("a state needs at least one frame or a text body")
+    return "<state>\n" + "\n".join(parts) + "\n</state>"
 
 
-def build_plain_prompt(options: Sequence[dict], instructions: str = DEFAULT_INSTRUCTIONS, n_placeholders: int = 1) -> str:
-    return f"{SYSTEM_PROMPT}\n\n{render_state(n_placeholders)}\n\n{render_suffix(options, instructions)}\n{PLAIN_ANSWER_CUE}"
+def build_plain_prompt(options: Sequence[dict], instructions: str = DEFAULT_INSTRUCTIONS, n_placeholders: int = 1,
+                       state_text: str | None = None) -> str:
+    return (f"{SYSTEM_PROMPT}\n\n{render_state(n_placeholders, state_text)}\n\n"
+            f"{render_suffix(options, instructions)}\n{PLAIN_ANSWER_CUE}")
 
 
 def stack_temporal_patches(prev_pv, cur_pv, temporal_patch_size: int = 2, patch_size: int = 16):
@@ -160,13 +169,13 @@ class PlayJevModel:
 
     # ----------------------------------------------------------------- prompt
     def build_prompt(self, options: Sequence[dict], instructions: str = DEFAULT_INSTRUCTIONS,
-                     frames_per_state: int = 1, stack: str = "temporal") -> str:
+                     frames_per_state: int = 1, stack: str = "temporal", state_text: str | None = None) -> str:
         """The exact text handed to the processor (before <|image_pad|> is expanded to one token per merged patch)."""
-        n = 1 if frames_per_state == 1 or stack == "temporal" else frames_per_state
+        n = 0 if frames_per_state == 0 else (1 if frames_per_state == 1 or stack == "temporal" else frames_per_state)
         if self.template == "plain":
-            return build_plain_prompt(options, instructions, n)
+            return build_plain_prompt(options, instructions, n, state_text)
         messages = [{"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": render_state(n) + "\n\n" + render_suffix(options, instructions)}]
+                    {"role": "user", "content": render_state(n, state_text) + "\n\n" + render_suffix(options, instructions)}]
         text = self.processor.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True,
                                                             enable_thinking=False)
         if not text.endswith("</think>\n\n"):
@@ -186,21 +195,26 @@ class PlayJevModel:
     def _stack_temporal(self, prev_pv, cur_pv):
         return stack_temporal_patches(prev_pv, cur_pv, self.temporal_patch_size, self.patch_size)
 
-    def _prepare(self, items: Sequence[Any], prompt: str, frames_per_state: int, stack: str, long_side: int | None):
+    def _prepare(self, items: Sequence[Any], prompts: Sequence[str], frames_per_state: int, stack: str,
+                 long_side: int | None):
         b = len(items)
+        if len(prompts) != b:
+            raise ValueError("one prompt per state")
+        if frames_per_state == 0:
+            return self.processor(text=list(prompts), return_tensors="pt", padding=True)
         if frames_per_state == 1:
             imgs = [self._to_image(x, long_side) for x in items]
-            enc = self.processor(text=[prompt] * b, images=imgs, return_tensors="pt", padding=True)
+            enc = self.processor(text=list(prompts), images=imgs, return_tensors="pt", padding=True)
         elif stack == "separate":
             imgs = [[self._to_image(f, long_side) for f in item] for item in items]
-            enc = self.processor(text=[prompt] * b, images=imgs, return_tensors="pt", padding=True)
+            enc = self.processor(text=list(prompts), images=imgs, return_tensors="pt", padding=True)
         elif stack == "temporal":
             if frames_per_state != 2:
                 raise ValueError("temporal stacking takes exactly 2 frames per state")
             cur = [self._to_image(item[-1], long_side) for item in items]
             prev = [self._to_image(item[0], long_side) for item in items]
             prev = [p if p.size == c.size else p.resize(c.size, Image.BILINEAR) for p, c in zip(prev, cur)]
-            enc = self.processor(text=[prompt] * b, images=cur, return_tensors="pt", padding=True)
+            enc = self.processor(text=list(prompts), images=cur, return_tensors="pt", padding=True)
             prev_enc = self.processor.image_processor(prev, return_tensors="pt")
             if not (prev_enc["image_grid_thw"] == enc["image_grid_thw"]).all():
                 raise ValueError("previous and current frames resize to different grids")
@@ -214,10 +228,10 @@ class PlayJevModel:
         import torch
 
         enc = {k: v.to(self.device) for k, v in enc.items() if hasattr(v, "to")}
+        kw = {k: enc[k] for k in ("pixel_values", "image_grid_thw", "mm_token_type_ids") if k in enc}
         with torch.inference_mode():
             out = self.model.model(input_ids=enc["input_ids"], attention_mask=enc["attention_mask"],
-                                   pixel_values=enc["pixel_values"], image_grid_thw=enc["image_grid_thw"],
-                                   mm_token_type_ids=enc["mm_token_type_ids"], use_cache=False, return_dict=True)
+                                   use_cache=False, return_dict=True, **kw)
             h = out.last_hidden_state[:, -1, :].float()  # left padding: the last position is the answer slot
             logits = h @ self.head_w32.T  # (B, V) float32
         if self.device.type == "cuda":
@@ -242,15 +256,22 @@ class PlayJevModel:
     # ----------------------------------------------------------------- public
     def decide(self, frames: Sequence[Any], options: Sequence[dict], instructions: str = DEFAULT_INSTRUCTIONS,
                frames_per_state: int = 1, stack: str = "temporal", batch_size: int = 32,
-               long_side: int | None = None) -> list[Decision]:
+               long_side: int | None = None,
+               state_text: str | Sequence[str | None] | None = None) -> list[Decision]:
         """One decision per state. `frames` holds one item per state: JPEG bytes (or a PIL image) for
-        frames_per_state=1, else a (previous, current) pair. All states share the option list, so the
-        batch needs no padding. `long_side` optionally rescales frames before the processor."""
+        frames_per_state=1, else a (previous, current) pair. With `frames_per_state=0` the state is
+        `state_text` alone and `frames` only sets the batch length (pass a list of None). `state_text` is
+        one string for every state, or a sequence with one entry per state when the states carry different
+        text. All states share the option list. `long_side` optionally rescales frames."""
         if self.model is None:
             self.load()
-        if frames_per_state not in (1, 2):
-            raise ValueError("frames_per_state must be 1 or 2")
-        prompt = self.build_prompt(options, instructions, frames_per_state, stack)
+        if frames_per_state not in (0, 1, 2):
+            raise ValueError("frames_per_state must be 0, 1 or 2")
+        texts = ([state_text] * len(frames) if state_text is None or isinstance(state_text, str)
+                 else list(state_text))
+        if len(texts) != len(frames):
+            raise ValueError("state_text must be one string or one per state")
+        prompts = [self.build_prompt(options, instructions, frames_per_state, stack, t) for t in texts]
         k = len(options)
         decisions: list[Decision] = []
         prep = fwd = 0.0
@@ -258,7 +279,7 @@ class PlayJevModel:
         for start in range(0, len(frames), batch_size):
             items = frames[start:start + batch_size]
             t0 = time.perf_counter()
-            enc = self._prepare(items, prompt, frames_per_state, stack, long_side)
+            enc = self._prepare(items, prompts[start:start + batch_size], frames_per_state, stack, long_side)
             t1 = time.perf_counter()
             logits = self._forward(enc)
             t2 = time.perf_counter()
@@ -266,7 +287,7 @@ class PlayJevModel:
             fwd += t2 - t1
             decisions.extend(self._readout(logits, k))
             timing.input_tokens = int(enc["attention_mask"][0].sum())
-            timing.visual_tokens = int((enc["input_ids"][0] == self.image_token_id).sum())
+            timing.visual_tokens = int((enc["input_ids"][0] == self.image_token_id).sum())  # 0 for a text state
         timing.prep_s, timing.forward_s = prep, fwd
         self.last_timing = timing
         return decisions
