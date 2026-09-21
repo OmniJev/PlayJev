@@ -1,7 +1,7 @@
 """README charts: System Two handover, calibration, and the one-step-late collapse.
 
 Light and dark versions of each, written to docs/assets/. Numbers come from runs/results/
-(handover/sft_all1_*.json, *_hrandom*.json, sft_all1.json, playjev-0.8b-dagger2_relabel.json),
+(handover/sft_all1_*.json, *_hrandom*.json, sft_all1.json, playjev-0.8b-dagger3_relabel.json),
 which are the same runs the README tables report.
 
     python scripts/readme_charts.py
@@ -99,7 +99,7 @@ def handover(dark=False, games=("breakout", "tetris", "pacman", "snake")):
     return t.save(fig, "handover")
 
 
-def calibration(dark=False, run="playjev-0.8b-dagger2_relabel.json"):
+def calibration(dark=False, run="playjev-0.8b-dagger3_relabel.json"):
     """How often the model's move matched the teacher, against the probability it gave that move."""
     t = Theme(dark)
     rows = {r["game"]: r for r in json.load(open(RES / run))}

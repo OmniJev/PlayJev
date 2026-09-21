@@ -1,0 +1,1 @@
+{"game":"sokoban","policy":"playjev-0.8b-dagger3","seed":5003,"actions":["up","down","left","right"],"frames_per_step":1,"steps":[{"a":3,"p":[0.0002,0.0,0.0004,0.9993],"score":101}],"final_score":101,"truncated":false}

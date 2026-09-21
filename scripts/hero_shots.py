@@ -1,6 +1,6 @@
-"""Frames for the README: replay a recorded dagger2 episode and screenshot the game at 2x.
+"""Frames for the README: replay a recorded version 3 episode and screenshot the game at 2x.
 
-The actions come from demo/replays/<game>/playjev-0.8b-dagger2_*.json, so every picture is a
+The actions come from demo/replays/<game>/playjev-0.8b-dagger3_*.json, so every picture is a
 position the trained model actually reached, not a hand-played one.
 """
 import argparse, asyncio, json, sys
@@ -15,7 +15,7 @@ CUT = {"snake": .92, "tetris": .88, "2048": .95, "mario": .70, "pacman": .55,
        "breakout": .80, "flappy": .90, "invaders": .55, "racer": .35, "sokoban": .80}
 
 
-def best_replay(game: str, policy: str = "playjev-0.8b-dagger2") -> dict:
+def best_replay(game: str, policy: str = "playjev-0.8b-dagger3") -> dict:
     files = sorted(Path(f"demo/replays/{game}").glob(f"{policy}_*.json"))
     if not files:
         raise SystemExit(f"{game}: no {policy} replay")

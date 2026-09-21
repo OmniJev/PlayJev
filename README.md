@@ -9,12 +9,12 @@
   <a href="https://huggingface.co/spaces/OmniJev/PlayJev"><img alt="live demo on Hugging Face" src="https://img.shields.io/badge/HF%20Space-try%20it-ffd21e?style=flat-square&logo=huggingface&logoColor=ffd21e&labelColor=16181c"></a>
   <a href="https://huggingface.co/OmniJev/PlayJev-0.8B"><img alt="weights on Hugging Face" src="https://img.shields.io/badge/weights-PlayJev--0.8B-ffd21e?style=flat-square&logo=huggingface&logoColor=ffd21e&labelColor=16181c"></a>
   <a href="#-how-a-decision-is-made"><img alt="43 ms per move" src="https://img.shields.io/badge/per%20move-43%20ms-eb6834?style=flat-square&labelColor=16181c"></a>
-  <a href="#-results"><img alt="0.53 vs teacher" src="https://img.shields.io/badge/vs%20teacher-0.53-2a78d6?style=flat-square&labelColor=16181c"></a>
+  <a href="#-results"><img alt="0.57 vs teacher" src="https://img.shields.io/badge/vs%20teacher-0.57-2a78d6?style=flat-square&labelColor=16181c"></a>
 </p>
 
 <p align="center">
   <img alt="pixels only" src="https://img.shields.io/badge/input-pixels_only-1c5cab?style=flat-square">
-  <img alt="863k frames" src="https://img.shields.io/badge/training-863k_frames-3987e5?style=flat-square">
+  <img alt="2.2M frames" src="https://img.shields.io/badge/training-2.2M_frames-3987e5?style=flat-square">
   <a href="https://github.com/OmniJev/openJev"><img alt="Jev System One" src="https://img.shields.io/badge/contract-Jev_System_One-1baf7a?style=flat-square"></a>
   <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square"></a>
 </p>
@@ -70,8 +70,9 @@ of them.
 
 The demo's single game view is the whole model in one picture: the frame on the left is the only input, the
 bars are what the forward pass returns, the line below them is how sure it was at every step so far. Moves are
-shuffled in every training sample, so position carries no information. One frame per decision; where velocity
-matters the vision tower also takes the previous frame, at no extra token cost. The prompt is built in
+shuffled in every training sample, so position carries no information. One frame per decision: these weights
+see a single still image. The vision tower's temporal patch of 2 can carry a second frame at no extra token
+cost, and this release leaves that off. The prompt is built in
 [playjev/model.py](playjev/model.py), and the demo prints the exact one for every game.
 
 ## ▶️ Run It
@@ -84,7 +85,7 @@ python -m playjev.play snake --policy local --ckpt OmniJev/PlayJev-0.8B --episod
 
 It pulls the weights from Hugging Face, opens Snake in headless Chromium and plays it. There is no dataset to
 download: the ten games are in this repository and `scripts/reproduce.sh` regenerates every training frame here,
-from the teachers through both DAgger rounds to the closed-loop score. Setup once (Python 3.12,
+from the teachers through three DAgger rounds to the closed-loop score. Setup once (Python 3.12,
 a CUDA GPU, about 3 GB for inference and 17 GB for training at batch 64):
 
 ```bash
@@ -99,7 +100,7 @@ pip install -r requirements.txt && playwright install chromium
 | `playjev.collect <game> --steps 4000 --shard s0` | (frame, teacher target) pairs under `data/<game>/s0` |
 | `playjev.train_sft --games <game> --model Qwen/Qwen3.5-0.8B-Base --out ckpt/x` | fine-tune, one epoch |
 | `playjev.serve --ckpt <ckpt> --port 18732` | the checkpoint at `/v1/systemone` in the OpenJev request shape; the demo switches every tile to it with `?server=http://127.0.0.1:18732` |
-| `bash scripts/reproduce.sh` | the whole model from nothing: the teachers collect, the base model clones them, two DAgger rounds, the closed loop |
+| `bash scripts/reproduce.sh` | the whole model from nothing: the teachers collect, the base model clones them, three DAgger rounds with the replay mix, the closed loop |
 | `python scripts/build_demo.py` | rebuild `demo/` from the games and the recorded runs, then serve it and open `index.html` |
 
 ## 📊 Results
@@ -109,24 +110,26 @@ seeds through the same harness; a teacher is the per-game search program that pl
 state, which the model never sees. **vs teacher** is (model - random) / (teacher - random), so 0 is random play
 and 1.00 is the teacher. `cloning` is one epoch over 863k teacher-labelled frames, `version 1` and `version 2`
 two DAgger rounds on top: the model plays 40k frames per game, the teachers label every frame it visited, one
-more epoch. Bold is the released model.
+more epoch. `version 3` starts over from the base model on every frame the first two rounds produced, with a
+fifth of each epoch spent on general image questions and a fifth on text so the model keeps what it knew, then
+plays one more round. Bold is the released model.
 
-| Game | Random | Cloning | Version 1 | Version 2 | Teacher | vs teacher |
-|---|---:|---:|---:|---:|---:|---:|
-| Space Invaders | 215 | 400 | 400 | **400** | 400 | 1.00 |
-| Racer | 238 | 6211 | 6704 | **6707** | 6712 | 1.00 |
-| Sokoban | 6.6 | 57.9 | 102.3 | **102.1** | 102.2 | 1.00 |
-| Snake | 1.0 | 77.8 | 107.9 | **89.5** | 114 | 0.79 |
-| Pacman | 113 | 1036 | 3209 | **3702** | 7026 | 0.52 |
-| Infinite Mario | 613 | 1156 | 1170 | **1764** | 4229 | 0.32 |
-| Tetris | 162 | 1034 | 1561 | **4718** | 15288 | 0.30 |
-| Floppy Bird | 0.0 | 8.9 | 9.3 | **13.8** | 84.0 | 0.16 |
-| Breakout | 496 | 611 | 1552 | **2712** | 16547 | 0.14 |
-| 2048 | 1021 | 3174 | 2170 | **3386** | 19593 | 0.13 |
-| **mean vs teacher** | | 0.37 | 0.49 | **0.53** | | |
+| Game | Random | Cloning | Version 1 | Version 2 | Version 3 | Teacher | vs teacher |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Space Invaders | 215 | 400 | 400 | 400 | **400** | 400 | 1.00 |
+| Racer | 238 | 6211 | 6704 | 6707 | **6709** | 6712 | 1.00 |
+| Sokoban | 6.6 | 57.9 | 102.3 | 102.1 | **102.1** | 102.2 | 1.00 |
+| Snake | 1.0 | 77.8 | 107.9 | 89.5 | **102.9** | 114 | 0.90 |
+| Pacman | 113 | 1036 | 3209 | 3702 | **3965** | 7026 | 0.56 |
+| Tetris | 162 | 1034 | 1561 | 4718 | **5792** | 15288 | 0.37 |
+| Infinite Mario | 613 | 1156 | 1170 | 1764 | **1757** | 4229 | 0.32 |
+| 2048 | 1021 | 3174 | 2170 | 3386 | **4868** | 19593 | 0.21 |
+| Floppy Bird | 0.0 | 8.9 | 9.3 | 13.8 | **15.5** | 84.0 | 0.18 |
+| Breakout | 496 | 611 | 1552 | 2712 | **2785** | 16547 | 0.14 |
+| **mean vs teacher** | | 0.37 | 0.49 | 0.53 | **0.57** | | |
 
 Zero-shot the base model puts 0.7 on option A whatever the frame. Three games end up at their teacher and the
-mean at 0.53. What separates the other seven from their teachers is one of four things, and the two rounds
+mean at 0.57. What separates the other seven from their teachers is one of four things, and the rounds
 close or halve three of them.
 
 | Problem | Games | How we know | What the rounds did |
@@ -135,6 +138,27 @@ close or halve three of them.
 | One frame shows no motion | Breakout, Mario | 16 percent agreement on its own play: cloning learned to read the paddle, which sits under the ball on every teacher frame | 47 percent after round 1, and round 2 doubles the score again |
 | Single-step precision | Floppy Bird, Tetris | Flappy matches the teacher on 99.8 percent of frames and dies at 9 pipes on the one it misses | a few hundred such moments in 40k frames, so it takes both rounds |
 | Reading tile digits at 448 px | 2048 | 0.48 agreement either way, and the model knows it: confidence 0.25 | relabelling cannot help where the digits are unreadable, resolution can |
+
+### 🧭 General Ability
+
+Two held-out sets the training never touched, 200 questions each, asked under the game contract: the picture
+or the passage is the state, the question is the instruction, the answers are the options, one forward pass.
+Each question is asked twice, with the options in both orders. Two game-only rounds spent the base model's
+general ability on game score, and version 2 answers both sets near chance. Version 3 keeps a fifth of every
+epoch on general image questions and a fifth on text; it comes out above the base model on MMBench, level with
+it on MMLU, and plays every game as well or better.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/general-dark.png">
+  <img alt="Accuracy on MMBench dev and the MMLU test slice for version 2, version 3 and the base model" src="docs/assets/general.png">
+</picture>
+
+| Model | MMBench dev | MMLU test |
+|---|---:|---:|
+| Qwen3.5-0.8B-Base | 0.66 | 0.33 |
+| Version 2 | 0.37 | 0.22 |
+| **Version 3** | **0.74** | **0.32** |
+| chance | 0.40 | 0.25 |
 
 The rest of what we measured, one line each.
 
@@ -170,7 +194,8 @@ The rest of what we measured, one line each.
 |---|---|
 | **Teachers** | One search program per game on the game's internal state: BFS (Snake), expectimax (2048), Dellacherie (Tetris), A* with deadlock pruning (Sokoban), exact physics (Floppy Bird), ghost occupancy (Pacman), ball flight (Breakout), dodge-and-aim DP (Invaders), lookahead steering (Racer), physics rollouts (Mario). Soft target: 0.9 on the best move, 0.1 over acceptable ones, 0 on losing ones. |
 | **Collection** | 100k frames per game, 448 px JPEGs, teachers playing with 2 to 30 percent random moves so the data covers recoveries. |
-| **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5 for the cloning epoch and 1e-5 for each round, bf16 autocast on fp32 master weights, 3 to 4 h per round on one H200. |
+| **Fine-tuning** | Full fine-tuning, one epoch over the ten games mixed, batch 64, lr 2e-5 for the cloning epoch and 1e-5 for each round, bf16 autocast on fp32 master weights, 3 to 4 h per round on one H200. Version 3 restarts from the base model over all 1.8M frames the first two rounds left behind (12 h), then plays one more round (7 h). |
+| **Replay** | From version 3 on, 60 percent of the batches are game frames, 20 percent are general image questions (A-OKVQA, ScienceQA) and 20 percent text questions (MMLU auxiliary train, SciQ, ARC), all rendered through the same prompt. 30 percent of the game samples get one of four option rewrites: a distractor move from another game, a pruned option, a paraphrased question or a renamed move. |
 | **Closed loop** | 16 held-out episodes per game, the same seeds as random play and the teacher. Validation also reports agreement, calibration error and per-position bias. |
 
 Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELINES.md).
@@ -179,11 +204,11 @@ Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELI
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/chart-dark.png">
-  <img alt="Score against the teacher for each game after cloning and after each of the two rounds" src="docs/assets/chart.png">
+  <img alt="Score against the teacher for each game after cloning and after each of the three rounds" src="docs/assets/chart.png">
 </picture>
 
 Every game and every version against its teacher. Three games are finished after one round, and the rest
-split by what was wrong with them.
+split by what was wrong with them; version 3 moves five of them again.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/handover-dark.png">

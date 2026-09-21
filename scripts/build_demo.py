@@ -462,7 +462,7 @@ def main() -> None:
     ap.add_argument("--results", default=str(ROOT / "runs" / "results"), help="model results directory")
     ap.add_argument("--games", default=",".join(ORDER), help="comma-separated game ids")
     ap.add_argument("--exclude-policies", default=r"-(delay\d+|sampled|plain)$", help="regex; recordings whose policy name matches stay out of the page")
-    ap.add_argument("--model-policy", default="playjev-0.8b-dagger2",
+    ap.add_argument("--model-policy", default="playjev-0.8b-dagger3",
                     help="policy name for the table's trained-model column and the default recording")
     ap.add_argument("--out", default=str(DEMO), help="demo directory (default demo/)")
     a = ap.parse_args()

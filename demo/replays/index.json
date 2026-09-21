@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-19T18:36:19",
+ "generated": "2026-09-21T21:24:09",
  "sources": [
   "runs/replays"
  ],
@@ -7,6 +7,7 @@
   "playjev-0.8b-dagger1",
   "playjev-0.8b-dagger1-s2",
   "playjev-0.8b-dagger2",
+  "playjev-0.8b-dagger3",
   "playjev-0.8b-sft_all1",
   "playjev-0.8b-sft_all1_d1",
   "playjev-0.8b-sft_all1_d1_2f",
@@ -452,6 +453,150 @@
     "file": "tetris/playjev-0.8b-dagger2_5021.json",
     "steps": 290,
     "final_score": 1180,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "tetris/playjev-0.8b-dagger3_5000.json",
+    "steps": 890,
+    "final_score": 7100,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "tetris/playjev-0.8b-dagger3_5001.json",
+    "steps": 665,
+    "final_score": 4670,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "tetris/playjev-0.8b-dagger3_5002.json",
+    "steps": 977,
+    "final_score": 7480,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "tetris/playjev-0.8b-dagger3_5003.json",
+    "steps": 446,
+    "final_score": 2740,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "tetris/playjev-0.8b-dagger3_5004.json",
+    "steps": 742,
+    "final_score": 5440,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "tetris/playjev-0.8b-dagger3_5005.json",
+    "steps": 599,
+    "final_score": 4590,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "tetris/playjev-0.8b-dagger3_5006.json",
+    "steps": 1400,
+    "final_score": 12970,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "tetris/playjev-0.8b-dagger3_5007.json",
+    "steps": 351,
+    "final_score": 2080,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "tetris/playjev-0.8b-dagger3_5009.json",
+    "steps": 1495,
+    "final_score": 12370,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "tetris/playjev-0.8b-dagger3_5010.json",
+    "steps": 686,
+    "final_score": 4830,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "tetris/playjev-0.8b-dagger3_5011.json",
+    "steps": 526,
+    "final_score": 3100,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "tetris/playjev-0.8b-dagger3_5012.json",
+    "steps": 872,
+    "final_score": 6930,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "tetris/playjev-0.8b-dagger3_5013.json",
+    "steps": 796,
+    "final_score": 6030,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "tetris/playjev-0.8b-dagger3_5015.json",
+    "steps": 951,
+    "final_score": 7210,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "tetris/playjev-0.8b-dagger3_5016.json",
+    "steps": 451,
+    "final_score": 2990,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5018,
+    "file": "tetris/playjev-0.8b-dagger3_5018.json",
+    "steps": 383,
+    "final_score": 2140,
     "truncated": false,
     "frames_per_step": 1
    },
@@ -1610,6 +1755,150 @@
     "frames_per_step": 1
    },
    {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "snake/playjev-0.8b-dagger3_5000.json",
+    "steps": 186,
+    "final_score": 51,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "snake/playjev-0.8b-dagger3_5001.json",
+    "steps": 607,
+    "final_score": 131,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "snake/playjev-0.8b-dagger3_5002.json",
+    "steps": 494,
+    "final_score": 111,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "snake/playjev-0.8b-dagger3_5003.json",
+    "steps": 369,
+    "final_score": 96,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "snake/playjev-0.8b-dagger3_5004.json",
+    "steps": 317,
+    "final_score": 76,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "snake/playjev-0.8b-dagger3_5005.json",
+    "steps": 655,
+    "final_score": 146,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "snake/playjev-0.8b-dagger3_5006.json",
+    "steps": 556,
+    "final_score": 136,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "snake/playjev-0.8b-dagger3_5007.json",
+    "steps": 563,
+    "final_score": 116,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "snake/playjev-0.8b-dagger3_5009.json",
+    "steps": 440,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "snake/playjev-0.8b-dagger3_5010.json",
+    "steps": 754,
+    "final_score": 151,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "snake/playjev-0.8b-dagger3_5011.json",
+    "steps": 307,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "snake/playjev-0.8b-dagger3_5012.json",
+    "steps": 335,
+    "final_score": 81,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "snake/playjev-0.8b-dagger3_5013.json",
+    "steps": 395,
+    "final_score": 96,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "snake/playjev-0.8b-dagger3_5014.json",
+    "steps": 272,
+    "final_score": 71,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "snake/playjev-0.8b-dagger3_5015.json",
+    "steps": 378,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5018,
+    "file": "snake/playjev-0.8b-dagger3_5018.json",
+    "steps": 378,
+    "final_score": 91,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "snake/playjev-0.8b-sft_all1_5000.json",
@@ -2683,6 +2972,150 @@
     "frames_per_step": 6
    },
    {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "pacman/playjev-0.8b-dagger3_5000.json",
+    "steps": 661,
+    "final_score": 4160,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "pacman/playjev-0.8b-dagger3_5001.json",
+    "steps": 634,
+    "final_score": 3060,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "pacman/playjev-0.8b-dagger3_5002.json",
+    "steps": 1500,
+    "final_score": 7890,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "pacman/playjev-0.8b-dagger3_5003.json",
+    "steps": 1500,
+    "final_score": 6880,
+    "truncated": true,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "pacman/playjev-0.8b-dagger3_5004.json",
+    "steps": 269,
+    "final_score": 1550,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "pacman/playjev-0.8b-dagger3_5005.json",
+    "steps": 578,
+    "final_score": 2580,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "pacman/playjev-0.8b-dagger3_5006.json",
+    "steps": 742,
+    "final_score": 3750,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "pacman/playjev-0.8b-dagger3_5007.json",
+    "steps": 869,
+    "final_score": 4540,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "pacman/playjev-0.8b-dagger3_5009.json",
+    "steps": 878,
+    "final_score": 4660,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "pacman/playjev-0.8b-dagger3_5010.json",
+    "steps": 734,
+    "final_score": 4030,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "pacman/playjev-0.8b-dagger3_5011.json",
+    "steps": 690,
+    "final_score": 3930,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "pacman/playjev-0.8b-dagger3_5012.json",
+    "steps": 531,
+    "final_score": 2350,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "pacman/playjev-0.8b-dagger3_5016.json",
+    "steps": 900,
+    "final_score": 4690,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5018,
+    "file": "pacman/playjev-0.8b-dagger3_5018.json",
+    "steps": 339,
+    "final_score": 2180,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5019,
+    "file": "pacman/playjev-0.8b-dagger3_5019.json",
+    "steps": 601,
+    "final_score": 3380,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5020,
+    "file": "pacman/playjev-0.8b-dagger3_5020.json",
+    "steps": 614,
+    "final_score": 3810,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "pacman/playjev-0.8b-sft_all1_5000.json",
@@ -3699,6 +4132,150 @@
     "steps": 1500,
     "final_score": 6631.3,
     "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "racer/playjev-0.8b-dagger3_5000.json",
+    "steps": 1407,
+    "final_score": 6710.4,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "racer/playjev-0.8b-dagger3_5001.json",
+    "steps": 1463,
+    "final_score": 6711.7,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "racer/playjev-0.8b-dagger3_5002.json",
+    "steps": 1476,
+    "final_score": 6713.3,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "racer/playjev-0.8b-dagger3_5003.json",
+    "steps": 1463,
+    "final_score": 6710.6,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "racer/playjev-0.8b-dagger3_5004.json",
+    "steps": 1452,
+    "final_score": 6713.3,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "racer/playjev-0.8b-dagger3_5005.json",
+    "steps": 1483,
+    "final_score": 6711.4,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "racer/playjev-0.8b-dagger3_5006.json",
+    "steps": 1500,
+    "final_score": 6652.4,
+    "truncated": true,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "racer/playjev-0.8b-dagger3_5007.json",
+    "steps": 1401,
+    "final_score": 6711.5,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "racer/playjev-0.8b-dagger3_5009.json",
+    "steps": 1383,
+    "final_score": 6714.2,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "racer/playjev-0.8b-dagger3_5010.json",
+    "steps": 1483,
+    "final_score": 6711.5,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "racer/playjev-0.8b-dagger3_5011.json",
+    "steps": 1441,
+    "final_score": 6712.4,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "racer/playjev-0.8b-dagger3_5012.json",
+    "steps": 1384,
+    "final_score": 6714.6,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "racer/playjev-0.8b-dagger3_5013.json",
+    "steps": 1414,
+    "final_score": 6712,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "racer/playjev-0.8b-dagger3_5014.json",
+    "steps": 1451,
+    "final_score": 6712.9,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "racer/playjev-0.8b-dagger3_5015.json",
+    "steps": 1435,
+    "final_score": 6713.7,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "racer/playjev-0.8b-dagger3_5016.json",
+    "steps": 1446,
+    "final_score": 6710.6,
+    "truncated": false,
     "frames_per_step": 5
    },
    {
@@ -5288,6 +5865,150 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "invaders/playjev-0.8b-dagger3_5000.json",
+    "steps": 195,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "invaders/playjev-0.8b-dagger3_5001.json",
+    "steps": 174,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "invaders/playjev-0.8b-dagger3_5002.json",
+    "steps": 195,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "invaders/playjev-0.8b-dagger3_5003.json",
+    "steps": 185,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "invaders/playjev-0.8b-dagger3_5004.json",
+    "steps": 185,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "invaders/playjev-0.8b-dagger3_5005.json",
+    "steps": 181,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "invaders/playjev-0.8b-dagger3_5006.json",
+    "steps": 170,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "invaders/playjev-0.8b-dagger3_5007.json",
+    "steps": 185,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "invaders/playjev-0.8b-dagger3_5009.json",
+    "steps": 203,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "invaders/playjev-0.8b-dagger3_5010.json",
+    "steps": 181,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "invaders/playjev-0.8b-dagger3_5011.json",
+    "steps": 195,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "invaders/playjev-0.8b-dagger3_5012.json",
+    "steps": 177,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "invaders/playjev-0.8b-dagger3_5013.json",
+    "steps": 185,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "invaders/playjev-0.8b-dagger3_5014.json",
+    "steps": 264,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "invaders/playjev-0.8b-dagger3_5015.json",
+    "steps": 167,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "invaders/playjev-0.8b-dagger3_5016.json",
+    "steps": 170,
+    "final_score": 400,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "invaders/playjev-0.8b-sft_all1_5000.json",
@@ -6292,6 +7013,150 @@
     "policy": "playjev-0.8b-dagger2",
     "seed": 5017,
     "file": "sokoban/playjev-0.8b-dagger2_5017.json",
+    "steps": 44,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "sokoban/playjev-0.8b-dagger3_5001.json",
+    "steps": 47,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "sokoban/playjev-0.8b-dagger3_5002.json",
+    "steps": 61,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "sokoban/playjev-0.8b-dagger3_5003.json",
+    "steps": 1,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "sokoban/playjev-0.8b-dagger3_5004.json",
+    "steps": 45,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "sokoban/playjev-0.8b-dagger3_5005.json",
+    "steps": 47,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "sokoban/playjev-0.8b-dagger3_5006.json",
+    "steps": 83,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "sokoban/playjev-0.8b-dagger3_5007.json",
+    "steps": 64,
+    "final_score": 103,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "sokoban/playjev-0.8b-dagger3_5009.json",
+    "steps": 76,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "sokoban/playjev-0.8b-dagger3_5010.json",
+    "steps": 34,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "sokoban/playjev-0.8b-dagger3_5011.json",
+    "steps": 26,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "sokoban/playjev-0.8b-dagger3_5012.json",
+    "steps": 37,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "sokoban/playjev-0.8b-dagger3_5013.json",
+    "steps": 82,
+    "final_score": 104,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "sokoban/playjev-0.8b-dagger3_5014.json",
+    "steps": 64,
+    "final_score": 102,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "sokoban/playjev-0.8b-dagger3_5015.json",
+    "steps": 23,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "sokoban/playjev-0.8b-dagger3_5016.json",
+    "steps": 60,
+    "final_score": 101,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5017,
+    "file": "sokoban/playjev-0.8b-dagger3_5017.json",
     "steps": 44,
     "final_score": 102,
     "truncated": false,
@@ -7304,6 +8169,150 @@
     "file": "mario/playjev-0.8b-dagger2_5020.json",
     "steps": 38,
     "final_score": 891,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "mario/playjev-0.8b-dagger3_5000.json",
+    "steps": 66,
+    "final_score": 1609,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "mario/playjev-0.8b-dagger3_5001.json",
+    "steps": 23,
+    "final_score": 653,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "mario/playjev-0.8b-dagger3_5002.json",
+    "steps": 169,
+    "final_score": 5229,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "mario/playjev-0.8b-dagger3_5003.json",
+    "steps": 20,
+    "final_score": 399,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "mario/playjev-0.8b-dagger3_5004.json",
+    "steps": 147,
+    "final_score": 3708,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "mario/playjev-0.8b-dagger3_5006.json",
+    "steps": 35,
+    "final_score": 891,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "mario/playjev-0.8b-dagger3_5007.json",
+    "steps": 72,
+    "final_score": 1793,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "mario/playjev-0.8b-dagger3_5009.json",
+    "steps": 29,
+    "final_score": 795,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "mario/playjev-0.8b-dagger3_5010.json",
+    "steps": 81,
+    "final_score": 2045,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "mario/playjev-0.8b-dagger3_5011.json",
+    "steps": 37,
+    "final_score": 991,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "mario/playjev-0.8b-dagger3_5012.json",
+    "steps": 61,
+    "final_score": 1694,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "mario/playjev-0.8b-dagger3_5014.json",
+    "steps": 27,
+    "final_score": 691,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "mario/playjev-0.8b-dagger3_5015.json",
+    "steps": 112,
+    "final_score": 2987,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "mario/playjev-0.8b-dagger3_5016.json",
+    "steps": 73,
+    "final_score": 2235,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5017,
+    "file": "mario/playjev-0.8b-dagger3_5017.json",
+    "steps": 81,
+    "final_score": 2059,
+    "truncated": false,
+    "frames_per_step": 6
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5018,
+    "file": "mario/playjev-0.8b-dagger3_5018.json",
+    "steps": 17,
+    "final_score": 337,
     "truncated": false,
     "frames_per_step": 6
    },
@@ -8462,6 +9471,150 @@
     "frames_per_step": 5
    },
    {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "flappy/playjev-0.8b-dagger3_5000.json",
+    "steps": 443,
+    "final_score": 21,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "flappy/playjev-0.8b-dagger3_5001.json",
+    "steps": 947,
+    "final_score": 51,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "flappy/playjev-0.8b-dagger3_5002.json",
+    "steps": 376,
+    "final_score": 17,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "flappy/playjev-0.8b-dagger3_5003.json",
+    "steps": 242,
+    "final_score": 9,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "flappy/playjev-0.8b-dagger3_5005.json",
+    "steps": 208,
+    "final_score": 7,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "flappy/playjev-0.8b-dagger3_5006.json",
+    "steps": 392,
+    "final_score": 18,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "flappy/playjev-0.8b-dagger3_5007.json",
+    "steps": 224,
+    "final_score": 8,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "flappy/playjev-0.8b-dagger3_5009.json",
+    "steps": 745,
+    "final_score": 39,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "flappy/playjev-0.8b-dagger3_5010.json",
+    "steps": 141,
+    "final_score": 3,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "flappy/playjev-0.8b-dagger3_5011.json",
+    "steps": 426,
+    "final_score": 20,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "flappy/playjev-0.8b-dagger3_5012.json",
+    "steps": 208,
+    "final_score": 7,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "flappy/playjev-0.8b-dagger3_5014.json",
+    "steps": 124,
+    "final_score": 2,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5015,
+    "file": "flappy/playjev-0.8b-dagger3_5015.json",
+    "steps": 493,
+    "final_score": 24,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "flappy/playjev-0.8b-dagger3_5016.json",
+    "steps": 242,
+    "final_score": 9,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5018,
+    "file": "flappy/playjev-0.8b-dagger3_5018.json",
+    "steps": 110,
+    "final_score": 1,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5019,
+    "file": "flappy/playjev-0.8b-dagger3_5019.json",
+    "steps": 292,
+    "final_score": 12,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
     "policy": "playjev-0.8b-sft_all1",
     "seed": 5000,
     "file": "flappy/playjev-0.8b-sft_all1_5000.json",
@@ -9612,6 +10765,150 @@
     "file": "breakout/playjev-0.8b-dagger2_5020.json",
     "steps": 107,
     "final_score": 230,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "breakout/playjev-0.8b-dagger3_5000.json",
+    "steps": 224,
+    "final_score": 700,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "breakout/playjev-0.8b-dagger3_5001.json",
+    "steps": 701,
+    "final_score": 3130,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "breakout/playjev-0.8b-dagger3_5002.json",
+    "steps": 223,
+    "final_score": 815,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "breakout/playjev-0.8b-dagger3_5003.json",
+    "steps": 572,
+    "final_score": 2600,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "breakout/playjev-0.8b-dagger3_5004.json",
+    "steps": 392,
+    "final_score": 5000,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "breakout/playjev-0.8b-dagger3_5005.json",
+    "steps": 823,
+    "final_score": 3965,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "breakout/playjev-0.8b-dagger3_5006.json",
+    "steps": 222,
+    "final_score": 960,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "breakout/playjev-0.8b-dagger3_5007.json",
+    "steps": 697,
+    "final_score": 8410,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "breakout/playjev-0.8b-dagger3_5009.json",
+    "steps": 791,
+    "final_score": 5275,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "breakout/playjev-0.8b-dagger3_5010.json",
+    "steps": 443,
+    "final_score": 1390,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "breakout/playjev-0.8b-dagger3_5011.json",
+    "steps": 358,
+    "final_score": 1340,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "breakout/playjev-0.8b-dagger3_5012.json",
+    "steps": 498,
+    "final_score": 2335,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "breakout/playjev-0.8b-dagger3_5013.json",
+    "steps": 387,
+    "final_score": 1795,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "breakout/playjev-0.8b-dagger3_5014.json",
+    "steps": 316,
+    "final_score": 5425,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5016,
+    "file": "breakout/playjev-0.8b-dagger3_5016.json",
+    "steps": 167,
+    "final_score": 580,
+    "truncated": false,
+    "frames_per_step": 5
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5017,
+    "file": "breakout/playjev-0.8b-dagger3_5017.json",
+    "steps": 199,
+    "final_score": 835,
     "truncated": false,
     "frames_per_step": 5
    },
@@ -10793,6 +12090,150 @@
     "file": "2048/playjev-0.8b-dagger2_5018.json",
     "steps": 177,
     "final_score": 2072,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5000,
+    "file": "2048/playjev-0.8b-dagger3_5000.json",
+    "steps": 287,
+    "final_score": 3452,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5001,
+    "file": "2048/playjev-0.8b-dagger3_5001.json",
+    "steps": 341,
+    "final_score": 4152,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5002,
+    "file": "2048/playjev-0.8b-dagger3_5002.json",
+    "steps": 275,
+    "final_score": 3356,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5003,
+    "file": "2048/playjev-0.8b-dagger3_5003.json",
+    "steps": 558,
+    "final_score": 8060,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5004,
+    "file": "2048/playjev-0.8b-dagger3_5004.json",
+    "steps": 680,
+    "final_score": 9848,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5005,
+    "file": "2048/playjev-0.8b-dagger3_5005.json",
+    "steps": 316,
+    "final_score": 3864,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5006,
+    "file": "2048/playjev-0.8b-dagger3_5006.json",
+    "steps": 370,
+    "final_score": 5224,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5007,
+    "file": "2048/playjev-0.8b-dagger3_5007.json",
+    "steps": 336,
+    "final_score": 4244,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5009,
+    "file": "2048/playjev-0.8b-dagger3_5009.json",
+    "steps": 439,
+    "final_score": 6232,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5010,
+    "file": "2048/playjev-0.8b-dagger3_5010.json",
+    "steps": 326,
+    "final_score": 4012,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5011,
+    "file": "2048/playjev-0.8b-dagger3_5011.json",
+    "steps": 564,
+    "final_score": 8380,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5012,
+    "file": "2048/playjev-0.8b-dagger3_5012.json",
+    "steps": 256,
+    "final_score": 3152,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5013,
+    "file": "2048/playjev-0.8b-dagger3_5013.json",
+    "steps": 345,
+    "final_score": 4220,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5014,
+    "file": "2048/playjev-0.8b-dagger3_5014.json",
+    "steps": 382,
+    "final_score": 5464,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5019,
+    "file": "2048/playjev-0.8b-dagger3_5019.json",
+    "steps": 213,
+    "final_score": 2484,
+    "truncated": false,
+    "frames_per_step": 1
+   },
+   {
+    "policy": "playjev-0.8b-dagger3",
+    "seed": 5021,
+    "file": "2048/playjev-0.8b-dagger3_5021.json",
+    "steps": 176,
+    "final_score": 1744,
     "truncated": false,
     "frames_per_step": 1
    },

@@ -1,6 +1,6 @@
-"""Animated version of the README board: ten recorded dagger2 episodes playing at once.
+"""Animated version of the README board: ten recorded version 3 episodes playing at once.
 
-Each tile replays the best demo/replays/<game>/playjev-0.8b-dagger2_*.json through playjev.env,
+Each tile replays the best demo/replays/<game>/playjev-0.8b-dagger3_*.json through playjev.env,
 exactly the way scripts/hero_shots.py replays it, and screenshots the game area every few steps.
 The frames go into the 5x2 grid scripts/readme_figs.py uses for docs/assets/board.png (same order,
 same CROP, same letterboxing, same black label strip), except that the score on the right of each
@@ -39,7 +39,7 @@ from readme_figs import BOARD_ORDER, CROP, GAMES, edge_colour, font  # noqa: E40
 # how far into each episode the clip runs, as in scripts/hero_shots.py
 CUT = {"snake": .92, "tetris": .88, "2048": .95, "mario": .70, "pacman": .55,
        "breakout": .80, "flappy": .90, "invaders": .55, "racer": .35, "sokoban": .80}
-POLICY = "playjev-0.8b-dagger2"
+POLICY = "playjev-0.8b-dagger3"
 CACHE = Path(tempfile.gettempdir()) / "playjev-board-gif"
 CANVAS_BBOX_JS = (
     "() => { let b = null, best = 0;"
