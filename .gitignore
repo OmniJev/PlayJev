@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 data/
 runs/
+.cache/
 /tmp/
 .scratch/
 

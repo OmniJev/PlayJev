@@ -14,7 +14,7 @@
 
 <p align="center">
   <img alt="pixels only" src="https://img.shields.io/badge/input-pixels_only-1c5cab?style=flat-square">
-  <a href="https://huggingface.co/datasets/OmniJev/PlayJev-data"><img alt="2.2M frames" src="https://img.shields.io/badge/training-2.2M_frames-3987e5?style=flat-square"></a>
+  <a href="https://huggingface.co/OmniJev/PlayJev-0.8B/tree/main/data"><img alt="2.2M frames" src="https://img.shields.io/badge/training-2.2M_frames-3987e5?style=flat-square"></a>
   <a href="https://github.com/OmniJev/openJev"><img alt="Jev System One" src="https://img.shields.io/badge/contract-Jev_System_One-1baf7a?style=flat-square"></a>
   <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square"></a>
 </p>
@@ -24,8 +24,8 @@
 PlayJev is Qwen3.5-0.8B-Base fine-tuned to play ten classic browser games from raw pixels. One frame goes in,
 one forward pass runs, one move comes out, 43 ms on an H200. Every picture above is the trained model playing,
 each a frame from a recorded held-out episode with the score it had reached by then. The weights are on
-[Hugging Face](https://huggingface.co/OmniJev/PlayJev-0.8B), and so is every record we trained on
-([PlayJev-data](https://huggingface.co/datasets/OmniJev/PlayJev-data)).
+[Hugging Face](https://huggingface.co/OmniJev/PlayJev-0.8B), with every record we trained on beside them in
+[data/](https://huggingface.co/OmniJev/PlayJev-0.8B/tree/main/data).
 
 ## 🎮 The Ten Games
 
@@ -173,12 +173,12 @@ Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELI
 
 ## 🗂️ Training Data
 
-Every record we trained on is on Hugging Face as [PlayJev-data](https://huggingface.co/datasets/OmniJev/PlayJev-data):
+Every record we trained on sits beside the weights on Hugging Face, in [data/](https://huggingface.co/OmniJev/PlayJev-0.8B/tree/main/data):
 2,166,984 decisions from 11,416 episodes, 853 MB of JSON lines with the teacher's target, the move taken and the
 MD5 of each frame. The frames themselves are drawn again here, since an episode is fixed by its seed and its moves:
 
 ```bash
-hf download OmniJev/PlayJev-data --repo-type dataset --local-dir data
+hf download OmniJev/PlayJev-0.8B --include "data/*" --local-dir .
 python -m playjev.rebuild data --pages 16
 ```
 
