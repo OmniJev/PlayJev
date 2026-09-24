@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # The whole model from nothing: the teachers collect, the base model clones them, two DAgger
 # rounds, then version 3 starts over from the base model on everything those rounds produced with
-# the replay mix and plays a third round, then the closed-loop score. No game dataset to download;
-# the games are in this repository and the collector drives them in headless Chromium, so the
-# frames are regenerated here. The replay pools are public multiple-choice sets that
-# scripts/build_aux.py fetches from Hugging Face.
+# the replay mix and plays a third round, then the closed-loop score. The games are in this
+# repository and the collector drives them in headless Chromium, so the frames are made here. To
+# train on the exact frames we trained on, download the released records into data/ and rebuild
+# their frames first (README, Training Data); every complete shard is then kept, not collected.
+# The replay pools are public multiple-choice sets that scripts/build_aux.py fetches from Hugging Face.
 #
 #   bash scripts/reproduce.sh                        # all ten games, the released recipe
 #   GAMES=snake bash scripts/reproduce.sh            # one game
@@ -40,7 +41,12 @@ collect () {                      # collect <run> [actor checkpoint] [seed0 seed
   for g in $GAMES; do
     local t0=$SECONDS i=0 pids=() logs=()
     for sh in a b c; do
-      local eps=""
+      local eps="" dir=data/$g/${run}_$sh
+      # a complete shard is kept: an earlier run's, or the released records with frames rebuilt
+      if [ -f "$dir/records.jsonl" ] && [ "$(wc -l < "$dir/records.jsonl")" -ge "$per" ] \
+         && [ "$(ls "$dir/frames" 2>/dev/null | wc -l)" -ge "$per" ]; then
+        echo "[collect $run $g] ${run}_$sh kept"; i=$(( i + 1 )); continue
+      fi
       [ -z "$ckpt" ] && [ "$sh" = c ] && [ "$g" != sokoban ] && eps="--epsilon 0.3"
       logs+=("logs/collect_${run}_${g}_$sh.log")
       $PY -u -m playjev.collect "$g" --steps "$per" --pages 8 $act $eps \

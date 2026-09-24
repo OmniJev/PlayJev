@@ -14,7 +14,7 @@
 
 <p align="center">
   <img alt="pixels only" src="https://img.shields.io/badge/input-pixels_only-1c5cab?style=flat-square">
-  <img alt="2.2M frames" src="https://img.shields.io/badge/training-2.2M_frames-3987e5?style=flat-square">
+  <a href="https://huggingface.co/datasets/OmniJev/PlayJev-data"><img alt="2.2M frames" src="https://img.shields.io/badge/training-2.2M_frames-3987e5?style=flat-square"></a>
   <a href="https://github.com/OmniJev/openJev"><img alt="Jev System One" src="https://img.shields.io/badge/contract-Jev_System_One-1baf7a?style=flat-square"></a>
   <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/licence-Apache_2.0-6d747e?style=flat-square"></a>
 </p>
@@ -24,7 +24,8 @@
 PlayJev is Qwen3.5-0.8B-Base fine-tuned to play ten classic browser games from raw pixels. One frame goes in,
 one forward pass runs, one move comes out, 43 ms on an H200. Every picture above is the trained model playing,
 each a frame from a recorded held-out episode with the score it had reached by then. The weights are on
-[Hugging Face](https://huggingface.co/OmniJev/PlayJev-0.8B).
+[Hugging Face](https://huggingface.co/OmniJev/PlayJev-0.8B), and so is every record we trained on
+([PlayJev-data](https://huggingface.co/datasets/OmniJev/PlayJev-data)).
 
 ## 🎮 The Ten Games
 
@@ -83,9 +84,9 @@ The model plays a game, one command:
 python -m playjev.play snake --policy local --ckpt OmniJev/PlayJev-0.8B --episodes 1
 ```
 
-It pulls the weights from Hugging Face, opens Snake in headless Chromium and plays it. There is no dataset to
-download: the ten games are in this repository and `scripts/reproduce.sh` regenerates every training frame here,
-from the teachers through three DAgger rounds to the closed-loop score. Setup once (Python 3.12,
+It pulls the weights from Hugging Face, opens Snake in headless Chromium and plays it. `scripts/reproduce.sh`
+builds the whole model from nothing, from the teachers through three DAgger rounds to the closed-loop score, and
+the records we trained on can be drawn back into frames (Training Data below). Setup once (Python 3.12,
 a CUDA GPU, about 3 GB for inference and 17 GB for training at batch 64):
 
 ```bash
@@ -98,6 +99,7 @@ pip install -r requirements.txt && playwright install chromium
 |---|---|
 | `playjev.play <game> --policy teacher` (or `random`) | the two reference rows; `--delay 1` decides one step late |
 | `playjev.collect <game> --steps 4000 --shard s0` | (frame, teacher target) pairs under `data/<game>/s0` |
+| `playjev.rebuild data` | the frames of the released records, each checked against the MD5 of the one we trained on |
 | `playjev.train_sft --games <game> --model Qwen/Qwen3.5-0.8B-Base --out ckpt/x` | fine-tune, one epoch |
 | `playjev.serve --ckpt <ckpt> --port 18732` | the checkpoint at `/v1/systemone` in the OpenJev request shape; the demo switches every tile to it with `?server=http://127.0.0.1:18732` |
 | `bash scripts/reproduce.sh` | the whole model from nothing: the teachers collect, the base model clones them, three DAgger rounds with the replay mix, the closed loop |
@@ -169,6 +171,29 @@ drawn from general image and text questions. Game agreement is validation agreem
 
 Random play and every teacher on the same seeds: [docs/BASELINES.md](docs/BASELINES.md).
 
+## 🗂️ Training Data
+
+Every record we trained on is on Hugging Face as [PlayJev-data](https://huggingface.co/datasets/OmniJev/PlayJev-data):
+2,166,984 decisions from 11,416 episodes, 853 MB of JSON lines with the teacher's target, the move taken and the
+MD5 of each frame. The frames themselves are drawn again here, since an episode is fixed by its seed and its moves:
+
+```bash
+hf download OmniJev/PlayJev-data --repo-type dataset --local-dir data
+python -m playjev.rebuild data --pages 16
+```
+
+The rebuild replays every episode in headless Chromium (about two hours at 16 pages), checks the score and the
+clock at each step and counts the frames that match the MD5. On x86-64 Linux all of them do (checked on two clusters). On ARM the states are
+the same and five games match byte for byte, the other five differ by a few grey levels where sprites are scaled.
+`bash scripts/reproduce.sh` then keeps every complete shard and trains on it.
+
+| Round | Played by | Records |
+|---|---|---:|
+| `clone` | the teachers, 2 to 30 percent random moves | 966,744 |
+| `dagger1` | the cloning model, 5 percent random moves | 400,080 |
+| `dagger2` | version 1 | 400,080 |
+| `dagger3` | the replay model version 3 continues from | 400,080 |
+
 ## 📈 More Charts
 
 <picture>
@@ -198,8 +223,8 @@ One step of latency takes the reflex games apart and leaves the slow ones alone 
 
 ```
 games/<id>/        vendored game, pj.json manifest, pj_hook.js, NOTES.md, TEACHER.md
-games/_shared/     pj_shim.js: virtual clock, seeded Math.random, synthetic keys, frame grab
-playjev/           env.py (Playwright driver), collect.py, teachers/, model.py, train_sft.py, play.py, serve.py
+games/_shared/     pj_shim.js: virtual clock, seeded Math.random, synthetic keys, frame grab; fonts/: the only fonts the browser sees
+playjev/           env.py (Playwright driver), collect.py, rebuild.py, teachers/, model.py, train_sft.py, play.py, serve.py
 demo/              the GitHub Pages site; scripts/build_demo.py assembles it from games/ and runs/replays/
 docs/              HARNESS.md (the hook contract), BASELINES.md (the reference scores), DEMO.md
 ```
@@ -230,7 +255,8 @@ The ten games are other people's work, vendored under `games/<id>/` with the aut
 Three of those READMEs say the art is not the author's to license: Mario's sprites are Nintendo's, Floppy
 Bird's come from the original Android game and belong to Dong Nguyen and .GEARS, the Racer's are placeholder
 art from the Mega Drive OutRun. The licence above covers the code each author wrote. Sokoban's Microban levels
-are by David Skinner.
+are by David Skinner. The DejaVu Sans fonts in `games/_shared/fonts/` keep their own licence, in `LICENSE` beside
+them.
 
 The roster ships silent. Every sound and music file was deleted, which costs nothing: the driver already
 aborted every audio request (`playjev/env.py`), the shim forces media elements muted, and Chromium runs with

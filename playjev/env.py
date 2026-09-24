@@ -12,6 +12,7 @@ import base64
 import functools
 import io
 import json
+import os
 import socket
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -23,6 +24,9 @@ from playwright.async_api import async_playwright
 ROOT = Path(__file__).resolve().parents[1]
 GAMES_DIR = ROOT / "games"
 SHIM_JS = (GAMES_DIR / "_shared" / "pj_shim.js").read_text()
+# The browser sees only the fonts in games/_shared/fonts, so text in a frame does not depend on what the machine has
+# installed (breakout asks for arial, which falls back to whatever sans-serif the system prefers).
+FONTS_CONF = GAMES_DIR / "_shared" / "fonts" / "fonts.conf"
 FRAME_LONG_SIDE = 448
 JPEG_QUALITY = 85
 
@@ -124,7 +128,7 @@ class VecGame:
         self.server = GameServer()
         self._pw = await async_playwright().start()
         self.browser = await self._pw.chromium.launch(
-            headless=self.headless,
+            headless=self.headless, env={**os.environ, "FONTCONFIG_FILE": str(FONTS_CONF)},
             args=["--no-sandbox", "--disable-gpu", "--mute-audio", "--disable-dev-shm-usage", "--disable-background-timer-throttling",
                   "--disable-renderer-backgrounding", "--autoplay-policy=no-user-gesture-required"])
         self.contexts = [await self.browser.new_context() for _ in range((self.n + self.ppc - 1) // self.ppc)]
